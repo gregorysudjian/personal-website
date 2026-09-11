@@ -1,0 +1,639 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------ design tokens */
+
+@theme {
+  --color-ink: #0b0c0e;
+  --color-graphite: #16181c;
+  --color-line: #2a2d33;
+  --color-trace: #3a3e46;
+  --color-paper: #edebe6;
+  --color-mute: #8a8f98;
+  --color-copper: #e8823a;
+  --color-copper-glow: #ffb27a;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-serif: var(--font-instrument), "Times New Roman", Georgia, serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+  --gutter: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+/* ------------------------------------------------------------------- base */
+
+html {
+  background: var(--color-ink);
+  color: var(--color-paper);
+  scrollbar-gutter: stable;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html.is-locked {
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-ink);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-copper);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------- utilities */
+
+@utility gutter {
+  padding-inline: var(--gutter);
+}
+
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Copper serif accent used by *starred* words in content/site.ts */
+.accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-copper);
+  letter-spacing: -0.01em;
+  padding-right: 0.04em;
+}
+
+/* ------------------------------------------------------ skip-to-content */
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ---------------------------------------------------- intro / boot states */
+
+/* Elements the intro / scroll reveals animate in start hidden, but only when JS is running. */
+html.js [data-intro],
+html.js [data-reveal] {
+  visibility: hidden;
+}
+
+/* Keep descenders (g, y, p) inside the line masks of revealed headings. */
+[data-reveal="lines"] > div {
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+
+/* The boot overlay only plays once per visit, never without JS or with reduced motion. */
+html:not(.js) .boot,
+html.booted .boot {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-intro],
+  html.js [data-reveal] {
+    visibility: visible;
+  }
+  .boot {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ grain */
+
+.grain {
+  position: fixed;
+  inset: -160px;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.9s steps(5) infinite;
+  will-change: transform;
+}
+
+@keyframes grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-48px, 32px, 0); }
+  40% { transform: translate3d(40px, -56px, 0); }
+  60% { transform: translate3d(-24px, -40px, 0); }
+  80% { transform: translate3d(56px, 24px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .grain {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------- hero circuit */
+
+/* Fade the decorative board at the very top (nav) and softly toward the corners. */
+.hero-circuit-mask {
+  mask-image:
+    linear-gradient(to bottom, transparent 4%, black 16%, black 88%, transparent 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, black 55%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* --------------------------------------------------------- circuit pulses */
+
+.pulse {
+  stroke-dasharray: 60 2000;
+  stroke-dashoffset: 60;
+  animation: pulse var(--dur, 4s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes pulse {
+  to { stroke-dashoffset: -1000; }
+}
+
+[data-paused] .pulse {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* -------------------------------------------------------------- the trace */
+
+.trace-pad {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border: 1px solid var(--color-trace);
+  background: var(--color-ink);
+  transition:
+    background-color 0.5s var(--ease-out-expo),
+    border-color 0.5s var(--ease-out-expo),
+    box-shadow 0.5s var(--ease-out-expo);
+}
+.trace-pad.is-on {
+  background: var(--color-copper);
+  border-color: var(--color-copper-glow);
+  box-shadow: 0 0 14px 2px rgb(232 130 58 / 0.55);
+}
+
+.trace-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 999px;
+  background: #fff4ea;
+  box-shadow:
+    0 0 6px 2px var(--color-copper-glow),
+    0 0 22px 6px rgb(232 130 58 / 0.45);
+  opacity: 0;
+  will-change: transform;
+}
+
+/* Scroll hint: a spark falling down a short wire */
+.hint-wire {
+  position: relative;
+  width: 1px;
+  height: 56px;
+  background: var(--color-line);
+  overflow: hidden;
+}
+.hint-wire::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -40%;
+  width: 1px;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, var(--color-copper));
+  animation: wire 2.2s var(--ease-out-expo) infinite;
+}
+
+@keyframes wire {
+  0% { transform: translateY(0); }
+  70%, 100% { transform: translateY(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-wire::after {
+    animation: none;
+    top: 0;
+    height: 100%;
+  }
+}
+
+/* Live status dot */
+.status-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-copper);
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-copper);
+  animation: ping 2s var(--ease-out-expo) infinite;
+}
+
+@keyframes ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ----------------------------------------------------------------- cursor */
+
+.cursor {
+  display: none;
+}
+html.has-cursor .cursor {
+  display: block;
+}
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+.cursor-ring,
+.cursor-dot,
+.cursor-tag {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 95;
+  pointer-events: none;
+  will-change: transform;
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgb(237 235 230 / 0.35);
+  border-radius: 999px;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-paper);
+}
+.cursor-tag {
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: var(--color-copper);
+  color: var(--color-ink);
+  white-space: nowrap;
+  font-size: 0.62rem;
+  opacity: 0;
+}
+
+/* ------------------------------------------------------ buttons and links */
+
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 3px;
+  transition: background-size 0.6s var(--ease-out-expo);
+}
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+.btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.05rem 1.6rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-paper);
+  transition:
+    color 0.5s var(--ease-out-expo),
+    border-color 0.5s var(--ease-out-expo);
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-paper);
+  transform: translateY(101%);
+  transition: transform 0.6s var(--ease-out-expo);
+}
+.btn:hover,
+.btn:focus-visible {
+  color: var(--color-ink);
+  border-color: var(--color-paper);
+}
+.btn:hover::before,
+.btn:focus-visible::before {
+  transform: translateY(0);
+}
+.btn-primary {
+  background: var(--color-copper);
+  border-color: var(--color-copper);
+  color: var(--color-ink);
+}
+
+/* -------------------------------------------------------- section labels */
+
+.section-index {
+  transition: text-shadow 0.8s var(--ease-out-expo);
+}
+.section-label.is-powered .section-index {
+  text-shadow: 0 0 14px rgb(232 130 58 / 0.85);
+}
+
+/* ------------------------------------------------------------------ about */
+
+.datasheet-glare {
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgb(255 178 122 / 0.13), transparent 45%);
+}
+.chip-core {
+  animation: core 2.6s ease-in-out infinite;
+}
+@keyframes core {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.chip-pins g {
+  animation: pin 2.8s calc(var(--i) * 0.16s) infinite;
+}
+@keyframes pin {
+  0%, 30%, 100% { stroke: var(--color-trace); }
+  8% { stroke: var(--color-copper); }
+}
+
+/* ------------------------------------------------------------------ focus */
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  html.js .focus-frame {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 5rem 0;
+  }
+  html.js .focus-track {
+    flex-direction: row;
+    width: max-content;
+  }
+  html.js .focus-panel {
+    width: min(72vw, 1040px);
+    height: min(54vh, 560px);
+    flex-shrink: 0;
+  }
+  html.js .focus-meter {
+    display: flex;
+  }
+}
+
+.caret {
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* --------------------------------------------------------------- projects */
+
+.typing-dot {
+  animation: typing 1s ease-in-out infinite;
+}
+@keyframes typing {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+
+.radar {
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgb(232 130 58 / 0.16) 40deg, transparent 62deg);
+  animation: spin 4.5s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.lead-row {
+  transition: background-color 0.5s var(--ease-out-expo);
+}
+.lead-row.is-focus {
+  background: rgb(232 130 58 / 0.1);
+}
+
+.scanline {
+  top: 0;
+  background: linear-gradient(to bottom, transparent, rgb(232 130 58 / 0.09), transparent);
+  animation: scan 3.2s linear infinite;
+}
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(600%); }
+}
+
+/* ------------------------------------------------------------- experience */
+
+.xp-row::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: -1px;
+  height: 1px;
+  background: var(--color-copper);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.4s var(--ease-out-expo);
+}
+.xp-row.is-powered::before {
+  transform: scaleX(1);
+}
+.xp-org {
+  color: var(--color-mute);
+  transition:
+    color 0.9s var(--ease-out-expo),
+    transform 0.6s var(--ease-out-expo);
+}
+.xp-dates {
+  transition: color 0.9s var(--ease-out-expo);
+}
+.xp-row.is-powered .xp-org {
+  color: var(--color-paper);
+}
+.xp-row.is-powered .xp-dates {
+  color: var(--color-copper);
+}
+@media (hover: hover) {
+  .xp-row:hover .xp-org {
+    transform: translateX(10px);
+  }
+}
+
+/* ----------------------------------------------------------------- skills */
+
+.marquee-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-mute);
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8rem 1.15rem;
+  border: 1px solid var(--color-line);
+  border-radius: 3px;
+  background: var(--color-graphite);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: rgb(237 235 230 / 0.85);
+  transition:
+    border-color 0.4s var(--ease-out-expo),
+    color 0.4s var(--ease-out-expo),
+    box-shadow 0.4s var(--ease-out-expo);
+}
+.chip::before,
+.chip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 64%;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(to bottom, var(--color-trace) 0 1px, transparent 1px 4px);
+}
+.chip::before {
+  left: -6px;
+}
+.chip::after {
+  right: -6px;
+}
+.chip:hover {
+  border-color: var(--color-copper);
+  color: var(--color-paper);
+  box-shadow: 0 0 26px -6px rgb(232 130 58 / 0.55);
+}
+.chip:hover::before,
+.chip:hover::after {
+  background: repeating-linear-gradient(to bottom, var(--color-copper) 0 1px, transparent 1px 4px);
+}
+
+/* ---------------------------------------------------------------- contact */
+
+.chip-box {
+  transition:
+    border-color 1.2s var(--ease-out-expo),
+    box-shadow 1.4s var(--ease-out-expo);
+}
+.chip-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -1px;
+  border-color: var(--color-mute);
+  transition: border-color 1s var(--ease-out-expo);
+}
+.contact.is-powered .chip-box {
+  border-color: rgb(232 130 58 / 0.55);
+  box-shadow:
+    0 0 0 1px rgb(232 130 58 / 0.12),
+    0 0 90px -12px rgb(232 130 58 / 0.4);
+}
+.contact.is-powered .chip-corner {
+  border-color: var(--color-copper);
+}
+.contact .accent {
+  transition: text-shadow 1.4s var(--ease-out-expo);
+}
+.contact.is-powered .accent {
+  text-shadow: 0 0 34px rgb(232 130 58 / 0.55);
+}
+
+.footer-mark {
+  margin-bottom: -2.4vw;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-trace);
+  transition: -webkit-text-stroke-color 0.8s var(--ease-out-expo);
+}
+.footer-mark:hover {
+  -webkit-text-stroke-color: var(--color-copper);
+}
+
+/* ------------------------------------------------ reduced motion: be still */
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-core,
+  .chip-pins g,
+  .caret,
+  .typing-dot,
+  .radar,
+  .scanline {
+    animation: none;
+  }
+  .typing {
+    display: none;
+  }
+}

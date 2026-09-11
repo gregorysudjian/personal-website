@@ -1,0 +1,134 @@
+"use client";
+
+import { useRef } from "react";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { t, type Locale } from "@/lib/i18n";
+import { focus } from "@/content/site";
+import CircuitTrace from "../CircuitTrace";
+import SectionHeader from "../SectionHeader";
+import { CodeWindow, NeuralNet, RobotArm } from "./Illustrations";
+
+const ART = { robotics: RobotArm, software: CodeWindow, ai: NeuralNet } as const;
+const HORIZONTAL = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
+
+/**
+ * The page pins and the three focus panels slide past sideways (desktop).
+ * The sticky frame + transformed track keeps it smooth; the section's height is set
+ * to exactly the horizontal distance so the scroll feels 1:1.
+ * On phones and with reduced motion the panels simply stack.
+ */
+export default function Focus({ locale }: { locale: Locale }) {
+  const root = useRef<HTMLElement>(null);
+  const frame = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const count = useRef<HTMLSpanElement>(null);
+  const n = focus.items.length;
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(HORIZONTAL, () => {
+        const section = root.current!;
+        const distance = () => Math.max(0, track.current!.scrollWidth - frame.current!.clientWidth);
+        const size = () => {
+          section.style.height = `${distance() + window.innerHeight}px`;
+        };
+        size();
+        ScrollTrigger.addEventListener("refreshInit", size);
+
+        const panels = gsap.utils.toArray<HTMLElement>(".focus-panel", section);
+        const tween = gsap.to(track.current, {
+          x: () => -distance(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: () => `+=${distance()}`,
+            scrub: true,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              gsap.set(bar.current, { scaleX: self.progress });
+              const i = Math.min(n, Math.floor(self.progress * n * 0.999) + 1);
+              if (count.current) count.current.textContent = String(i).padStart(2, "0");
+            },
+          },
+        });
+
+        // Each panel's art drifts slightly against the motion, for depth.
+        panels.forEach((panel) => {
+          gsap.fromTo(
+            panel.querySelector(".focus-art"),
+            { xPercent: 12 },
+            {
+              xPercent: -12,
+              ease: "none",
+              scrollTrigger: { trigger: panel, containerAnimation: tween, start: "left right", end: "right left", scrub: true },
+            },
+          );
+        });
+
+        ScrollTrigger.refresh();
+        return () => {
+          ScrollTrigger.removeEventListener("refreshInit", size);
+          section.style.height = "";
+        };
+      });
+    },
+    { scope: root },
+  );
+
+  return (
+    <section ref={root} id="focus" className="focus relative">
+      <CircuitTrace route="rail" padsAt="[data-pad]" />
+
+      <div ref={frame} className="focus-frame py-28">
+        <div className="gutter flex items-end justify-between gap-10">
+          <SectionHeader index="02" label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
+          <div className="focus-meter hidden shrink-0 items-center gap-4 pb-3" aria-hidden="true">
+            <span className="label-mono text-paper">
+              <span ref={count}>01</span>
+              <span className="text-mute"> / {String(n).padStart(2, "0")}</span>
+            </span>
+            <span className="relative h-px w-28 bg-line">
+              <span ref={bar} className="absolute inset-0 origin-left scale-x-0 bg-copper" />
+            </span>
+          </div>
+        </div>
+
+        <div ref={track} className="focus-track gutter mt-14 flex flex-col gap-6 md:mt-12 md:gap-8">
+          {focus.items.map((item, i) => {
+            const Art = ART[item.id as keyof typeof ART];
+            return (
+              <article
+                key={item.id}
+                data-reveal
+                className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2"
+              >
+                <div className="relative aspect-square overflow-hidden border-b border-line md:aspect-auto md:border-b-0 md:border-r">
+                  <div className="bg-grid absolute inset-0 opacity-30" />
+                  <div className="focus-art absolute inset-0 flex items-center justify-center p-6 md:p-10">
+                    <Art />
+                  </div>
+                </div>
+                <div className="flex flex-col justify-between gap-10 p-8 md:p-12">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm text-copper">0{i + 1}</span>
+                    <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" />
+                  </div>
+                  <div>
+                    <h3 className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.045em] text-paper">
+                      {t(item.title, locale)}
+                    </h3>
+                    <p className="mt-6 max-w-[38ch] text-lg leading-relaxed text-paper/70">{t(item.text, locale)}</p>
+                  </div>
+                  <p className="label-mono text-mute">{t(item.keywords, locale)}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
