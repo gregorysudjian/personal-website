@@ -113,14 +113,13 @@ export default function Nav({ locale }: { locale: Locale }) {
 
           <nav aria-label={locale === "fr" ? "Navigation principale" : "Main navigation"} className="hidden md:block">
             <ul className="flex items-center gap-9">
-              {ui.nav.map((item, i) => (
+              {ui.nav.map((item) => (
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
                     onClick={go(item.id)}
-                    className="label-mono group flex items-center gap-2 text-mute transition-colors duration-300 hover:text-paper"
+                    className="link-underline label-mono text-mute transition-colors duration-300 hover:text-paper"
                   >
-                    <span className="text-copper/70 transition-colors group-hover:text-copper">0{i + 1}</span>
                     {t(item.label, locale)}
                   </a>
                 </li>
@@ -161,10 +160,10 @@ export default function Nav({ locale }: { locale: Locale }) {
       >
         <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_top,black,transparent_70%)]" />
         <ul className="relative flex flex-col gap-2">
-          {ui.nav.map((item, i) => (
+          {ui.nav.map((item) => (
             <li key={item.id} className="overflow-hidden border-b border-line pb-3">
-              <a href={`#${item.id}`} onClick={go(item.id)} className="menu-item flex items-baseline gap-4 text-paper">
-                <span className="label-mono text-copper">0{i + 1}</span>
+              <a href={`#${item.id}`} onClick={go(item.id)} className="menu-item flex items-center gap-4 text-paper">
+                <span className="h-px w-6 bg-copper" aria-hidden="true" />
                 <span className="text-5xl font-medium tracking-tight">{t(item.label, locale)}</span>
               </a>
             </li>

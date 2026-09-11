@@ -26,7 +26,7 @@ export default function Contact({ locale }: { locale: Locale }) {
         <span className="chip-corner bottom-0 right-0 border-b border-r" aria-hidden="true" />
 
         <p data-reveal className="label-mono flex items-center gap-3 text-mute">
-          <span className="text-copper">[06]</span>
+          <span className="h-px w-8 bg-copper" aria-hidden="true" />
           {t(contact.label, locale)}
         </p>
         <h2

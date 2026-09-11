@@ -85,7 +85,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           {t(ui.skipToContent, locale)}
         </a>
         <SmoothScroll />
-        <Boot locale={locale} />
+        <Boot />
         <Nav locale={locale} />
         {children}
         <ScrollProgress />

@@ -394,14 +394,22 @@ html.has-cursor * {
   border-color: var(--color-copper);
   color: var(--color-ink);
 }
+.btn-sm {
+  padding: 0.8rem 1.2rem;
+  font-size: 0.66rem;
+}
 
 /* -------------------------------------------------------- section labels */
 
 .section-index {
-  transition: text-shadow 0.8s var(--ease-out-expo);
+  transform-origin: left;
+  transition:
+    transform 0.9s var(--ease-out-expo),
+    box-shadow 0.9s var(--ease-out-expo);
 }
 .section-label.is-powered .section-index {
-  text-shadow: 0 0 14px rgb(232 130 58 / 0.85);
+  transform: scaleX(1.5);
+  box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
 }
 
 /* ------------------------------------------------------------------ about */

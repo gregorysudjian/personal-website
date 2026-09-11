@@ -18,7 +18,7 @@ export default function About({ locale }: { locale: Locale }) {
         </div>
 
         <div className="md:col-span-6 md:col-start-7">
-          <SectionHeader index="01" label={t(about.label, locale)} heading={t(about.heading, locale)} />
+          <SectionHeader label={t(about.label, locale)} heading={t(about.heading, locale)} />
 
           <p data-reveal className="mt-12 text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5]">
             {t(first, locale)}

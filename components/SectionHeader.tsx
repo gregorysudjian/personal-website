@@ -1,14 +1,12 @@
 import Rich from "./Rich";
 
-/** "[01] About" label + big heading + optional intro. The label gets a pad on the copper rail. */
+/** Section label + big heading + optional intro. The label gets a pad on the copper rail. */
 export default function SectionHeader({
-  index,
   label,
   heading,
   intro,
   className = "",
 }: {
-  index: string;
   label: string;
   heading: string;
   intro?: string;
@@ -17,7 +15,7 @@ export default function SectionHeader({
   return (
     <header className={className}>
       <p data-pad data-reveal className="section-label label-mono flex items-center gap-3 text-mute">
-        <span className="section-index text-copper">[{index}]</span>
+        <span className="section-index h-px w-8 bg-copper" aria-hidden="true" />
         {label}
       </p>
       <h2

@@ -20,8 +20,6 @@ export const person = {
   email: "gregory.sutjian@mail.mcgill.ca",
   // Put your CV in /public/cv/ and keep this path in sync.
   cv: "/cv/Gregory_Sutjian_CV.pdf",
-  // Montreal coordinates, shown in the hero as a technical detail.
-  coordinates: "45.5019° N — 73.5674° W",
   timezone: "America/Toronto", // Montreal time
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/gregorysutjian" },
@@ -58,12 +56,6 @@ export const ui = {
     { id: "experience", label: { en: "Experience", fr: "Parcours" } },
     { id: "contact", label: { en: "Contact", fr: "Contact" } },
   ],
-  boot: [
-    { en: "Initializing", fr: "Initialisation" },
-    { en: "Loading modules", fr: "Chargement des modules" },
-    { en: "Routing signal", fr: "Routage du signal" },
-    { en: "System ready", fr: "Système prêt" },
-  ],
 } satisfies Record<string, unknown>;
 
 /* ------------------------------------------------------------------- hero */
@@ -77,11 +69,10 @@ export const hero = {
     en: "Engineering student in Montreal. I build AI agents, robots and the software that connects them.",
     fr: "Étudiant en ingénierie à Montréal. Je conçois des agents IA, des robots et les logiciels qui les relient.",
   },
-  status: {
-    en: "Now — building 2 AI agents",
-    fr: "En ce moment — 2 agents IA en développement",
-  },
-  scrollHint: { en: "Scroll to power on", fr: "Défilez pour démarrer" },
+  status: { en: "Open to internships", fr: "Ouvert aux stages" },
+  ctaProjects: { en: "View projects", fr: "Voir les projets" },
+  ctaCv: { en: "Download CV", fr: "Télécharger le CV" },
+  scrollHint: { en: "Scroll", fr: "Défiler" },
 };
 
 /* -------------------------------------------------------------- statement */
@@ -189,161 +180,280 @@ export const focus = {
 
 export type Project = {
   slug: string;
+  kicker: Text; // small line above the title, e.g. "AI agent · Claude + WhatsApp"
   title: Text;
   summary: Text;
-  status: "in-progress" | "live";
+  highlights: Text[]; // 2–3 short points shown on the card
+  status: "in-progress" | "ready" | "live";
   year: string;
   role: Text;
   stack: Text[];
-  // Leave these as null until you're ready. The card shows "Details coming soon".
+  // The "How it's built" panel. Use null to hide a part.
   problem: Text | null;
   solution: Text | null;
   how: Text | null;
   // A built-in animated preview ("chat" or "leads"). Set to null when you use media instead.
   preview: "chat" | "leads" | null;
-  // Screenshot or short video, stored in /public/projects/ (shown when preview is null).
-  media: null | { type: "image" | "video"; src: string; alt: Text };
+  // A picture in /public/projects/. "scroll" = a tall full-page screenshot that scrolls on hover.
+  // src can differ per language: { en: "/projects/a-en.webp", fr: "/projects/a-fr.webp" }
+  media: null | { type: "image" | "scroll" | "video"; src: Text; alt: Text };
   links: { label: Text; href: string }[];
+  privateRepo?: boolean; // shows "Private repository" instead of a code link
 };
+
+const soloBuild = { en: "Designed & built solo", fr: "Conçu et développé seul" };
+const viewCode = { en: "View code", fr: "Voir le code" };
 
 export const projects = {
   label: { en: "Projects", fr: "Projets" },
-  heading: { en: "Currently *building*.", fr: "En *développement*." },
+  heading: { en: "Things I've *built*.", fr: "Ce que j'ai *construit*." },
   intro: {
-    en: "Two AI agents are on the workbench right now. Full breakdowns land here as they ship.",
-    fr: "Deux agents IA sont sur l'établi en ce moment. Les détails arriveront ici au fil des lancements.",
+    en: "Four projects I designed and built on my own: two AI agents, the website for my tutoring business, and this site.",
+    fr: "Quatre projets que j'ai conçus et développés seul : deux agents IA, le site de mon entreprise de tutorat et ce site.",
   },
   labels: {
     "in-progress": { en: "In development", fr: "En développement" },
+    ready: { en: "Deploy-ready", fr: "Prêt à déployer" },
     live: { en: "Live", fr: "En ligne" },
     problem: { en: "Problem", fr: "Problème" },
     solution: { en: "Solution", fr: "Solution" },
     how: { en: "How it works", fr: "Fonctionnement" },
     stack: { en: "Stack", fr: "Technologies" },
     role: { en: "Role", fr: "Rôle" },
-    year: { en: "Year", fr: "Année" },
-    comingSoon: { en: "Details coming soon", fr: "Détails à venir" },
     specs: { en: "How it's built", fr: "Sous le capot" },
-    codeSoon: { en: "Code coming soon", fr: "Code bientôt disponible" },
-    preview: { en: "Live preview", fr: "Aperçu" },
-    demo: { en: "Demo preview", fr: "Aperçu démo" },
+    privateRepo: { en: "Private repository", fr: "Dépôt privé" },
+    demo: { en: "Illustrative demo", fr: "Démo illustrative" },
+    cursorDemo: { en: "Live demo", fr: "Démo animée" },
+    cursorScroll: { en: "Hover to scroll", fr: "Survoler pour défiler" },
+    cursorImage: { en: "Preview", fr: "Aperçu" },
   },
   // Text inside the animated previews.
   previews: {
     chat: {
-      header: { en: "Assistant · online", fr: "Assistant · en ligne" },
-      badge: { en: "Auto-reply", fr: "Réponse auto" },
+      header: { en: "Ninja Co · Assistant", fr: "Ninja Co · Assistant" },
+      badge: { en: "AI agent", fr: "Agent IA" },
       messages: [
-        { from: "customer", text: { en: "Hi! Are you open tomorrow?", fr: "Bonjour ! Vous êtes ouverts demain ?" } },
         {
-          from: "agent",
+          from: "customer",
           text: {
-            en: "Hi Sara! Yes, from 9 am to 7 pm. Want me to book you a time?",
-            fr: "Bonjour Sara ! Oui, de 9 h à 19 h. Voulez-vous que je vous réserve un créneau ?",
+            en: "Hi! Do you have robotics classes for a 10 year old?",
+            fr: "Bonjour ! Vous avez des cours de robotique pour un enfant de 10 ans ?",
           },
         },
-        { from: "customer", text: { en: "Yes please, around 3?", fr: "Oui, vers 15 h ?" } },
         {
           from: "agent",
           text: {
-            en: "Done: tomorrow at 3:00 pm. I'll send you a reminder in the morning.",
-            fr: "C'est fait : demain à 15 h. Je vous enverrai un rappel le matin.",
+            en: "Yes! Our robotics class is 60 minutes, Monday to Friday between 8 am and 3 pm. Would you like to book a trial?",
+            fr: "Oui ! Notre cours de robotique dure 60 minutes, du lundi au vendredi entre 8 h et 15 h. Voulez-vous réserver un cours d'essai ?",
+          },
+        },
+        { from: "customer", text: { en: "Tuesday at 10 please", fr: "Mardi à 10 h, s'il vous plaît" } },
+        {
+          from: "agent",
+          text: {
+            en: "Booked: Tuesday at 10:00 for the robotics class. See you then!",
+            fr: "C'est réservé : mardi à 10 h pour le cours de robotique. À bientôt !",
           },
         },
       ] as { from: "customer" | "agent"; text: Text }[],
     },
     leads: {
-      scanning: { en: "Scanning Montreal", fr: "Analyse de Montréal" },
-      leads: { en: "Leads", fr: "Prospects" },
-      building: { en: "Generating site", fr: "Génération du site" },
+      scanning: { en: "Catalog · Montreal", fr: "Catalogue · Montréal" },
+      leads: { en: "Leads · score", fr: "Prospects · score" },
+      building: { en: "Generating demo site", fr: "Génération du site démo" },
       statuses: [
-        { en: "Found", fr: "Trouvé" },
-        { en: "Saved", fr: "Enregistré" },
-        { en: "Site ready", fr: "Site prêt" },
+        { en: "Scored", fr: "Évalué" },
+        { en: "Researched", fr: "Analysé" },
+        { en: "Demo ready", fr: "Démo prête" },
       ],
       businesses: [
-        { en: "Bakery — Rue Bernard", fr: "Boulangerie — rue Bernard" },
-        { en: "Bike shop — Av. du Parc", fr: "Atelier vélo — av. du Parc" },
-        { en: "Florist — Rue Rachel", fr: "Fleuriste — rue Rachel" },
+        { en: "Hair salon — Rue Bernard", fr: "Salon de coiffure — rue Bernard" },
         { en: "Barber — St-Denis", fr: "Barbier — St-Denis" },
+        { en: "Nail studio — Av. du Parc", fr: "Studio d'ongles — av. du Parc" },
+        { en: "Esthetics — Rue Rachel", fr: "Esthétique — rue Rachel" },
       ],
+      scores: [92, 88, 74, 67],
     },
   },
-  /* DEMO PROJECTS — these are placeholders to show off the layout.
-     Send me your real projects and they'll replace these. */
+  /* To add a project, copy one of the blocks below and edit it. */
   items: [
     {
-      slug: "whatsapp-agent",
-      title: { en: "WhatsApp Automation Agent", fr: "Agent d'automatisation WhatsApp" },
+      slug: "whatsapp-ai-agent",
+      kicker: { en: "AI agent · Claude + WhatsApp", fr: "Agent IA · Claude + WhatsApp" },
+      title: { en: "WhatsApp AI Agent", fr: "Agent IA WhatsApp" },
       summary: {
-        en: "An AI agent that handles WhatsApp conversations on its own: replying, following up and taking care of routine requests.",
-        fr: "Un agent IA qui gère seul des conversations WhatsApp : il répond, relance et s'occupe des demandes courantes.",
+        en: "A WhatsApp assistant for small businesses: it answers customers, books appointments and hands the chat to a person when it should. One server runs it for many businesses, each with its own bilingual dashboard.",
+        fr: "Un assistant WhatsApp pour les petites entreprises : il répond aux clients, prend des rendez-vous et passe la conversation à un humain quand il le faut. Un seul serveur le fait tourner pour plusieurs entreprises, chacune avec son propre tableau de bord bilingue.",
       },
-      status: "in-progress",
+      highlights: [
+        {
+          en: "Claude with strict tool calling to check availability, book, reschedule and escalate",
+          fr: "Claude avec des appels d'outils stricts pour vérifier les disponibilités, réserver, déplacer et transférer",
+        },
+        {
+          en: "Multi-business by design: every record scoped to its business, credentials encrypted with AES-256-GCM",
+          fr: "Multi-entreprise dès la conception : chaque donnée liée à son entreprise, identifiants chiffrés en AES-256-GCM",
+        },
+        {
+          en: "Live inbox with human takeover, booking calendar, monthly PDF reports and Quebec Law 25 privacy tools",
+          fr: "Boîte de réception en direct avec reprise par un humain, calendrier des réservations, rapports PDF mensuels et outils de conformité à la Loi 25",
+        },
+      ],
+      status: "ready",
       year: "2026",
-      role: { en: "Solo build", fr: "Projet solo" },
-      stack: ["Claude Code", "WhatsApp", { en: "AI agents", fr: "Agents IA" }],
+      role: soloBuild,
+      stack: ["TypeScript", "Node.js", "Express", "Claude API", "Meta Cloud API", "React", "SQLite"],
       problem: {
-        en: "Small businesses get most of their customer messages on WhatsApp, and every unanswered one is a customer who might not come back.",
-        fr: "Les petites entreprises reçoivent la plupart des messages de leurs clients sur WhatsApp, et chaque message sans réponse est un client qui risque de ne pas revenir.",
+        en: "Small businesses get questions, bookings and reschedules on WhatsApp at all hours. Answering by hand is slow, and a naive chatbot makes up facts or double-books.",
+        fr: "Les petites entreprises reçoivent questions, réservations et changements sur WhatsApp à toute heure. Répondre à la main est lent, et un chatbot naïf invente des informations ou réserve deux fois le même créneau.",
       },
       solution: {
-        en: "An agent that replies in seconds, day or night: it answers common questions, books appointments, follows up, and hands the conversation to a human when it should.",
-        fr: "Un agent qui répond en quelques secondes, jour et nuit : il répond aux questions courantes, prend des rendez-vous, fait les relances et passe la main à un humain quand il le faut.",
+        en: "Claude answers only from the owner's saved settings and from tool results, and books through tools that refuse overlapping slots. The owner follows every conversation from a live inbox and can take over at any moment.",
+        fr: "Claude répond uniquement à partir des paramètres enregistrés par le propriétaire et des résultats de ses outils, et réserve via des outils qui refusent les chevauchements. Le propriétaire suit chaque conversation en direct et peut reprendre la main à tout moment.",
       },
       how: {
-        en: "Each incoming message is read with the business's context. The agent decides whether to reply, act or escalate, and every conversation is logged.",
-        fr: "Chaque message entrant est lu avec le contexte de l'entreprise. L'agent décide s'il faut répondre, agir ou transférer, et chaque conversation est enregistrée.",
+        en: "Meta webhook → signature check → one queue per conversation → Claude picks tools in a capped loop → reply. The business and customer IDs come from the verified webhook, never from the model, so it can't be talked into touching another client's data.",
+        fr: "Webhook Meta → vérification de signature → une file par conversation → Claude choisit ses outils dans une boucle limitée → réponse. Les identifiants de l'entreprise et du client viennent du webhook vérifié, jamais du modèle : impossible de le convaincre d'accéder aux données d'un autre client.",
       },
       preview: "chat",
       media: null,
-      links: [],
+      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/whatsapp-ai-agent" }],
     },
     {
-      slug: "lead-agent",
-      title: { en: "Local Business Lead Agent", fr: "Agent de prospection locale" },
+      slug: "lead-finder",
+      kicker: { en: "AI lead agent", fr: "Agent IA de prospection" },
+      title: "Lead Finder",
       summary: {
-        en: "An AI agent that finds local businesses, stores and tracks their data, then builds each one a personalized website.",
-        fr: "Un agent IA qui repère des commerces locaux, enregistre et suit leurs données, puis crée pour chacun un site web personnalisé.",
+        en: "Finds Montreal hair and beauty businesses that have no website, ranks them with a transparent score, researches each one and drafts a unique bilingual demo site for a person to review.",
+        fr: "Repère les salons de coiffure et d'esthétique montréalais sans site web, les classe avec un score transparent, étudie chacun d'eux et prépare un site démo bilingue unique, à valider par une personne.",
       },
+      highlights: [
+        {
+          en: "2,843 businesses loaded from Overture Maps with DuckDB, ranked by a rule-based 0–100 score (no AI in the ranking)",
+          fr: "2 843 commerces chargés depuis Overture Maps avec DuckDB, classés par un score de 0 à 100 fondé sur des règles (sans IA)",
+        },
+        {
+          en: "Claude writes the analysis and demo copy as schema-validated structured output",
+          fr: "Claude rédige l'analyse et les textes des démos en sortie structurée, validée par un schéma",
+        },
+        {
+          en: "Every demo site gets its own design “genome”: 10 art directions, contrast-tested palettes and 29 typefaces",
+          fr: "Chaque site démo a son propre « génome » de design : 10 directions artistiques, des palettes testées pour le contraste et 29 polices",
+        },
+      ],
       status: "in-progress",
       year: "2026",
-      role: { en: "Solo build", fr: "Projet solo" },
-      stack: ["Claude Code", { en: "Web generation", fr: "Génération web" }, { en: "Data", fr: "Données" }],
+      role: soloBuild,
+      stack: ["Next.js", "TypeScript", "Supabase", "Claude API", "DuckDB", "Vitest"],
       problem: {
-        en: "Plenty of great local businesses still have no website, or one nobody has touched in years, and finding them by hand takes forever.",
-        fr: "Beaucoup de bons commerces locaux n'ont toujours pas de site web, ou un site laissé à l'abandon depuis des années, et les trouver à la main prend un temps fou.",
+        en: "The best prospects for a web designer are small businesses with no website, but they're hard to find and you know almost nothing about them when you reach out.",
+        fr: "Les meilleurs prospects pour un designer web sont les petites entreprises sans site, mais elles sont difficiles à trouver et on sait très peu de choses sur elles au moment de les contacter.",
       },
       solution: {
-        en: "An agent that scouts an area, collects each business's details, tracks them as leads and generates a personalized website draft for each one.",
-        fr: "Un agent qui explore un secteur, collecte les informations de chaque commerce, les suit comme prospects et génère une première version de site personnalisée pour chacun.",
+        en: "A pipeline that finds and scores businesses, reads their public pages for facts, and prepares tailored demo sites and outreach drafts. Nothing is ever sent automatically: a person reviews everything.",
+        fr: "Un outil qui trouve et évalue les commerces, lit leurs pages publiques pour en tirer des faits, et prépare des sites démo et des brouillons de prise de contact sur mesure. Rien n'est envoyé automatiquement : une personne valide tout.",
       },
       how: {
-        en: "Search → enrich → store → build. Each step is a tool the agent can call, so the whole pipeline runs from a single request.",
-        fr: "Recherche → enrichissement → stockage → création. Chaque étape est un outil que l'agent peut appeler : tout le processus part d'une seule requête.",
+        en: "Catalog → lead → homepage research → analysis → demo site → outreach draft. Web research is sandboxed (private addresses blocked, robots.txt honoured, rate-limited) and every external service has a mock, so the whole pipeline runs offline and is covered by about 80 test files.",
+        fr: "Catalogue → prospect → recherche sur le site → analyse → site démo → brouillon de message. La recherche web est encadrée (adresses privées bloquées, robots.txt respecté, débit limité) et chaque service externe a une version simulée : tout tourne hors ligne et est couvert par environ 80 fichiers de tests.",
       },
       preview: "leads",
       media: null,
-      links: [],
+      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/ai-lead-agent" }],
     },
-    /* To add a project, copy one of the blocks above and paste it here.
-       Example of a finished one:
     {
-      slug: "my-robot",
-      title: { en: "Line-Following Robot", fr: "Robot suiveur de ligne" },
-      summary: { en: "...", fr: "..." },
-      status: "live",
-      year: "2027",
-      role: { en: "Team of 3 — software lead", fr: "Équipe de 3 — responsable logiciel" },
-      stack: ["Python", "Arduino"],
-      problem: { en: "...", fr: "..." },
-      solution: { en: "...", fr: "..." },
-      how: { en: "...", fr: "..." },
+      slug: "clarte-math",
+      kicker: { en: "Business website + owner dashboard", fr: "Site d'entreprise + tableau de bord" },
+      title: "Clarté Math",
+      summary: {
+        en: "The bilingual website for my one-on-one math tutoring in Montreal, with a private dashboard where I run the business: requests, clients, lessons and payments.",
+        fr: "Le site bilingue de mon service de tutorat individuel en maths à Montréal, avec un tableau de bord privé pour gérer l'entreprise : demandes, clients, cours et paiements.",
+      },
+      highlights: [
+        {
+          en: "Booking form that validates input, traps bots and notifies me by email",
+          fr: "Formulaire de réservation qui valide les saisies, piège les robots et m'avertit par courriel",
+        },
+        {
+          en: "Owner dashboard: one-click request → client, lesson calendar, payments, notes and Excel export",
+          fr: "Tableau de bord : demande → client en un clic, calendrier des cours, paiements, notes et export Excel",
+        },
+        {
+          en: "No database needed: an atomic, queued JSON store with backups, and an .xlsx exporter written from scratch",
+          fr: "Aucune base de données : un stockage JSON atomique avec file d'attente et sauvegardes, et un export .xlsx écrit de zéro",
+        },
+      ],
+      status: "ready",
+      year: "2026",
+      role: soloBuild,
+      stack: ["Next.js", "React", "TypeScript", "Node.js", "Nodemailer"],
+      problem: {
+        en: "As a solo tutor I needed a professional, bilingual way for families to find me, plus one place to track requests, clients, lessons and payments, without paying for a SaaS tool.",
+        fr: "En tant que tuteur indépendant, j'avais besoin d'une façon professionnelle et bilingue pour que les familles me trouvent, et d'un seul endroit pour suivre demandes, clients, cours et paiements, sans payer un logiciel en ligne.",
+      },
+      solution: {
+        en: "One Next.js app does both: the public site sends requests straight into a private dashboard where I turn them into clients, schedule lessons and track who has paid.",
+        fr: "Une seule application Next.js fait les deux : le site public envoie les demandes directement dans un tableau de bord privé où je les transforme en clients, planifie les cours et suis les paiements.",
+      },
+      how: {
+        en: "Password-protected dashboard with a signed session cookie, timing-safe checks and a rate-limited login. Integration tests boot the real production build to check the auth redirects, a forged cookie, the bot trap and saved requests.",
+        fr: "Tableau de bord protégé par mot de passe avec cookie de session signé, vérifications à temps constant et connexion limitée en tentatives. Des tests d'intégration lancent la vraie version de production pour vérifier les redirections, un cookie falsifié, le piège à robots et l'enregistrement des demandes.",
+      },
       preview: null,
-      media: { type: "image", src: "/projects/my-robot.jpg", alt: { en: "The robot on its track", fr: "Le robot sur sa piste" } },
-      links: [{ label: { en: "View code", fr: "Voir le code" }, href: "https://github.com/..." }],
+      media: {
+        type: "scroll",
+        src: { en: "/projects/clarte-en.webp", fr: "/projects/clarte-fr.webp" },
+        alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
+      },
+      links: [],
+      privateRepo: true,
     },
-    */
+    {
+      slug: "personal-website",
+      kicker: { en: "Personal website", fr: "Site personnel" },
+      title: { en: "This website", fr: "Ce site" },
+      summary: {
+        en: "The site you're on: a scroll-driven story where one copper circuit trace runs from the first screen to the contact section. Designed and built from scratch, in English and French.",
+        fr: "Le site sur lequel vous êtes : une histoire guidée par le défilement, où une piste de cuivre relie le premier écran à la section contact. Conçu et développé de zéro, en anglais et en français.",
+      },
+      highlights: [
+        {
+          en: "The trace is computed from the live page layout and drawn in step with your scroll",
+          fr: "La piste est calculée à partir de la mise en page réelle et se dessine au rythme du défilement",
+        },
+        {
+          en: "A procedurally generated circuit board that lights up when the signal arrives",
+          fr: "Un circuit imprimé généré par programme qui s'allume à l'arrivée du signal",
+        },
+        {
+          en: "Animates only transforms and opacity for smooth motion, with a calm reduced-motion version",
+          fr: "N'anime que les transformations et l'opacité pour des mouvements fluides, avec une version sans animation",
+        },
+      ],
+      status: "ready",
+      year: "2026",
+      role: soloBuild,
+      stack: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Lenis"],
+      problem: {
+        en: "Most student portfolios look alike. I wanted a site that shows how I think as an engineer before anyone reads a word.",
+        fr: "La plupart des portfolios étudiants se ressemblent. Je voulais un site qui montre ma façon de penser en ingénieur avant même qu'on lise un mot.",
+      },
+      solution: {
+        en: "One visual idea, a circuit being powered on, carried through every section, with all the text kept in a single file so it's easy to update.",
+        fr: "Une seule idée visuelle, un circuit qu'on met sous tension, portée à travers chaque section, avec tout le texte réuni dans un seul fichier pour le mettre à jour facilement.",
+      },
+      how: {
+        en: "Next.js App Router with static English and French pages, GSAP ScrollTrigger and SplitText for the motion, Lenis for smooth scrolling, and a generated share image for social links.",
+        fr: "Next.js (App Router) avec des pages statiques en anglais et en français, GSAP ScrollTrigger et SplitText pour les animations, Lenis pour le défilement fluide, et une image d'aperçu générée pour les réseaux sociaux.",
+      },
+      preview: null,
+      media: {
+        type: "image",
+        src: { en: "/projects/website-en.webp", fr: "/projects/website-fr.webp" },
+        alt: { en: "The opening screen of this website", fr: "L'écran d'ouverture de ce site" },
+      },
+      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/personal-website" }],
+    },
   ] satisfies Project[],
 };
 

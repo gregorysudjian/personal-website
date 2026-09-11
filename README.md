@@ -19,19 +19,21 @@ Everything written on the site lives in **`content/site.ts`**, English and Frenc
 - Wrap a word in `*stars*` to make it copper italic: `"Let's build *something*."`
 - Don't delete the commas, quotes or brackets around the text.
 
-## Replace the demo projects
+## Edit or add projects
 
 In `content/site.ts`, find `projects` → `items`. Each project is one `{ ... }` block:
 
 | Field | What it is |
 |---|---|
-| `title`, `summary` | Name and one-line description |
-| `status` | `"in-progress"` or `"live"` |
+| `kicker`, `title`, `summary` | Small line above the title, the name, and a short description |
+| `highlights` | 2–3 short points shown on the card |
+| `status` | `"in-progress"`, `"ready"` (deploy-ready) or `"live"` |
 | `year`, `role`, `stack` | Shown in the details list |
 | `problem`, `solution`, `how` | The "How it's built" panel (use `null` to hide) |
 | `preview` | `"chat"` or `"leads"` for the built-in animated demos, otherwise `null` |
-| `media` | A screenshot or video: put the file in `public/projects/` and set `{ type: "image", src: "/projects/my-file.jpg", alt: { en: "...", fr: "..." } }` |
+| `media` | A picture in `public/projects/`: `{ type: "image", src: "/projects/my-file.webp", alt: { en: "...", fr: "..." } }`. Use `type: "scroll"` for a tall full-page screenshot that scrolls on hover. `src` can be one file, or `{ en: "...", fr: "..." }` |
 | `links` | `[{ label: { en: "View code", fr: "Voir le code" }, href: "https://github.com/..." }]` |
+| `privateRepo` | `true` shows "Private repository" instead of a code link |
 
 ## Add your photo
 

@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { gsap, SplitText, useGSAP, FULL_MOTION, FINE_POINTER, REDUCED_MOTION } from "@/lib/gsap";
-import { introReady } from "@/lib/scroll";
+import { introReady, scrollToTarget } from "@/lib/scroll";
 import { t, type Locale } from "@/lib/i18n";
-import { hero, person, focus } from "@/content/site";
+import { hero, person } from "@/content/site";
 import CircuitTrace from "../CircuitTrace";
 import HeroCircuit from "./HeroCircuit";
 
@@ -93,7 +93,7 @@ export default function Hero({ locale }: { locale: Locale }) {
           s.to(lines[li], { yPercent: li === 0 ? -55 : 55, ease: "power2.in", duration: 0.75 }, 0);
         });
 
-        s.to(q(".hero-hud-scroll"), { autoAlpha: 0, y: -28, duration: 0.15 }, 0)
+        s.to(q(".hero-hud-scroll, .hero-eyebrow"), { autoAlpha: 0, y: -28, duration: 0.15 }, 0)
           .to(q(".hero-name-scroll"), { scale: small ? 1.35 : 1.55, ease: "power2.in", duration: 0.75 }, 0)
           .to(q(".hero-name-scroll"), { autoAlpha: 0, duration: 0.32 }, 0.4)
           .to(q(".hero-circuit-scroll"), { scale: small ? 1.45 : 1.7, duration: 1 }, 0)
@@ -145,7 +145,10 @@ export default function Hero({ locale }: { locale: Locale }) {
     { scope: root },
   );
 
-  const focusItems = focus.items.map((item) => t(item.title, locale));
+  const toProjects = (e: React.MouseEvent) => {
+    e.preventDefault();
+    scrollToTarget("#projects");
+  };
 
   return (
     <section ref={root} id="top" className="relative h-[170vh] md:h-[190vh]">
@@ -165,7 +168,7 @@ export default function Hero({ locale }: { locale: Locale }) {
           <div className="hero-floor-mouse absolute inset-0">
             <div
               data-intro
-              className="hero-floor absolute inset-0 [perspective:640px] [perspective-origin:50%_58%] [mask-image:linear-gradient(to_bottom,transparent_58%,rgb(0_0_0/0.55)_74%,black_100%)]"
+              className="hero-floor absolute inset-0 [perspective:640px] [perspective-origin:50%_58%] [mask-image:linear-gradient(to_bottom,transparent_58%,rgb(0_0_0/0.6)_72%,rgb(0_0_0/0.3)_100%)]"
             >
               <div className="bg-grid absolute -left-[80%] -right-[80%] top-[58%] h-[600px] origin-top [transform:rotateX(78deg)]" />
             </div>
@@ -175,15 +178,22 @@ export default function Hero({ locale }: { locale: Locale }) {
         {/* Layer 2 — circuit traces */}
         <div ref={circuit} className="hero-circuit-scroll pointer-events-none absolute inset-0">
           <div className="hero-circuit-mouse absolute inset-[-3%]">
-            <div data-intro className="hero-circuit-mask absolute inset-0">
+            <div data-intro className="hero-circuit-mask absolute inset-0 opacity-75">
               <HeroCircuit />
             </div>
           </div>
         </div>
 
-        {/* Layer 3 — the name */}
+        {/* Layer 3 — the name, with one quiet line above it */}
         <div className="hero-name-scroll absolute inset-0 flex items-center">
           <div className="hero-name-mouse gutter w-full">
+            {/* wrapper fades on scroll; inner line is revealed by the intro (never both on one element) */}
+            <div className="hero-eyebrow mb-6 md:mb-9">
+              <p data-intro className="hero-hud label-mono flex items-center gap-3 leading-[1.6] text-mute">
+                <span className="h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
+                {t(hero.eyebrow, locale)}
+              </p>
+            </div>
             <h1
               data-intro
               aria-label={person.name}
@@ -195,39 +205,29 @@ export default function Hero({ locale }: { locale: Locale }) {
               <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em] text-right">
                 {person.lastName}
               </span>
-              <span data-intro className="hero-hud label-mono absolute bottom-[14%] left-0 hidden gap-3 font-normal text-mute lg:flex">
-                <span className="mt-px h-2 w-2 shrink-0 bg-copper" aria-hidden="true" />
-                <span className="flex flex-col gap-2">
-                  {focusItems.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
-                </span>
-              </span>
             </h1>
           </div>
         </div>
 
-        {/* Layer 4 — HUD */}
-        <div className="hero-hud-scroll gutter pointer-events-none absolute inset-0 flex flex-col justify-between pb-8 pt-24 md:pb-10 md:pt-32">
-          <div className="flex items-start justify-between gap-6">
-            <p data-intro className="hero-hud label-mono flex items-start gap-3 leading-[1.6] text-mute">
-              <span className="text-copper">[00]</span>
-              {t(hero.eyebrow, locale)}
-            </p>
-            <p data-intro className="hero-hud label-mono hidden text-mute md:block">
-              {person.coordinates}
-            </p>
-          </div>
-
-          <div className="grid items-end gap-6 md:grid-cols-3">
-            <p data-intro className="hero-hud max-w-[34ch] text-base leading-relaxed text-paper/80 md:text-lg">
-              {t(hero.tagline, locale)}
-            </p>
+        {/* Layer 4 — bottom row: who, what next, status */}
+        <div className="hero-hud-scroll gutter pointer-events-none absolute inset-x-0 bottom-0 pb-8 md:pb-10">
+          <div className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr]">
+            <div data-intro className="hero-hud pointer-events-auto">
+              <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg">{t(hero.tagline, locale)}</p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <a href="#projects" onClick={toProjects} className="btn btn-primary btn-sm">
+                  {t(hero.ctaProjects, locale)} <span aria-hidden="true">↓</span>
+                </a>
+                <a href={person.cv} download className="btn btn-sm">
+                  {t(hero.ctaCv, locale)}
+                </a>
+              </div>
+            </div>
             <div data-intro className="hero-hud hidden flex-col items-center gap-3 md:flex" aria-hidden="true">
               <span className="label-mono text-mute">{t(hero.scrollHint, locale)}</span>
               <span className="hint-wire" />
             </div>
-            <p data-intro className="hero-hud label-mono flex items-center gap-3 text-paper/80 md:justify-end">
+            <p data-intro className="hero-hud label-mono flex items-center gap-3 text-paper/80 md:justify-end md:pb-3">
               <span className="status-dot" aria-hidden="true" />
               {t(hero.status, locale)}
             </p>

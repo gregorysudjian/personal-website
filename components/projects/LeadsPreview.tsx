@@ -84,8 +84,9 @@ export default function LeadsPreview({ locale }: { locale: Locale }) {
           <p className="label-mono border-b border-line px-3 py-2 text-[0.58rem] text-mute">{t(L.leads, locale)}</p>
           <ul>
             {L.businesses.map((b, i) => (
-              <li key={i} className="lead-row flex items-center justify-between gap-3 border-b border-line/60 px-3 py-[0.42rem]">
-                <span className="truncate text-paper/85">{t(b, locale)}</span>
+              <li key={i} className="lead-row flex items-center gap-3 border-b border-line/60 px-3 py-[0.42rem]">
+                <span className="w-6 shrink-0 font-mono text-[11px] text-copper">{L.scores[i]}</span>
+                <span className="min-w-0 flex-1 truncate text-paper/85">{t(b, locale)}</span>
                 <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider">
                   {L.statuses.map((s, k) => (
                     <span key={k} className={`st ${k === 2 ? "text-copper" : k === 1 ? "text-paper/70" : "text-mute"}`} style={k ? { display: "none" } : undefined}>
@@ -111,10 +112,9 @@ export default function LeadsPreview({ locale }: { locale: Locale }) {
         <div className="flex flex-1 flex-col gap-2 p-3">
           <div className="site-block flex items-center justify-between rounded-sm border border-line px-2 py-1.5">
             <span className="h-1.5 w-8 rounded-full bg-paper/60" />
-            <span className="flex gap-1">
-              <span className="h-1 w-4 rounded-full bg-line" />
-              <span className="h-1 w-4 rounded-full bg-line" />
-              <span className="h-1 w-4 rounded-full bg-line" />
+            <span className="flex items-center gap-1 font-mono text-[8px] tracking-wider">
+              <span className="rounded-sm bg-paper/80 px-1 text-ink">FR</span>
+              <span className="text-mute">EN</span>
             </span>
           </div>
           <div className="site-block rounded-sm border border-copper/30 bg-copper/10 px-3 py-4">

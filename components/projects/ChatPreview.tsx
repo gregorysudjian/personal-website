@@ -7,12 +7,12 @@ import { t, type Locale } from "@/lib/i18n";
 import { projects } from "@/content/site";
 import Mark from "../Mark";
 
-/* What the agent "thinks" after each message, shown in the side log. */
+/* What the agent does after each message, shown in the side log (real tool names from the project). */
 const LOG: string[][] = [
-  ["intent → opening_hours"],
-  ["reply → hours + offer_booking"],
-  ["intent → book(tomorrow, 15:00)"],
-  ["calendar.book ✓", "reminder.schedule(09:00) ✓"],
+  ["webhook signature ✓", "get_business_info()"],
+  ["reply sent"],
+  ["check_availability(tue 10:00)", "create_booking(robotics)"],
+  ["booking saved ✓"],
 ];
 
 /** Demo: a customer chats with the WhatsApp agent, which answers and books a slot. */

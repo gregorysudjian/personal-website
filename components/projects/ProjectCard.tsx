@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
+import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
 import { projects, type Project } from "@/content/site";
 import ChatPreview from "./ChatPreview";
 import LeadsPreview from "./LeadsPreview";
 
-const TILT = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+const HOVER = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+const TOUCH = "(hover: none) and (prefers-reduced-motion: no-preference)";
 const L = projects.labels;
 
 export default function ProjectCard({ project, index, locale }: { project: Project; index: number; locale: Locale }) {
@@ -19,32 +21,57 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   const specsId = useId();
   const flip = index % 2 === 1;
   const hasSpecs = Boolean(project.problem || project.solution || project.how);
+  const media = project.media;
 
-  // Tilt the preview window toward the cursor.
+  const cursorLabel = project.preview
+    ? t(L.cursorDemo, locale)
+    : media?.type === "scroll"
+      ? t(L.cursorScroll, locale)
+      : t(L.cursorImage, locale);
+
   useGSAP(
     () => {
+      const f = frame.current!;
+      const host = f.parentElement!;
+      const shot = f.querySelector<HTMLElement>(".scroll-shot");
+      const view = shot?.parentElement;
+      const distance = () => (shot && view ? Math.max(0, shot.offsetHeight - view.clientHeight) : 0);
       const mm = gsap.matchMedia();
-      mm.add(TILT, () => {
-        const f = frame.current!;
-        const host = f.parentElement!;
+
+      // Desktop: tilt toward the cursor; a full-page screenshot scrolls while hovered.
+      mm.add(HOVER, () => {
         gsap.set(f, { transformPerspective: 1400 });
         const rx = gsap.quickTo(f, "rotationX", { duration: 1, ease: "power3" });
         const ry = gsap.quickTo(f, "rotationY", { duration: 1, ease: "power3" });
         const move = (e: PointerEvent) => {
           const r = host.getBoundingClientRect();
-          ry(((e.clientX - r.left) / r.width - 0.5) * 7);
-          rx(-((e.clientY - r.top) / r.height - 0.5) * 6);
+          ry(((e.clientX - r.left) / r.width - 0.5) * 6);
+          rx(-((e.clientY - r.top) / r.height - 0.5) * 5);
+        };
+        const enter = () => {
+          if (shot) gsap.to(shot, { y: -distance(), duration: Math.max(2, distance() / 420), ease: "power1.inOut", overwrite: true });
         };
         const leave = () => {
           rx(0);
           ry(0);
+          if (shot) gsap.to(shot, { y: 0, duration: 1.2, ease: "power3.out", overwrite: true });
         };
         host.addEventListener("pointermove", move);
+        host.addEventListener("pointerenter", enter);
         host.addEventListener("pointerleave", leave);
         return () => {
           host.removeEventListener("pointermove", move);
+          host.removeEventListener("pointerenter", enter);
           host.removeEventListener("pointerleave", leave);
         };
+      });
+
+      // Touch screens: the screenshot scrolls down and back on its own while visible.
+      mm.add(TOUCH, () => {
+        if (!shot) return;
+        const tl = gsap.timeline({ repeat: -1, yoyo: true, repeatDelay: 1.2, paused: true, delay: 1 });
+        tl.to(shot, { y: () => -distance(), duration: () => Math.max(4, distance() / 260), ease: "power1.inOut" });
+        return playWhenVisible(f, tl, 0.4);
       });
     },
     { scope: root },
@@ -54,7 +81,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
     const el = specs.current!;
     const next = !open;
     setOpen(next);
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(REDUCED_MOTION).matches;
     gsap.to(el, { height: next ? "auto" : 0, duration: reduce ? 0 : 0.8, ease: "expo.inOut" });
     gsap.fromTo(
       el.querySelectorAll(".spec"),
@@ -64,10 +91,10 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   };
 
   return (
-    <article ref={root} className="project grid items-center gap-10 md:grid-cols-12 md:gap-12">
-      {/* preview window */}
-      <div className={`md:col-span-7 ${flip ? "md:order-2 md:col-start-6" : ""}`}>
-        <div data-reveal="clip" data-cursor={t(project.preview ? L.preview : L.comingSoon, locale)}>
+    <article ref={root} className="project grid items-start gap-10 md:grid-cols-12 md:gap-12">
+      {/* preview window (stays in view while the details scroll past) */}
+      <div className={`md:sticky md:top-28 md:col-span-7 ${flip ? "md:order-2 md:col-start-6" : ""}`}>
+        <div data-reveal="clip" data-cursor={cursorLabel}>
           <div
             ref={frame}
             className="overflow-hidden rounded-[8px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
@@ -76,7 +103,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
-              <span className="label-mono ml-3 truncate text-[0.62rem] text-mute">{project.slug}.preview</span>
+              <span className="label-mono ml-3 truncate text-[0.62rem] text-mute">{project.slug}</span>
               {project.preview && (
                 <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">{t(L.demo, locale)}</span>
               )}
@@ -84,19 +111,29 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             <div className="relative aspect-[16/11] overflow-hidden bg-ink [contain:layout_paint]">
               {project.preview === "chat" && <ChatPreview locale={locale} />}
               {project.preview === "leads" && <LeadsPreview locale={locale} />}
-              {!project.preview && project.media?.type === "image" && (
+              {!project.preview && media?.type === "image" && (
                 <Image
-                  src={project.media.src}
-                  alt={t(project.media.alt, locale)}
+                  src={t(media.src, locale)}
+                  alt={t(media.alt, locale)}
                   fill
                   sizes="(min-width: 768px) 58vw, 92vw"
-                  className="object-cover"
+                  className="object-cover object-top"
                 />
               )}
-              {!project.preview && project.media?.type === "video" && (
+              {!project.preview && media?.type === "scroll" && (
+                // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
+                <img
+                  src={t(media.src, locale)}
+                  alt={t(media.alt, locale)}
+                  loading="lazy"
+                  decoding="async"
+                  className="scroll-shot absolute inset-x-0 top-0 w-full will-change-transform"
+                />
+              )}
+              {!project.preview && media?.type === "video" && (
                 <video
-                  src={project.media.src}
-                  aria-label={t(project.media.alt, locale)}
+                  src={t(media.src, locale)}
+                  aria-label={t(media.alt, locale)}
                   className="absolute inset-0 h-full w-full object-cover"
                   autoPlay
                   muted
@@ -105,7 +142,6 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                   preload="none"
                 />
               )}
-              {!project.preview && !project.media && <ComingSoon label={t(L.comingSoon, locale)} />}
             </div>
           </div>
         </div>
@@ -114,26 +150,34 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
       {/* details */}
       <div className={`md:col-span-5 ${flip ? "md:order-1 md:col-start-1" : ""}`}>
         <div data-reveal="stagger">
-          <div className="flex items-center gap-4">
-            <span className="font-mono text-sm text-mute">0{index + 1}</span>
+          <div className="flex flex-wrap items-center gap-3">
             <span
               className={`label-mono flex items-center gap-2 rounded-full border px-3 py-1.5 text-[0.62rem] ${
-                project.status === "live" ? "border-paper/30 text-paper" : "border-copper/40 text-copper"
+                project.status === "in-progress" ? "border-copper/40 text-copper" : "border-paper/25 text-paper/85"
               }`}
             >
               <span className="status-dot" aria-hidden="true" />
               {t(L[project.status], locale)}
             </span>
+            <span className="label-mono text-mute">{project.year}</span>
           </div>
 
-          <h3 className="mt-6 text-[clamp(2rem,3.4vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.035em] text-paper">
+          <p className="label-mono mt-7 text-copper/90">{t(project.kicker, locale)}</p>
+          <h3 className="mt-3 text-[clamp(2rem,3.4vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.035em] text-paper">
             {t(project.title, locale)}
           </h3>
           <p className="mt-5 text-lg leading-relaxed text-paper/70">{t(project.summary, locale)}</p>
 
+          <ul className="mt-7 flex flex-col gap-3">
+            {project.highlights.map((h) => (
+              <li key={t(h, locale)} className="flex gap-3 leading-relaxed text-paper/85">
+                <span className="mt-[0.7em] h-px w-3 shrink-0 bg-copper" aria-hidden="true" />
+                {t(h, locale)}
+              </li>
+            ))}
+          </ul>
+
           <dl className="mt-8 grid grid-cols-[auto_1fr] gap-x-8 gap-y-4 border-t border-line pt-6">
-            <dt className="label-mono pt-1 text-mute">{t(L.year, locale)}</dt>
-            <dd className="text-paper">{project.year}</dd>
             <dt className="label-mono pt-1 text-mute">{t(L.role, locale)}</dt>
             <dd className="text-paper">{t(project.role, locale)}</dd>
             <dt className="label-mono pt-1.5 text-mute">{t(L.stack, locale)}</dt>
@@ -178,35 +222,24 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap items-center gap-6">
-            {project.links.length ? (
-              project.links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="link-underline label-mono text-paper"
-                >
-                  {t(link.label, locale)} ↗
-                </a>
-              ))
-            ) : (
-              <span className="label-mono text-mute">{t(L.codeSoon, locale)}</span>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            {project.links.map((link) => (
+              <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="btn btn-sm">
+                {t(link.label, locale)} <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+            {project.privateRepo && (
+              <span className="label-mono flex items-center gap-2 text-mute">
+                <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                  <rect x="3" y="7" width="10" height="7" rx="1" />
+                  <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+                </svg>
+                {t(L.privateRepo, locale)}
+              </span>
             )}
           </div>
         </div>
       </div>
     </article>
-  );
-}
-
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className="absolute inset-0 grid place-items-center">
-      <div className="bg-grid absolute inset-0 opacity-40" />
-      <div className="scanline absolute inset-x-0 h-24" />
-      <p className="label-mono relative text-mute">{label}</p>
-    </div>
   );
 }

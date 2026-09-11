@@ -10,7 +10,7 @@ export default function Experience({ locale }: { locale: Locale }) {
   return (
     <section id="experience" className="relative gutter py-32 md:py-48">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
-      <SectionHeader index="04" label={t(experience.label, locale)} heading={t(experience.heading, locale)} />
+      <SectionHeader label={t(experience.label, locale)} heading={t(experience.heading, locale)} />
 
       <div className="mt-20 flex flex-col gap-20 md:mt-28 md:gap-28">
         <Group title={t(experience.workLabel, locale)} items={experience.work} locale={locale} />

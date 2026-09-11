@@ -84,7 +84,7 @@ export default function Focus({ locale }: { locale: Locale }) {
 
       <div ref={frame} className="focus-frame py-28">
         <div className="gutter flex items-end justify-between gap-10">
-          <SectionHeader index="02" label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
+          <SectionHeader label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
           <div className="focus-meter hidden shrink-0 items-center gap-4 pb-3" aria-hidden="true">
             <span className="label-mono text-paper">
               <span ref={count}>01</span>

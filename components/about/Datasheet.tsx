@@ -74,8 +74,6 @@ export default function Datasheet({ locale }: { locale: Locale }) {
           ) : (
             <Chip />
           )}
-          <span className="label-mono absolute bottom-3 left-4 text-[0.6rem] text-mute">FIG. 1</span>
-          <span className="label-mono absolute bottom-3 right-4 text-[0.6rem] text-mute">1:1</span>
         </div>
 
         <dl className="relative divide-y divide-line">

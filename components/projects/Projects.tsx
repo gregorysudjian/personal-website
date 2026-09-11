@@ -9,7 +9,6 @@ export default function Projects({ locale }: { locale: Locale }) {
     <section id="projects" className="relative gutter py-32 md:py-48">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
       <SectionHeader
-        index="03"
         label={t(projects.label, locale)}
         heading={t(projects.heading, locale)}
         intro={t(projects.intro, locale)}
