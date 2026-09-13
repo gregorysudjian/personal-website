@@ -6,6 +6,7 @@ import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
 import { projects, type Project } from "@/content/site";
+import ChatPreview from "./ChatPreview";
 import Slides from "./Slides";
 
 const HOVER = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
@@ -22,8 +23,9 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   const hasSpecs = Boolean(project.problem || project.solution || project.how);
   const media = project.media;
 
-  const cursorLabel =
-    media?.type === "scroll"
+  const cursorLabel = project.preview
+    ? t(L.cursorDemo, locale)
+    : media?.type === "scroll"
       ? t(L.cursorScroll, locale)
       : media?.type === "slides"
         ? t(L.cursorSlides, locale)
@@ -104,11 +106,14 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="label-mono ml-3 truncate text-[0.62rem] text-mute">{project.slug}</span>
-              {media?.type === "slides" && (
-                <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">{t(L.slidesBadge, locale)}</span>
+              {(project.preview || media?.type === "slides") && (
+                <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">
+                  {t(project.preview ? L.demo : L.slidesBadge, locale)}
+                </span>
               )}
             </div>
             <div className="relative aspect-[16/11] overflow-hidden bg-ink [contain:layout_paint]">
+              {project.preview === "chat" && <ChatPreview locale={locale} />}
               {media?.type === "slides" && <Slides slides={media.slides} locale={locale} />}
               {media?.type === "image" && (
                 <Image

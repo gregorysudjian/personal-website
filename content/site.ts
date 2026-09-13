@@ -99,8 +99,8 @@ export const about = {
       fr: "Avant l'université, j'ai passé beaucoup de temps à enseigner : les bases du code avec des kits LEGO WeDo et SPIKE à des enfants chez NinjaCO, puis les maths à des élèves à Beyrouth et à Montréal. Expliquer simplement une idée difficile reste la meilleure façon que je connaisse de la comprendre moi-même.",
     },
     {
-      en: "Lately I've been building projects with AI tools like Claude Code: an AI lead agent, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
-      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : un agent IA de prospection, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
+      en: "Lately I've been building projects with AI tools like Claude Code: two AI agents, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
+      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : deux agents IA, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
     },
   ],
   facts: [
@@ -181,7 +181,7 @@ export type Project = {
   title: Text;
   summary: Text;
   highlights: Text[]; // 2–3 short points shown on the card
-  status: "in-progress" | "ready" | "live";
+  status: "in-progress" | "prototype" | "ready" | "live";
   year: string;
   role: Text;
   stack: Text[];
@@ -189,6 +189,8 @@ export type Project = {
   problem: Text | null;
   solution: Text | null;
   how: Text | null;
+  // A built-in animated demo instead of pictures ("chat" = the WhatsApp conversation).
+  preview?: "chat";
   // Pictures in /public/projects/.
   //  - "image": one screenshot            - "scroll": a tall full-page screenshot that scrolls on hover
   //  - "slides": a few screens that step through how it works, each with a short label and caption
@@ -222,8 +224,8 @@ export const projects = {
   label: { en: "Projects", fr: "Projets" },
   heading: { en: "Things I've *built*.", fr: "Ce que j'ai *construit*." },
   intro: {
-    en: "Three projects I've built with AI tools like Claude Code: an AI lead agent, the website for my math tutoring, and this site.",
-    fr: "Trois projets que j'ai développés avec des outils d'IA comme Claude Code : un agent IA de prospection, le site de mon tutorat en maths et ce site.",
+    en: "Four projects I've built with AI tools like Claude Code: two AI agents, the website for my math tutoring, and this site.",
+    fr: "Quatre projets que j'ai développés avec des outils d'IA comme Claude Code : deux agents IA, le site de mon tutorat en maths et ce site.",
   },
   labels: {
     "in-progress": { en: "In development", fr: "En développement" },
@@ -240,6 +242,28 @@ export const projects = {
     cursorImage: { en: "Preview", fr: "Aperçu" },
     cursorSlides: { en: "Real screens", fr: "Vrais écrans" },
     slidesBadge: { en: "Real app screens", fr: "Écrans réels" },
+    prototype: { en: "Prototype", fr: "Prototype" },
+    demo: { en: "Illustrative demo", fr: "Démo illustrative" },
+    cursorDemo: { en: "Live demo", fr: "Démo animée" },
+  },
+  // Text inside the animated WhatsApp demo (a made-up business and customer).
+  previews: {
+    chat: {
+      header: { en: "Demo business · Assistant", fr: "Commerce démo · Assistant" },
+      badge: { en: "AI agent", fr: "Agent IA" },
+      messages: [
+        { from: "customer", text: { en: "Hi! Can I book a haircut this week?", fr: "Bonjour ! Je peux réserver une coupe cette semaine ?" } },
+        {
+          from: "agent",
+          text: {
+            en: "Hi! Sure. I have Tuesday at 10:00 or Thursday at 3:30. Which works better for you?",
+            fr: "Bonjour ! Bien sûr. J'ai mardi à 10 h ou jeudi à 15 h 30. Qu'est-ce qui vous convient le mieux ?",
+          },
+        },
+        { from: "customer", text: { en: "Tuesday at 10 please", fr: "Mardi à 10 h, s'il vous plaît" } },
+        { from: "agent", text: { en: "Booked: Tuesday at 10:00. See you then!", fr: "C'est réservé : mardi à 10 h. À bientôt !" } },
+      ] as { from: "customer" | "agent"; text: Text }[],
+    },
   },
   /* To add a project, copy one of the blocks below and edit it. */
   items: [
@@ -323,6 +347,48 @@ export const projects = {
       ],
     },
     {
+      slug: "whatsapp-ai-agent",
+      kicker: { en: "Personal project · AI agent", fr: "Projet personnel · Agent IA" },
+      title: { en: "WhatsApp AI Agent", fr: "Agent IA WhatsApp" },
+      summary: {
+        en: "A WhatsApp assistant for small businesses: it answers customers, books appointments and hands the chat to a person when it should. One server can run it for several businesses, each with its own bilingual dashboard.",
+        fr: "Un assistant WhatsApp pour les petites entreprises : il répond aux clients, prend des rendez-vous et passe la conversation à un humain quand il le faut. Un seul serveur peut le faire tourner pour plusieurs entreprises, chacune avec son propre tableau de bord bilingue.",
+      },
+      highlights: [
+        {
+          en: "Claude with strict tool calling to check availability, book, reschedule and escalate",
+          fr: "Claude avec des appels d'outils stricts pour vérifier les disponibilités, réserver, déplacer et transférer",
+        },
+        {
+          en: "Multi-business by design: every record scoped to its business, credentials encrypted with AES-256-GCM",
+          fr: "Multi-entreprise dès la conception : chaque donnée liée à son entreprise, identifiants chiffrés en AES-256-GCM",
+        },
+        {
+          en: "Live inbox with human takeover, booking calendar, monthly PDF reports and Quebec Law 25 privacy tools",
+          fr: "Boîte de réception en direct avec reprise par un humain, calendrier des réservations, rapports PDF mensuels et outils de conformité à la Loi 25",
+        },
+      ],
+      status: "prototype",
+      year: "2026",
+      role: soloBuild,
+      stack: ["TypeScript", "Node.js", "Express", "Claude API", "Meta Cloud API", "React", "SQLite"],
+      problem: {
+        en: "Small businesses get questions, bookings and reschedules on WhatsApp at all hours. Answering by hand is slow, and a naive chatbot makes up facts or double-books.",
+        fr: "Les petites entreprises reçoivent questions, réservations et changements sur WhatsApp à toute heure. Répondre à la main est lent, et un chatbot naïf invente des informations ou réserve deux fois le même créneau.",
+      },
+      solution: {
+        en: "Claude answers only from the owner's saved settings and from tool results, and books through tools that refuse overlapping slots. The owner follows every conversation from a live inbox and can take over at any moment.",
+        fr: "Claude répond uniquement à partir des paramètres enregistrés par le propriétaire et des résultats de ses outils, et réserve via des outils qui refusent les chevauchements. Le propriétaire suit chaque conversation en direct et peut reprendre la main à tout moment.",
+      },
+      how: {
+        en: "Meta webhook → signature check → one queue per conversation → Claude picks tools in a capped loop → reply. The business and customer IDs come from the verified webhook, never from the model, so it can't be talked into touching another client's data.",
+        fr: "Webhook Meta → vérification de signature → une file par conversation → Claude choisit ses outils dans une boucle limitée → réponse. Les identifiants de l'entreprise et du client viennent du webhook vérifié, jamais du modèle : impossible de le convaincre d'accéder aux données d'un autre client.",
+      },
+      preview: "chat",
+      media: null,
+      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/whatsapp-ai-agent" }],
+    },
+    {
       slug: "clarte-math",
       kicker: { en: "Business website + owner dashboard", fr: "Site d'entreprise + tableau de bord" },
       title: "Clarté Math",
@@ -389,8 +455,10 @@ export const projects = {
           },
         ],
       },
-      links: [{ label: viewSite, href: "https://clarte-math.vercel.app" }],
-      privateRepo: true,
+      links: [
+        { label: viewSite, href: "https://clarte-math.vercel.app" },
+        { label: viewCode, href: "https://github.com/gregorysudjian-ui/clarte-math" },
+      ],
     },
     {
       slug: "personal-website",
