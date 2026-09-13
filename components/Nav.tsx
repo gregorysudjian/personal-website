@@ -106,7 +106,7 @@ export default function Nav({ locale }: { locale: Locale }) {
       <header ref={header} data-intro className="fixed inset-x-0 top-0 z-50">
         <div className="pointer-events-none absolute inset-0 -bottom-8 bg-gradient-to-b from-ink/90 via-ink/50 to-transparent" />
         <div className="gutter relative flex h-16 items-center justify-between md:h-20">
-          <a href="#top" onClick={go("top")} className="flex items-center gap-3 text-paper" aria-label={person.name}>
+          <a href="#top" onClick={go("top")} className="tap-area flex items-center gap-3 text-paper" aria-label={person.name}>
             <Mark className="h-6 w-6" />
             <span className="label-mono hidden sm:inline">{person.name}</span>
           </a>
@@ -118,7 +118,7 @@ export default function Nav({ locale }: { locale: Locale }) {
                   <a
                     href={`#${item.id}`}
                     onClick={go(item.id)}
-                    className="link-underline label-mono text-mute transition-colors duration-300 hover:text-paper"
+                    className="tap-area link-underline label-mono text-mute transition-colors duration-300 hover:text-paper"
                   >
                     {t(item.label, locale)}
                   </a>
@@ -132,7 +132,7 @@ export default function Nav({ locale }: { locale: Locale }) {
               href={`/${other}`}
               hrefLang={other}
               aria-label={t(ui.switchLanguage, locale)}
-              className="label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
+              className="tap-area label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
             >
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
               <span className="text-line">/</span>

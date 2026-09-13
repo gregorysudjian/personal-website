@@ -12,7 +12,7 @@ next-env.d.ts
 !.env.example
 
 # original CV upload (the site serves the copy in public/cv/)
-/Gregory_Sutjian_CV.pdf
+/Gregory_Sutjian_CV*.pdf
 
 # misc
 .DS_Store

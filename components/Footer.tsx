@@ -20,7 +20,7 @@ export default function Footer({ locale }: { locale: Locale }) {
           </span>
         </p>
         <div className="md:text-right">
-          <button type="button" onClick={() => scrollToTarget(0)} className="link-underline label-mono text-paper">
+          <button type="button" onClick={() => scrollToTarget(0)} className="tap-area link-underline label-mono text-paper">
             {t(footer.backToTop, locale)} ↑
           </button>
         </div>

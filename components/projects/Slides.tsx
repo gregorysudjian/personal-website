@@ -87,7 +87,8 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
                   src={t(slide.src, locale)}
                   alt={t(slide.alt, locale)}
                   fill
-                  sizes="(min-width: 768px) 58vw, 92vw"
+                  sizes="(min-width: 1024px) 58vw, 92vw"
+                  quality={90}
                   className={slide.fit === "contain" ? "object-contain" : "object-cover object-top"}
                 />
               )}
@@ -97,10 +98,16 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
       </div>
 
       {/* steps + caption */}
-      <div className="shrink-0 border-t border-line bg-ink px-4 pb-3.5 pt-3 md:px-5">
+      <div className="shrink-0 border-t border-line bg-ink px-4 pb-3.5 md:px-5">
         <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${slides.length}, minmax(0, 1fr))` }}>
           {slides.map((slide, i) => (
-            <button key={i} type="button" onClick={() => setActive(i)} aria-pressed={i === active} className="group text-left">
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActive(i)}
+              aria-pressed={i === active}
+              className="group pb-1.5 pt-3 text-left"
+            >
               <span className="relative block h-[2px] overflow-hidden bg-paper/15">
                 <span
                   key={i === active ? `on-${active}` : "off"}
@@ -120,7 +127,8 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
             </button>
           ))}
         </div>
-        <p className="mt-2.5 truncate text-[12.5px] leading-snug text-paper/75" aria-live="polite">
+        {/* two lines reserved so the screen above doesn't jump between short and long captions */}
+        <p className="mt-1 line-clamp-2 min-h-[2lh] text-[12.5px] leading-snug text-paper/75" aria-live="polite">
           {t(current.caption, locale)}
         </p>
       </div>

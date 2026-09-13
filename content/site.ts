@@ -431,7 +431,7 @@ export const projects = {
         type: "slides",
         slides: [
           {
-            src: { en: "/projects/clarte-en.webp", fr: "/projects/clarte-fr.webp" },
+            src: { en: "/projects/clarte-site-en.webp", fr: "/projects/clarte-site-fr.webp" },
             scroll: true,
             duration: 13000,
             label: { en: "Website", fr: "Site web" },
@@ -442,7 +442,7 @@ export const projects = {
             alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
           },
           {
-            src: "/projects/clarte-dashboard.webp",
+            src: "/projects/clarte-hq.webp",
             label: { en: "Dashboard", fr: "Tableau de bord" },
             caption: {
               en: "My private dashboard: requests, upcoming lessons and payments at a glance (demo data)",

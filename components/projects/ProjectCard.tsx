@@ -93,9 +93,9 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   };
 
   return (
-    <article ref={root} className="project grid items-start gap-10 md:grid-cols-12 md:gap-12">
-      {/* preview window (stays in view while the details scroll past) */}
-      <div className={`md:sticky md:top-28 md:col-span-7 ${flip ? "md:order-2 md:col-start-6" : ""}`}>
+    <article ref={root} className="project grid items-start gap-10 lg:grid-cols-12 lg:gap-12">
+      {/* preview window (stays in view while the details scroll past); stacked above the text below 1024px */}
+      <div className={`lg:sticky lg:top-28 lg:col-span-7 ${flip ? "lg:order-2 lg:col-start-6" : ""}`}>
         <div data-reveal="clip" data-cursor={cursorLabel}>
           <div
             ref={frame}
@@ -120,7 +120,8 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                   src={t(media.src, locale)}
                   alt={t(media.alt, locale)}
                   fill
-                  sizes="(min-width: 768px) 58vw, 92vw"
+                  sizes="(min-width: 1024px) 58vw, 92vw"
+                  quality={90}
                   className="object-cover object-top"
                 />
               )}
@@ -152,7 +153,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
       </div>
 
       {/* details */}
-      <div className={`md:col-span-5 ${flip ? "md:order-1 md:col-start-1" : ""}`}>
+      <div className={`max-w-2xl lg:col-span-5 lg:max-w-none ${flip ? "lg:order-1 lg:col-start-1" : ""}`}>
         <div data-reveal="stagger">
           <div className="flex flex-wrap items-center gap-3">
             <span
