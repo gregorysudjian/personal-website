@@ -1,26 +1,30 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { t, type Locale, type Text } from "@/lib/i18n";
+import Shot from "./Shot";
 
 type Slide = {
   src: Text; // can differ per language
+  mobile?: Text; // phone-width capture used on phones
   label: Text;
   caption: Text;
   alt: Text;
-  fit?: "cover" | "contain";
+  fit?: "cover" | "contain"; // still screens are shown whole ("contain") unless set to "cover"
   scroll?: boolean; // a tall full-page screenshot that scrolls down while it's showing
-  duration?: number; // ms this slide stays up
+  duration?: number; // minimum ms this slide stays up
 };
 
 const STEP_MS = 4200;
-const SCROLL_MS = 10000;
+const SCROLL_MS = 8000;
+const SCROLL_SPEED = 220; // px per second: slow enough to read along
+const SCROLL_PAUSE = 700; // ms before the glide starts; it also rests at the bottom for as long
 
 /**
  * Steps through a few real screens of a project. Auto-advances while on screen
  * (never with reduced motion); the step tabs can be clicked at any time.
- * A "scroll" slide glides from the top of its page to the bottom while it shows.
+ * A "scroll" slide glides from the top of its page to the bottom while it shows,
+ * at a steady reading speed, so a longer page simply stays up longer.
  */
 export default function Slides({ slides, locale }: { slides: Slide[]; locale: Locale }) {
   const root = useRef<HTMLDivElement>(null);
@@ -30,7 +34,10 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
   const [playing, setPlaying] = useState(false);
   const [distance, setDistance] = useState(0);
   const current = slides[active];
-  const duration = current.duration ?? (current.scroll ? SCROLL_MS : STEP_MS);
+  const glide = Math.round((distance / SCROLL_SPEED) * 1000);
+  const duration = current.scroll
+    ? Math.max(current.duration ?? SCROLL_MS, glide + 2 * SCROLL_PAUSE)
+    : (current.duration ?? STEP_MS);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -47,12 +54,18 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
   }, [playing, active, duration, slides.length]);
 
   // How far the active scroll slide has to travel to reach the bottom of its page.
+  // Re-measured when the image loads (or swaps between the phone and laptop version) and on resize.
   useLayoutEffect(() => {
     const img = shots.current[active];
     if (!current.scroll || !img || !view.current) return setDistance(0);
     const measure = () => setDistance(Math.max(0, img.offsetHeight - view.current!.clientHeight));
     if (img.complete) measure();
-    else img.addEventListener("load", measure, { once: true });
+    img.addEventListener("load", measure);
+    window.addEventListener("resize", measure);
+    return () => {
+      img.removeEventListener("load", measure);
+      window.removeEventListener("resize", measure);
+    };
   }, [active, current.scroll]);
 
   return (
@@ -64,32 +77,28 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
           return (
             <div key={i} className={`slide absolute inset-0 overflow-hidden ${on ? "is-active" : ""}`} aria-hidden={!on}>
               {slide.scroll ? (
-                // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
-                <img
+                <Shot
                   ref={(el) => {
                     shots.current[i] = el;
                   }}
                   src={t(slide.src, locale)}
+                  mobile={slide.mobile && t(slide.mobile, locale)}
                   alt={t(slide.alt, locale)}
-                  loading="lazy"
-                  decoding="async"
                   className="absolute inset-x-0 top-0 w-full will-change-transform"
                   style={{
                     transform: `translateY(${on && playing ? -distance : 0}px)`,
                     transition:
                       on && playing
-                        ? `transform ${duration - 1600}ms cubic-bezier(0.45, 0, 0.55, 1) 700ms`
+                        ? `transform ${glide}ms cubic-bezier(0.4, 0.1, 0.6, 0.9) ${SCROLL_PAUSE}ms`
                         : "transform 0.6s ease",
                   }}
                 />
               ) : (
-                <Image
+                <Shot
                   src={t(slide.src, locale)}
+                  mobile={slide.mobile && t(slide.mobile, locale)}
                   alt={t(slide.alt, locale)}
-                  fill
-                  sizes="(min-width: 1024px) 58vw, 92vw"
-                  quality={90}
-                  className={slide.fit === "contain" ? "object-contain" : "object-cover object-top"}
+                  className={`absolute inset-0 h-full w-full object-top ${slide.fit === "cover" ? "object-cover" : "object-contain"}`}
                 />
               )}
             </div>

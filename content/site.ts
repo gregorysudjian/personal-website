@@ -195,15 +195,17 @@ export type Project = {
   //  - "image": one screenshot            - "scroll": a tall full-page screenshot that scrolls on hover
   //  - "slides": a few screens that step through how it works, each with a short label and caption
   // src can differ per language: { en: "/projects/a-en.webp", fr: "/projects/a-fr.webp" }
+  // mobile: an optional phone-width capture shown on phones instead (the laptop one is unreadable that small)
   media:
     | null
-    | { type: "image" | "scroll" | "video"; src: Text; alt: Text }
+    | { type: "image" | "scroll" | "video"; src: Text; mobile?: Text; alt: Text }
     | {
         type: "slides";
-        // fit "contain" shows the whole screen; scroll: true glides down a tall full-page screenshot
-        // duration (ms) sets how long a slide stays up; src can differ per language
+        // still screens show whole on a white ground (fit "cover" fills the frame instead); scroll: true glides down a tall full-page screenshot
+        // duration (ms) is the minimum a slide stays up (long scrolling pages stay up longer); src can differ per language
         slides: {
           src: Text;
+          mobile?: Text;
           label: Text;
           caption: Text;
           alt: Text;
@@ -310,18 +312,18 @@ export const projects = {
         type: "slides",
         slides: [
           {
-            src: "/projects/lead-finder-search.webp",
-            fit: "contain",
+            src: "/projects/lf-search.webp",
+            mobile: "/projects/lf-search-m.webp",
             label: { en: "Search", fr: "Recherche" },
             caption: {
-              en: "Search and filter 2,800+ Montreal businesses, best prospects first",
-              fr: "Rechercher et filtrer plus de 2 800 commerces montréalais, les meilleurs prospects en premier",
+              en: "Search and filter Montreal hair and beauty businesses, best prospects first",
+              fr: "Rechercher et filtrer les commerces de coiffure et de beauté de Montréal, les meilleurs prospects en premier",
             },
             alt: { en: "Lead Finder's business search with trade and area filters", fr: "La recherche de commerces de Lead Finder avec filtres par métier et par secteur" },
           },
           {
-            src: "/projects/lead-finder-generate.webp",
-            fit: "contain",
+            src: "/projects/lf-grid.webp",
+            mobile: "/projects/lf-grid-m.webp",
             label: { en: "Generate", fr: "Génération" },
             caption: {
               en: "Each one gets its own generated design: layout, palette and typefaces",
@@ -330,7 +332,8 @@ export const projects = {
             alt: { en: "A grid of generated demo websites", fr: "Une grille de sites démo générés" },
           },
           {
-            src: "/projects/lead-finder-demo.webp",
+            src: "/projects/lf-demo.webp",
+            mobile: "/projects/lf-demo-m.webp",
             scroll: true,
             label: { en: "Review", fr: "Validation" },
             caption: {
@@ -431,9 +434,9 @@ export const projects = {
         type: "slides",
         slides: [
           {
-            src: { en: "/projects/clarte-site-en.webp", fr: "/projects/clarte-site-fr.webp" },
+            src: { en: "/projects/clarte-web-en.webp", fr: "/projects/clarte-web-fr.webp" },
+            mobile: { en: "/projects/clarte-web-en-m.webp", fr: "/projects/clarte-web-fr-m.webp" },
             scroll: true,
-            duration: 13000,
             label: { en: "Website", fr: "Site web" },
             caption: {
               en: "The public site families see, in English and French, with the request form at the bottom",
@@ -442,7 +445,9 @@ export const projects = {
             alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
           },
           {
-            src: "/projects/clarte-hq.webp",
+            src: "/projects/clarte-dash.webp",
+            mobile: "/projects/clarte-dash-m.webp",
+            scroll: true,
             label: { en: "Dashboard", fr: "Tableau de bord" },
             caption: {
               en: "My private dashboard: requests, upcoming lessons and payments at a glance (demo data)",
@@ -500,7 +505,8 @@ export const projects = {
       },
       media: {
         type: "image",
-        src: { en: "/projects/website-en.webp", fr: "/projects/website-fr.webp" },
+        src: { en: "/projects/site-en.webp", fr: "/projects/site-fr.webp" },
+        mobile: { en: "/projects/site-en-m.webp", fr: "/projects/site-fr-m.webp" },
         alt: { en: "The opening screen of this website", fr: "L'écran d'ouverture de ce site" },
       },
       links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/personal-website" }],

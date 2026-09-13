@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
 import { projects, type Project } from "@/content/site";
 import ChatPreview from "./ChatPreview";
+import Shot from "./Shot";
 import Slides from "./Slides";
 
 const HOVER = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
@@ -93,9 +93,10 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   };
 
   return (
-    <article ref={root} className="project grid items-start gap-10 lg:grid-cols-12 lg:gap-12">
-      {/* preview window (stays in view while the details scroll past); stacked above the text below 1024px */}
-      <div className={`lg:sticky lg:top-28 lg:col-span-7 ${flip ? "lg:order-2 lg:col-start-6" : ""}`}>
+    <article ref={root} className="project grid items-start gap-10 xl:grid-cols-12 xl:gap-12">
+      {/* preview window (stays in view while the details scroll past); stacked full width above the text
+          below 1280px so tablets get a big, readable preview */}
+      <div className={`xl:sticky xl:top-28 xl:col-span-7 ${flip ? "xl:order-2 xl:col-start-6" : ""}`}>
         <div data-reveal="clip" data-cursor={cursorLabel}>
           <div
             ref={frame}
@@ -112,17 +113,16 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                 </span>
               )}
             </div>
-            <div className="relative aspect-[16/11] overflow-hidden bg-ink [contain:layout_paint]">
+            {/* taller on phones, where a wide frame would leave the screens too small to read */}
+            <div className="relative aspect-[3/4] overflow-hidden bg-ink [contain:layout_paint] md:aspect-[16/11]">
               {project.preview === "chat" && <ChatPreview locale={locale} />}
               {media?.type === "slides" && <Slides slides={media.slides} locale={locale} />}
               {media?.type === "image" && (
-                <Image
+                <Shot
                   src={t(media.src, locale)}
+                  mobile={media.mobile && t(media.mobile, locale)}
                   alt={t(media.alt, locale)}
-                  fill
-                  sizes="(min-width: 1024px) 58vw, 92vw"
-                  quality={90}
-                  className="object-cover object-top"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
                 />
               )}
               {media?.type === "scroll" && (
@@ -153,7 +153,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
       </div>
 
       {/* details */}
-      <div className={`max-w-2xl lg:col-span-5 lg:max-w-none ${flip ? "lg:order-1 lg:col-start-1" : ""}`}>
+      <div className={`max-w-2xl xl:col-span-5 xl:max-w-none ${flip ? "xl:order-1 xl:col-start-1" : ""}`}>
         <div data-reveal="stagger">
           <div className="flex flex-wrap items-center gap-3">
             <span

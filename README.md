@@ -31,7 +31,7 @@ In `content/site.ts`, find `projects` → `items`. Each project is one `{ ... }`
 | `year`, `role`, `stack` | Shown in the details list |
 | `problem`, `solution`, `how` | The "How it's built" panel (use `null` to hide) |
 | `preview` | `"chat"` or `"leads"` for the built-in animated demos, otherwise `null` |
-| `media` | A picture in `public/projects/`: `{ type: "image", src: "/projects/my-file.webp", alt: { en: "...", fr: "..." } }`. Use `type: "scroll"` for a tall full-page screenshot that scrolls on hover. `src` can be one file, or `{ en: "...", fr: "..." }` |
+| `media` | A picture in `public/projects/`: `{ type: "image", src: "/projects/my-file.webp", alt: { en: "...", fr: "..." } }`. Use `type: "scroll"` for a tall full-page screenshot that scrolls on hover. `src` can be one file, or `{ en: "...", fr: "..." }`. Add `mobile: "/projects/my-file-m.webp"` with a phone-width capture and phones show that one instead (a laptop screenshot is unreadable at phone size). Capture at 2x: laptop versions at an 880px-wide window, phone versions at 390px |
 | `links` | `[{ label: { en: "View code", fr: "Voir le code" }, href: "https://github.com/..." }]` |
 | `privateRepo` | `true` shows "Private repository" instead of a code link |
 
