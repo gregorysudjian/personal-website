@@ -6,9 +6,9 @@ import { t, type Locale } from "@/lib/i18n";
 import { focus } from "@/content/site";
 import CircuitTrace from "../CircuitTrace";
 import SectionHeader from "../SectionHeader";
-import { CodeWindow, NeuralNet, RobotArm } from "./Illustrations";
+import { CodeWindow, MathPlot, NeuralNet } from "./Illustrations";
 
-const ART = { robotics: RobotArm, software: CodeWindow, ai: NeuralNet } as const;
+const ART = { software: CodeWindow, ai: NeuralNet, math: MathPlot } as const;
 const HORIZONTAL = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 
 /**

@@ -38,8 +38,8 @@ export const meta = {
     fr: "Gregory Sutjian — Génie informatique à McGill",
   },
   description: {
-    en: "Gregory Sutjian is a Computer Engineering student at McGill University in Montreal, building AI agents, robots and software.",
-    fr: "Gregory Sutjian est étudiant en génie informatique à l'Université McGill, à Montréal. Il conçoit des agents IA, des robots et des logiciels.",
+    en: "Gregory Sutjian is a Computer Engineering student at McGill in Montreal who builds AI agents and full-stack web apps, and is looking for internships.",
+    fr: "Gregory Sutjian est étudiant en génie informatique à McGill, à Montréal. Il développe des agents IA et des applications web complètes, et cherche un stage.",
   },
 };
 
@@ -66,8 +66,8 @@ export const hero = {
     fr: "Génie informatique — Université McGill",
   },
   tagline: {
-    en: "Engineering student in Montreal. I build AI agents, robots and the software that connects them.",
-    fr: "Étudiant en ingénierie à Montréal. Je conçois des agents IA, des robots et les logiciels qui les relient.",
+    en: "I like building things, from AI agents to full websites, and I'm always up for learning something new.",
+    fr: "J'aime construire des choses, des agents IA aux sites web complets, et j'ai toujours envie d'apprendre quelque chose de nouveau.",
   },
   status: { en: "Open to internships", fr: "Ouvert aux stages" },
   ctaProjects: { en: "View projects", fr: "Voir les projets" },
@@ -78,8 +78,8 @@ export const hero = {
 /* -------------------------------------------------------------- statement */
 
 export const statement: Text = {
-  en: "I like building things that *think* for themselves: robots that sense the world around them, and AI agents that keep working long after I've closed my laptop.",
-  fr: "J'aime construire des choses qui *pensent* par elles-mêmes : des robots qui perçoivent le monde autour d'eux, et des agents IA qui continuent de travailler bien après que j'ai fermé mon ordinateur.",
+  en: "My favourite part of building something is the moment I understand how it *actually* works. I chase that feeling everywhere: in code, in math, and in whatever I haven't tried yet.",
+  fr: "Mon moment préféré quand je construis quelque chose, c'est celui où je comprends comment ça marche *vraiment*. Je cours après ce moment partout : dans le code, dans les maths, et dans tout ce que je n'ai pas encore essayé.",
 };
 
 /* ------------------------------------------------------------------ about */
@@ -89,31 +89,28 @@ export const about = {
   heading: { en: "Hi, I'm *Gregory*.", fr: "Bonjour, moi c'est *Gregory*." },
   paragraphs: [
     {
-      en: "I grew up in Lebanon and moved to Montreal to study Computer Engineering at McGill. I'm most interested in the space where hardware, software and AI meet, where code stops being text on a screen and starts doing something in the real world.",
-      fr: "J'ai grandi au Liban et je suis venu à Montréal pour étudier le génie informatique à McGill. Ce qui m'intéresse le plus, c'est le point de rencontre entre le matériel, le logiciel et l'IA : là où le code cesse d'être du texte à l'écran et commence à agir dans le monde réel.",
+      en: "I grew up in Lebanon and moved to Montreal for university at McGill. What I enjoy most is taking an idea all the way to something that works in the real world, and picking up whatever I need to learn along the way.",
+      fr: "J'ai grandi au Liban et je suis venu à Montréal pour mes études à McGill. Ce que j'aime le plus, c'est mener une idée jusqu'à quelque chose qui fonctionne dans le monde réel, en apprenant en chemin tout ce qu'il faut.",
     },
     {
-      en: "Before university, I spent a lot of my time teaching: robotics to kids at NinjaCO, then math to students in Beirut and Montreal. Explaining a hard idea simply is still the best way I know to understand it myself.",
-      fr: "Avant l'université, j'ai passé beaucoup de temps à enseigner : la robotique à des enfants chez NinjaCO, puis les maths à des élèves à Beyrouth et à Montréal. Expliquer simplement une idée difficile reste la meilleure façon que je connaisse de la comprendre moi-même.",
+      en: "Before university, I spent a lot of my time teaching: basic coding with LEGO WeDo and SPIKE kits to kids at NinjaCO, then math to students in Beirut and Montreal. Explaining a hard idea simply is still the best way I know to understand it myself.",
+      fr: "Avant l'université, j'ai passé beaucoup de temps à enseigner : les bases du code avec des kits LEGO WeDo et SPIKE à des enfants chez NinjaCO, puis les maths à des élèves à Beyrouth et à Montréal. Expliquer simplement une idée difficile reste la meilleure façon que je connaisse de la comprendre moi-même.",
     },
     {
-      en: "Right now I'm building two AI agents: one that runs WhatsApp conversations on its own, and one that finds local businesses, keeps track of them and builds each one a website of its own.",
-      fr: "En ce moment, je développe deux agents IA : l'un gère seul des conversations sur WhatsApp, l'autre repère des commerces locaux, garde une trace de leurs données et crée pour chacun un site web sur mesure.",
+      en: "Lately I've been building projects with AI tools like Claude Code: an AI lead agent, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
+      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : un agent IA de prospection, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
     },
   ],
   facts: [
     { label: { en: "Based in", fr: "Basé à" }, value: { en: "Montreal, Canada", fr: "Montréal, Canada" } },
+    { label: { en: "School", fr: "Université" }, value: { en: "McGill University", fr: "Université McGill" } },
     {
-      label: { en: "Studying", fr: "Études" },
-      value: { en: "B.Eng. Computer Engineering, McGill", fr: "B.Ing. génie informatique, McGill" },
+      label: { en: "Looking for", fr: "Je cherche" },
+      value: { en: "Internships and co-op roles", fr: "Des stages et des stages coop" },
     },
     {
-      label: { en: "Focus", fr: "Domaines" },
-      value: { en: "Robotics · Software · AI", fr: "Robotique · Logiciel · IA" },
-    },
-    {
-      label: { en: "Currently", fr: "En ce moment" },
-      value: { en: "Building 2 AI agents", fr: "2 agents IA en développement" },
+      label: { en: "Next up", fr: "La suite" },
+      value: { en: "Whatever I haven't learned yet", fr: "Tout ce que je n'ai pas encore appris" },
     },
   ],
   // The interactive "component datasheet" card next to the About text.
@@ -123,12 +120,9 @@ export const about = {
     part: "GS-26",
     rows: [
       { label: { en: "Model", fr: "Modèle" }, value: "Gregory Sutjian" },
-      {
-        label: { en: "Type", fr: "Type" },
-        value: { en: "Computer engineer, in progress", fr: "Ingénieur informatique, en cours" },
-      },
+      { label: { en: "Type", fr: "Type" }, value: { en: "Curious builder", fr: "Bâtisseur curieux" } },
       { label: { en: "Origin", fr: "Origine" }, value: { en: "Lebanon → Montreal", fr: "Liban → Montréal" } },
-      { label: { en: "Status", fr: "Statut" }, value: { en: "Building", fr: "En construction" } },
+      { label: { en: "Status", fr: "Statut" }, value: { en: "Always learning", fr: "Toujours en apprentissage" } },
     ],
     footer: {
       en: "Designed in Lebanon. Assembled in Montreal.",
@@ -145,22 +139,14 @@ export const focus = {
     en: "Three things I keep *coming back* to.",
     fr: "Trois domaines auxquels je *reviens* toujours.",
   },
+  // id picks the drawing: "software" = code, "ai" = network, "math" = function plot
   items: [
-    {
-      id: "robotics",
-      title: { en: "Robotics", fr: "Robotique" },
-      text: {
-        en: "Machines that sense, decide and move. I first learned robotics by teaching it: sensors, motors and the code that makes them work together.",
-        fr: "Des machines qui perçoivent, décident et bougent. J'ai appris la robotique en l'enseignant : capteurs, moteurs, et le code qui les fait fonctionner ensemble.",
-      },
-      keywords: { en: "Sensors · Motors · Control", fr: "Capteurs · Moteurs · Contrôle" },
-    },
     {
       id: "software",
       title: { en: "Software", fr: "Logiciel" },
       text: {
-        en: "Clear, structured code that holds up. Python, Java, data structures and algorithms: the foundations everything else runs on.",
-        fr: "Du code clair et structuré, qui tient la route. Python, Java, structures de données et algorithmes : les fondations sur lesquelles tout le reste repose.",
+        en: "I started with Python and Java, and I'm learning data structures and algorithms at McGill. Every project I build teaches me something new.",
+        fr: "J'ai commencé avec Python et Java, et j'apprends les structures de données et les algorithmes à McGill. Chaque projet m'apprend quelque chose de nouveau.",
       },
       keywords: { en: "Python · Java · Algorithms", fr: "Python · Java · Algorithmes" },
     },
@@ -168,10 +154,19 @@ export const focus = {
       id: "ai",
       title: { en: "AI", fr: "IA" },
       text: {
-        en: "Agents that don't just answer, they act. I'm building autonomous AI agents with Claude Code that take real work off people's plates.",
-        fr: "Des agents qui ne se contentent pas de répondre : ils agissent. Je développe avec Claude Code des agents IA autonomes qui prennent en charge du vrai travail.",
+        en: "I use AI tools like Claude Code every day to build faster, and I'm learning how to make agents that take real work off people's plates.",
+        fr: "J'utilise chaque jour des outils d'IA comme Claude Code pour avancer plus vite, et j'apprends à créer des agents qui prennent en charge du vrai travail.",
       },
-      keywords: { en: "Agents · Automation · Claude", fr: "Agents · Automatisation · Claude" },
+      keywords: { en: "Claude Code · Agents · Automation", fr: "Claude Code · Agents · Automatisation" },
+    },
+    {
+      id: "math",
+      title: { en: "Math", fr: "Maths" },
+      text: {
+        en: "Years of tutoring algebra, geometry and calculus made math the way I think through problems: break it down, find the pattern, check the answer.",
+        fr: "Des années de tutorat en algèbre, en géométrie et en calcul ont fait des maths ma façon d'aborder les problèmes : décomposer, trouver la logique, vérifier la réponse.",
+      },
+      keywords: { en: "Algebra · Calculus · Problem solving", fr: "Algèbre · Calcul · Résolution de problèmes" },
     },
   ],
 };
@@ -180,7 +175,7 @@ export const focus = {
 
 export type Project = {
   slug: string;
-  kicker: Text; // small line above the title, e.g. "AI agent · Claude + WhatsApp"
+  kicker: Text; // small line above the title, e.g. "AI lead agent"
   title: Text;
   summary: Text;
   highlights: Text[]; // 2–3 short points shown on the card
@@ -192,24 +187,32 @@ export type Project = {
   problem: Text | null;
   solution: Text | null;
   how: Text | null;
-  // A built-in animated preview ("chat" or "leads"). Set to null when you use media instead.
-  preview: "chat" | "leads" | null;
-  // A picture in /public/projects/. "scroll" = a tall full-page screenshot that scrolls on hover.
+  // Pictures in /public/projects/.
+  //  - "image": one screenshot            - "scroll": a tall full-page screenshot that scrolls on hover
+  //  - "slides": a few screens that step through how it works, each with a short label and caption
   // src can differ per language: { en: "/projects/a-en.webp", fr: "/projects/a-fr.webp" }
-  media: null | { type: "image" | "scroll" | "video"; src: Text; alt: Text };
+  media:
+    | null
+    | { type: "image" | "scroll" | "video"; src: Text; alt: Text }
+    | {
+        type: "slides";
+        // fit "contain" shows the whole screen; scroll: true glides down a tall full-page screenshot
+        slides: { src: string; label: Text; caption: Text; alt: Text; fit?: "cover" | "contain"; scroll?: boolean }[];
+      };
   links: { label: Text; href: string }[];
   privateRepo?: boolean; // shows "Private repository" instead of a code link
 };
 
-const soloBuild = { en: "Designed & built solo", fr: "Conçu et développé seul" };
+const soloBuild = { en: "Solo project, built with Claude Code", fr: "Projet solo, développé avec Claude Code" };
 const viewCode = { en: "View code", fr: "Voir le code" };
+const viewSite = { en: "View website", fr: "Voir le site" };
 
 export const projects = {
   label: { en: "Projects", fr: "Projets" },
   heading: { en: "Things I've *built*.", fr: "Ce que j'ai *construit*." },
   intro: {
-    en: "Four projects I designed and built on my own: two AI agents, the website for my tutoring business, and this site.",
-    fr: "Quatre projets que j'ai conçus et développés seul : deux agents IA, le site de mon entreprise de tutorat et ce site.",
+    en: "Three projects I've built with AI tools like Claude Code: an AI lead agent, the website for my math tutoring, and this site.",
+    fr: "Trois projets que j'ai développés avec des outils d'IA comme Claude Code : un agent IA de prospection, le site de mon tutorat en maths et ce site.",
   },
   labels: {
     "in-progress": { en: "In development", fr: "En développement" },
@@ -222,103 +225,13 @@ export const projects = {
     role: { en: "Role", fr: "Rôle" },
     specs: { en: "How it's built", fr: "Sous le capot" },
     privateRepo: { en: "Private repository", fr: "Dépôt privé" },
-    demo: { en: "Illustrative demo", fr: "Démo illustrative" },
-    cursorDemo: { en: "Live demo", fr: "Démo animée" },
     cursorScroll: { en: "Hover to scroll", fr: "Survoler pour défiler" },
     cursorImage: { en: "Preview", fr: "Aperçu" },
-  },
-  // Text inside the animated previews.
-  previews: {
-    chat: {
-      header: { en: "Ninja Co · Assistant", fr: "Ninja Co · Assistant" },
-      badge: { en: "AI agent", fr: "Agent IA" },
-      messages: [
-        {
-          from: "customer",
-          text: {
-            en: "Hi! Do you have robotics classes for a 10 year old?",
-            fr: "Bonjour ! Vous avez des cours de robotique pour un enfant de 10 ans ?",
-          },
-        },
-        {
-          from: "agent",
-          text: {
-            en: "Yes! Our robotics class is 60 minutes, Monday to Friday between 8 am and 3 pm. Would you like to book a trial?",
-            fr: "Oui ! Notre cours de robotique dure 60 minutes, du lundi au vendredi entre 8 h et 15 h. Voulez-vous réserver un cours d'essai ?",
-          },
-        },
-        { from: "customer", text: { en: "Tuesday at 10 please", fr: "Mardi à 10 h, s'il vous plaît" } },
-        {
-          from: "agent",
-          text: {
-            en: "Booked: Tuesday at 10:00 for the robotics class. See you then!",
-            fr: "C'est réservé : mardi à 10 h pour le cours de robotique. À bientôt !",
-          },
-        },
-      ] as { from: "customer" | "agent"; text: Text }[],
-    },
-    leads: {
-      scanning: { en: "Catalog · Montreal", fr: "Catalogue · Montréal" },
-      leads: { en: "Leads · score", fr: "Prospects · score" },
-      building: { en: "Generating demo site", fr: "Génération du site démo" },
-      statuses: [
-        { en: "Scored", fr: "Évalué" },
-        { en: "Researched", fr: "Analysé" },
-        { en: "Demo ready", fr: "Démo prête" },
-      ],
-      businesses: [
-        { en: "Hair salon — Rue Bernard", fr: "Salon de coiffure — rue Bernard" },
-        { en: "Barber — St-Denis", fr: "Barbier — St-Denis" },
-        { en: "Nail studio — Av. du Parc", fr: "Studio d'ongles — av. du Parc" },
-        { en: "Esthetics — Rue Rachel", fr: "Esthétique — rue Rachel" },
-      ],
-      scores: [92, 88, 74, 67],
-    },
+    cursorSlides: { en: "Real screens", fr: "Vrais écrans" },
+    slidesBadge: { en: "Real app screens", fr: "Écrans réels" },
   },
   /* To add a project, copy one of the blocks below and edit it. */
   items: [
-    {
-      slug: "whatsapp-ai-agent",
-      kicker: { en: "AI agent · Claude + WhatsApp", fr: "Agent IA · Claude + WhatsApp" },
-      title: { en: "WhatsApp AI Agent", fr: "Agent IA WhatsApp" },
-      summary: {
-        en: "A WhatsApp assistant for small businesses: it answers customers, books appointments and hands the chat to a person when it should. One server runs it for many businesses, each with its own bilingual dashboard.",
-        fr: "Un assistant WhatsApp pour les petites entreprises : il répond aux clients, prend des rendez-vous et passe la conversation à un humain quand il le faut. Un seul serveur le fait tourner pour plusieurs entreprises, chacune avec son propre tableau de bord bilingue.",
-      },
-      highlights: [
-        {
-          en: "Claude with strict tool calling to check availability, book, reschedule and escalate",
-          fr: "Claude avec des appels d'outils stricts pour vérifier les disponibilités, réserver, déplacer et transférer",
-        },
-        {
-          en: "Multi-business by design: every record scoped to its business, credentials encrypted with AES-256-GCM",
-          fr: "Multi-entreprise dès la conception : chaque donnée liée à son entreprise, identifiants chiffrés en AES-256-GCM",
-        },
-        {
-          en: "Live inbox with human takeover, booking calendar, monthly PDF reports and Quebec Law 25 privacy tools",
-          fr: "Boîte de réception en direct avec reprise par un humain, calendrier des réservations, rapports PDF mensuels et outils de conformité à la Loi 25",
-        },
-      ],
-      status: "ready",
-      year: "2026",
-      role: soloBuild,
-      stack: ["TypeScript", "Node.js", "Express", "Claude API", "Meta Cloud API", "React", "SQLite"],
-      problem: {
-        en: "Small businesses get questions, bookings and reschedules on WhatsApp at all hours. Answering by hand is slow, and a naive chatbot makes up facts or double-books.",
-        fr: "Les petites entreprises reçoivent questions, réservations et changements sur WhatsApp à toute heure. Répondre à la main est lent, et un chatbot naïf invente des informations ou réserve deux fois le même créneau.",
-      },
-      solution: {
-        en: "Claude answers only from the owner's saved settings and from tool results, and books through tools that refuse overlapping slots. The owner follows every conversation from a live inbox and can take over at any moment.",
-        fr: "Claude répond uniquement à partir des paramètres enregistrés par le propriétaire et des résultats de ses outils, et réserve via des outils qui refusent les chevauchements. Le propriétaire suit chaque conversation en direct et peut reprendre la main à tout moment.",
-      },
-      how: {
-        en: "Meta webhook → signature check → one queue per conversation → Claude picks tools in a capped loop → reply. The business and customer IDs come from the verified webhook, never from the model, so it can't be talked into touching another client's data.",
-        fr: "Webhook Meta → vérification de signature → une file par conversation → Claude choisit ses outils dans une boucle limitée → réponse. Les identifiants de l'entreprise et du client viennent du webhook vérifié, jamais du modèle : impossible de le convaincre d'accéder aux données d'un autre client.",
-      },
-      preview: "chat",
-      media: null,
-      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/whatsapp-ai-agent" }],
-    },
     {
       slug: "lead-finder",
       kicker: { en: "AI lead agent", fr: "Agent IA de prospection" },
@@ -329,8 +242,8 @@ export const projects = {
       },
       highlights: [
         {
-          en: "2,843 businesses loaded from Overture Maps with DuckDB, ranked by a rule-based 0–100 score (no AI in the ranking)",
-          fr: "2 843 commerces chargés depuis Overture Maps avec DuckDB, classés par un score de 0 à 100 fondé sur des règles (sans IA)",
+          en: "2,800+ businesses loaded from Overture Maps with DuckDB, ranked by a rule-based 0–100 score (no AI in the ranking)",
+          fr: "Plus de 2 800 commerces chargés depuis Overture Maps avec DuckDB, classés par un score de 0 à 100 fondé sur des règles (sans IA)",
         },
         {
           en: "Claude writes the analysis and demo copy as schema-validated structured output",
@@ -341,7 +254,7 @@ export const projects = {
           fr: "Chaque site démo a son propre « génome » de design : 10 directions artistiques, des palettes testées pour le contraste et 29 polices",
         },
       ],
-      status: "in-progress",
+      status: "live",
       year: "2026",
       role: soloBuild,
       stack: ["Next.js", "TypeScript", "Supabase", "Claude API", "DuckDB", "Vitest"],
@@ -357,9 +270,46 @@ export const projects = {
         en: "Catalog → lead → homepage research → analysis → demo site → outreach draft. Web research is sandboxed (private addresses blocked, robots.txt honoured, rate-limited) and every external service has a mock, so the whole pipeline runs offline and is covered by about 80 test files.",
         fr: "Catalogue → prospect → recherche sur le site → analyse → site démo → brouillon de message. La recherche web est encadrée (adresses privées bloquées, robots.txt respecté, débit limité) et chaque service externe a une version simulée : tout tourne hors ligne et est couvert par environ 80 fichiers de tests.",
       },
-      preview: "leads",
-      media: null,
-      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/ai-lead-agent" }],
+      // Real screens from the app, stepped through in order.
+      media: {
+        type: "slides",
+        slides: [
+          {
+            src: "/projects/lead-finder-search.webp",
+            fit: "contain",
+            label: { en: "Search", fr: "Recherche" },
+            caption: {
+              en: "Search and filter 2,800+ Montreal businesses, best prospects first",
+              fr: "Rechercher et filtrer plus de 2 800 commerces montréalais, les meilleurs prospects en premier",
+            },
+            alt: { en: "Lead Finder's business search with trade and area filters", fr: "La recherche de commerces de Lead Finder avec filtres par métier et par secteur" },
+          },
+          {
+            src: "/projects/lead-finder-generate.webp",
+            fit: "contain",
+            label: { en: "Generate", fr: "Génération" },
+            caption: {
+              en: "Each one gets its own generated design: layout, palette and typefaces",
+              fr: "Chacun reçoit son propre design généré : mise en page, palette et polices",
+            },
+            alt: { en: "A grid of generated demo websites", fr: "Une grille de sites démo générés" },
+          },
+          {
+            src: "/projects/lead-finder-demo.webp",
+            scroll: true,
+            label: { en: "Review", fr: "Validation" },
+            caption: {
+              en: "A finished demo site, in French and English, ready for a person to review before anything is sent",
+              fr: "Un site démo terminé, en français et en anglais, à valider par une personne avant tout envoi",
+            },
+            alt: { en: "A generated demo website for a Montreal barbershop", fr: "Un site démo généré pour un barbier montréalais" },
+          },
+        ],
+      },
+      links: [
+        { label: viewSite, href: "https://ai-lead-agent-lac.vercel.app" },
+        { label: viewCode, href: "https://github.com/gregorysudjian-ui/ai-lead-agent" },
+      ],
     },
     {
       slug: "clarte-math",
@@ -379,11 +329,11 @@ export const projects = {
           fr: "Tableau de bord : demande → client en un clic, calendrier des cours, paiements, notes et export Excel",
         },
         {
-          en: "No database needed: an atomic, queued JSON store with backups, and an .xlsx exporter written from scratch",
-          fr: "Aucune base de données : un stockage JSON atomique avec file d'attente et sauvegardes, et un export .xlsx écrit de zéro",
+          en: "No database needed: an atomic, queued JSON store with backups, and an Excel export that uses no outside library",
+          fr: "Aucune base de données : un stockage JSON atomique avec file d'attente et sauvegardes, et un export Excel sans aucune librairie externe",
         },
       ],
-      status: "ready",
+      status: "live",
       year: "2026",
       role: soloBuild,
       stack: ["Next.js", "React", "TypeScript", "Node.js", "Nodemailer"],
@@ -399,13 +349,12 @@ export const projects = {
         en: "Password-protected dashboard with a signed session cookie, timing-safe checks and a rate-limited login. Integration tests boot the real production build to check the auth redirects, a forged cookie, the bot trap and saved requests.",
         fr: "Tableau de bord protégé par mot de passe avec cookie de session signé, vérifications à temps constant et connexion limitée en tentatives. Des tests d'intégration lancent la vraie version de production pour vérifier les redirections, un cookie falsifié, le piège à robots et l'enregistrement des demandes.",
       },
-      preview: null,
       media: {
         type: "scroll",
         src: { en: "/projects/clarte-en.webp", fr: "/projects/clarte-fr.webp" },
         alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
       },
-      links: [],
+      links: [{ label: viewSite, href: "https://clarte-math.vercel.app" }],
       privateRepo: true,
     },
     {
@@ -413,8 +362,8 @@ export const projects = {
       kicker: { en: "Personal website", fr: "Site personnel" },
       title: { en: "This website", fr: "Ce site" },
       summary: {
-        en: "The site you're on: a scroll-driven story where one copper circuit trace runs from the first screen to the contact section. Designed and built from scratch, in English and French.",
-        fr: "Le site sur lequel vous êtes : une histoire guidée par le défilement, où une piste de cuivre relie le premier écran à la section contact. Conçu et développé de zéro, en anglais et en français.",
+        en: "The site you're on: a scroll-driven story where one copper circuit trace runs from the first screen to the contact section. Built with Claude Code, in English and French.",
+        fr: "Le site sur lequel vous êtes : une histoire guidée par le défilement, où une piste de cuivre relie le premier écran à la section contact. Développé avec Claude Code, en anglais et en français.",
       },
       highlights: [
         {
@@ -430,7 +379,7 @@ export const projects = {
           fr: "N'anime que les transformations et l'opacité pour des mouvements fluides, avec une version sans animation",
         },
       ],
-      status: "ready",
+      status: "live",
       year: "2026",
       role: soloBuild,
       stack: ["Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Lenis"],
@@ -446,7 +395,6 @@ export const projects = {
         en: "Next.js App Router with static English and French pages, GSAP ScrollTrigger and SplitText for the motion, Lenis for smooth scrolling, and a generated share image for social links.",
         fr: "Next.js (App Router) avec des pages statiques en anglais et en français, GSAP ScrollTrigger et SplitText pour les animations, Lenis pour le défilement fluide, et une image d'aperçu générée pour les réseaux sociaux.",
       },
-      preview: null,
       media: {
         type: "image",
         src: { en: "/projects/website-en.webp", fr: "/projects/website-fr.webp" },
@@ -501,8 +449,8 @@ export const experience = {
       dates: { en: "Jul — Aug 2023", fr: "juil. — août 2023" },
       place: { en: "Beirut", fr: "Beyrouth" },
       text: {
-        en: "Taught hands-on robotics: basic programming, sensors and mechanical parts. Guided students through building, testing and debugging their own robots.",
-        fr: "Enseignement pratique de la robotique : programmation de base, capteurs et pièces mécaniques. Accompagnement des élèves dans la construction, les tests et le débogage de leurs robots.",
+        en: "Taught kids the basics of coding and building with LEGO WeDo and SPIKE kits, and helped them test and fix their projects.",
+        fr: "Initiation des enfants au code et à la construction avec des kits LEGO WeDo et SPIKE, en les aidant à tester et à corriger leurs projets.",
       },
     },
   ] satisfies { org: Text; role: Text; dates: Text; place: Text; text: Text }[],
@@ -535,16 +483,20 @@ export const experience = {
 export const skills = {
   label: { en: "Skills", fr: "Compétences" },
   heading: { en: "The *toolkit*.", fr: "La *boîte à outils*." },
+  intro: {
+    en: "What I've used so far. It keeps growing, and I'm always happy to pick up whatever a team works with.",
+    fr: "Ce que j'ai utilisé jusqu'ici. La liste grandit sans cesse, et j'apprends volontiers les outils de l'équipe.",
+  },
   // The big scrolling band of words above the skills.
   marquee: [
     "Python",
     "Java",
     "Claude Code",
     { en: "AI agents", fr: "Agents IA" },
-    { en: "Robotics", fr: "Robotique" },
+    { en: "Math", fr: "Maths" },
     { en: "Automation", fr: "Automatisation" },
     { en: "Algorithms", fr: "Algorithmes" },
-    { en: "Circuits", fr: "Circuits" },
+    { en: "Problem solving", fr: "Résolution de problèmes" },
   ] satisfies Text[],
   groups: [
     { title: { en: "Languages", fr: "Langages" }, items: ["Python", "Java"] },
@@ -553,12 +505,12 @@ export const skills = {
       items: [
         { en: "Data structures", fr: "Structures de données" },
         { en: "Algorithms", fr: "Algorithmes" },
-        { en: "Robotics programming", fr: "Programmation robotique" },
+        { en: "Mathematics", fr: "Mathématiques" },
       ],
     },
     {
       title: { en: "AI", fr: "IA" },
-      items: ["Claude Code", { en: "AI agents", fr: "Agents IA" }],
+      items: ["Claude Code", "ChatGPT", "Codex", "Gemini"],
     },
   ] satisfies { title: Text; items: Text[] }[],
 };
@@ -569,8 +521,8 @@ export const contact = {
   label: { en: "Contact", fr: "Contact" },
   heading: { en: "Let's build *something*.", fr: "Construisons *quelque chose*." },
   text: {
-    en: "Open to internships, collaborations and good conversations about robotics, software and AI.",
-    fr: "Ouvert aux stages, aux collaborations et aux bonnes discussions sur la robotique, le logiciel et l'IA.",
+    en: "I'm looking for an internship or co-op where I can learn fast, help wherever I'm needed and build things that matter. If that sounds like your team, I'd love to hear from you.",
+    fr: "Je cherche un stage où apprendre vite, aider là où on a besoin de moi et construire des choses qui comptent. Si ça ressemble à votre équipe, j'aimerais beaucoup vous parler.",
   },
   emailLabel: { en: "Email", fr: "Courriel" },
   copy: { en: "Copy", fr: "Copier" },
@@ -581,7 +533,7 @@ export const contact = {
 /* ----------------------------------------------------------------- footer */
 
 export const footer = {
-  builtIn: { en: "Designed & built in Montreal", fr: "Conçu et développé à Montréal" },
+  builtIn: { en: "Made in Montreal", fr: "Fait à Montréal" },
   localTime: { en: "Local time", fr: "Heure locale" },
   backToTop: { en: "Back to top", fr: "Haut de page" },
 };

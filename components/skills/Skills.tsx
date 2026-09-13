@@ -12,7 +12,7 @@ export default function Skills({ locale }: { locale: Locale }) {
       <Marquee words={skills.marquee.map((w) => t(w, locale))} />
 
       <div className="gutter mt-24 md:mt-32">
-        <SectionHeader label={t(skills.label, locale)} heading={t(skills.heading, locale)} />
+        <SectionHeader label={t(skills.label, locale)} heading={t(skills.heading, locale)} intro={t(skills.intro, locale)} />
         <div className="mt-16 grid gap-14 md:mt-20 md:grid-cols-3 md:gap-10">
           {skills.groups.map((group) => (
             <div key={t(group.title, locale)}>

@@ -6,8 +6,7 @@ import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
 import { projects, type Project } from "@/content/site";
-import ChatPreview from "./ChatPreview";
-import LeadsPreview from "./LeadsPreview";
+import Slides from "./Slides";
 
 const HOVER = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 const TOUCH = "(hover: none) and (prefers-reduced-motion: no-preference)";
@@ -23,11 +22,12 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   const hasSpecs = Boolean(project.problem || project.solution || project.how);
   const media = project.media;
 
-  const cursorLabel = project.preview
-    ? t(L.cursorDemo, locale)
-    : media?.type === "scroll"
+  const cursorLabel =
+    media?.type === "scroll"
       ? t(L.cursorScroll, locale)
-      : t(L.cursorImage, locale);
+      : media?.type === "slides"
+        ? t(L.cursorSlides, locale)
+        : t(L.cursorImage, locale);
 
   useGSAP(
     () => {
@@ -104,14 +104,13 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="h-2.5 w-2.5 rounded-full bg-line" />
               <span className="label-mono ml-3 truncate text-[0.62rem] text-mute">{project.slug}</span>
-              {project.preview && (
-                <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">{t(L.demo, locale)}</span>
+              {media?.type === "slides" && (
+                <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">{t(L.slidesBadge, locale)}</span>
               )}
             </div>
             <div className="relative aspect-[16/11] overflow-hidden bg-ink [contain:layout_paint]">
-              {project.preview === "chat" && <ChatPreview locale={locale} />}
-              {project.preview === "leads" && <LeadsPreview locale={locale} />}
-              {!project.preview && media?.type === "image" && (
+              {media?.type === "slides" && <Slides slides={media.slides} locale={locale} />}
+              {media?.type === "image" && (
                 <Image
                   src={t(media.src, locale)}
                   alt={t(media.alt, locale)}
@@ -120,7 +119,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                   className="object-cover object-top"
                 />
               )}
-              {!project.preview && media?.type === "scroll" && (
+              {media?.type === "scroll" && (
                 // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
                 <img
                   src={t(media.src, locale)}
@@ -130,7 +129,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                   className="scroll-shot absolute inset-x-0 top-0 w-full will-change-transform"
                 />
               )}
-              {!project.preview && media?.type === "video" && (
+              {media?.type === "video" && (
                 <video
                   src={t(media.src, locale)}
                   aria-label={t(media.alt, locale)}
@@ -223,8 +222,14 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
           )}
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            {project.links.map((link) => (
-              <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="btn btn-sm">
+            {project.links.map((link, i) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
+              >
                 {t(link.label, locale)} <span aria-hidden="true">↗</span>
               </a>
             ))}

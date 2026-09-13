@@ -402,13 +402,10 @@ html.has-cursor * {
 /* -------------------------------------------------------- section labels */
 
 .section-index {
-  transform-origin: left;
-  transition:
-    transform 0.9s var(--ease-out-expo),
-    box-shadow 0.9s var(--ease-out-expo);
+  flex-shrink: 0;
+  transition: box-shadow 0.9s var(--ease-out-expo);
 }
 .section-label.is-powered .section-index {
-  transform: scaleX(1.5);
   box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
 }
 
@@ -468,28 +465,33 @@ html.has-cursor * {
 
 /* --------------------------------------------------------------- projects */
 
-.typing-dot {
-  animation: typing 1s ease-in-out infinite;
+/* Project slideshow: crossfade + a slow push-in on the active screen */
+.slide {
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 0.8s var(--ease-out-expo),
+    transform 5s linear;
 }
-@keyframes typing {
-  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-  30% { opacity: 1; transform: translateY(-2px); }
+.slide.is-active {
+  opacity: 1;
+  transform: scale(1);
 }
-
-.radar {
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0deg, rgb(232 130 58 / 0.16) 40deg, transparent 62deg);
-  animation: spin 4.5s linear infinite;
+.slide-progress {
+  animation: slide-progress 4.2s linear forwards;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes slide-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
-
-.lead-row {
-  transition: background-color 0.5s var(--ease-out-expo);
-}
-.lead-row.is-focus {
-  background: rgb(232 130 58 / 0.1);
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transform: none;
+    transition: opacity 0.2s;
+  }
+  .slide-progress {
+    animation: none;
+  }
 }
 
 .scanline {
@@ -636,12 +638,7 @@ html.has-cursor * {
   .chip-core,
   .chip-pins g,
   .caret,
-  .typing-dot,
-  .radar,
   .scanline {
     animation: none;
-  }
-  .typing {
-    display: none;
   }
 }

@@ -4,65 +4,109 @@ import { useRef } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 
-/* Three living line drawings for the Focus panels. Each loops only while visible. */
+/* Three living drawings for the Focus panels. Each loops only while visible. */
 
-/* ------------------------------------------------------------- robot arm */
+/* ----------------------------------------------------------- math plot */
 
-export function RobotArm() {
+// A sine curve on a small grid: x from X0 to X1 in pixels, one unit = U pixels.
+const X0 = 60;
+const X1 = 350;
+const Y0 = 200;
+const AMP = 84;
+const U = 46;
+const fx = (x: number) => Y0 - AMP * Math.sin((x - X0) / U);
+const slope = (x: number) => -(AMP / U) * Math.cos((x - X0) / U); // dy/dx in screen space
+const CURVE = (() => {
+  let d = "";
+  for (let x = X0; x <= X1; x += 3) d += (x === X0 ? "M" : "L") + x + " " + fx(x).toFixed(1);
+  return d;
+})();
+
+export function MathPlot() {
   const root = useRef<SVGSVGElement>(null);
 
   useGSAP(
     () => {
+      const q = gsap.utils.selector(root);
+      const svg = root.current!;
+      const dot = svg.querySelector<SVGCircleElement>(".m-dot")!;
+      const tangent = svg.querySelector<SVGLineElement>(".m-tangent")!;
+      const dropX = svg.querySelector<SVGLineElement>(".m-drop-x")!;
+      const dropY = svg.querySelector<SVGLineElement>(".m-drop-y")!;
+      const readX = svg.querySelector<SVGTextElement>(".m-read-x")!;
+      const readD = svg.querySelector<SVGTextElement>(".m-read-d")!;
+
+      // Puts the point, its tangent and the readouts at screen x.
+      const place = (x: number) => {
+        const y = fx(x);
+        const m = slope(x);
+        const len = 46 / Math.sqrt(1 + m * m);
+        dot.setAttribute("cx", x.toFixed(1));
+        dot.setAttribute("cy", y.toFixed(1));
+        tangent.setAttribute("x1", (x - len).toFixed(1));
+        tangent.setAttribute("y1", (y - len * m).toFixed(1));
+        tangent.setAttribute("x2", (x + len).toFixed(1));
+        tangent.setAttribute("y2", (y + len * m).toFixed(1));
+        dropX.setAttribute("x1", x.toFixed(1));
+        dropX.setAttribute("x2", x.toFixed(1));
+        dropX.setAttribute("y1", y.toFixed(1));
+        dropY.setAttribute("y1", y.toFixed(1));
+        dropY.setAttribute("y2", y.toFixed(1));
+        dropY.setAttribute("x2", x.toFixed(1));
+        readX.textContent = "x = " + ((x - X0) / U).toFixed(2);
+        readD.textContent = "f′(x) = " + Math.cos((x - X0) / U).toFixed(2);
+      };
+
+      const start = X0 + U * (Math.PI / 2);
+      place(start);
       if (window.matchMedia(REDUCED_MOTION).matches) return;
-      const tl = gsap.timeline({ repeat: -1, paused: true, defaults: { ease: "power2.inOut", duration: 1.6 } });
-      tl.to(".arm-upper", { rotation: -28, svgOrigin: "200 300" }, 0)
-        .to(".arm-fore", { rotation: 62, svgOrigin: "200 180" }, 0)
-        .to(".arm-grip-l", { rotation: 18, svgOrigin: "200 86" }, 0.9)
-        .to(".arm-grip-r", { rotation: -18, svgOrigin: "200 86" }, 0.9)
-        .to(".arm-upper", { rotation: 22, svgOrigin: "200 300" }, 2)
-        .to(".arm-fore", { rotation: -40, svgOrigin: "200 180" }, 2)
-        .to(".arm-grip-l", { rotation: 0, svgOrigin: "200 86" }, 3)
-        .to(".arm-grip-r", { rotation: 0, svgOrigin: "200 86" }, 3)
-        .to(".arm-upper", { rotation: 0, svgOrigin: "200 300" }, 4)
-        .to(".arm-fore", { rotation: 0, svgOrigin: "200 180" }, 4)
-        .to(".arm-scan", { opacity: 1, duration: 0.3, yoyo: true, repeat: 3, ease: "none" }, 4.2);
+
+      const state = { x: X0 };
+      const tl = gsap.timeline({ repeat: -1, paused: true });
+      tl.set(q(".m-point"), { autoAlpha: 0 })
+        .fromTo(q(".m-curve"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: "power2.inOut" })
+        .add(() => {
+          state.x = X0;
+          place(X0);
+        })
+        .to(q(".m-point"), { autoAlpha: 1, duration: 0.3 })
+        .to(state, { x: X1, duration: 5, ease: "sine.inOut", onUpdate: () => place(state.x) })
+        .to(state, { x: X0, duration: 5, ease: "sine.inOut", onUpdate: () => place(state.x) })
+        .to(q(".m-point"), { autoAlpha: 0, duration: 0.3 });
       return playWhenVisible(root.current!, tl);
     },
     { scope: root },
   );
 
+  const grid = [];
+  for (let x = X0; x <= X1; x += U / 2) grid.push(<path key={"v" + x} d={"M" + x + " 90V310"} />);
+  for (let y = 110; y <= 290; y += U / 2) grid.push(<path key={"h" + y} d={"M" + X0 + " " + y + "H" + X1} />);
+
   return (
     <svg ref={root} viewBox="0 0 400 400" fill="none" className="h-full w-full" aria-hidden="true">
-      {/* rotation range guides */}
-      <path d="M130 300a70 70 0 0 1 140 0" stroke="var(--color-line)" strokeDasharray="2 6" />
-      <path d="M150 180a50 50 0 0 1 100 0" stroke="var(--color-line)" strokeDasharray="2 6" />
-      <text x="282" y="304" fontFamily="var(--font-mono)" fontSize="10" fill="var(--color-mute)">J1</text>
-      <text x="262" y="184" fontFamily="var(--font-mono)" fontSize="10" fill="var(--color-mute)">J2</text>
-
-      {/* ground + base */}
-      <path d="M60 340H340" stroke="var(--color-line)" />
-      <path d="M70 348l10-8M90 348l10-8M110 348l10-8M290 348l10-8M310 348l10-8" stroke="var(--color-line)" />
-      <rect x="150" y="306" width="100" height="34" rx="4" stroke="var(--color-paper)" strokeOpacity="0.7" />
-      <path d="M165 323H235" stroke="var(--color-line)" />
-
-      <g className="arm-upper">
-        <rect x="186" y="172" width="28" height="136" rx="14" stroke="var(--color-paper)" strokeOpacity="0.8" />
-        <path d="M200 200V280" stroke="var(--color-line)" strokeDasharray="3 4" />
-        <g className="arm-fore">
-          <rect x="189" y="80" width="22" height="108" rx="11" stroke="var(--color-paper)" strokeOpacity="0.8" />
-          <g className="arm-grip-l">
-            <path d="M196 86L184 62L190 48" stroke="var(--color-paper)" strokeOpacity="0.8" strokeWidth="2" strokeLinecap="round" />
-          </g>
-          <g className="arm-grip-r">
-            <path d="M204 86L216 62L210 48" stroke="var(--color-paper)" strokeOpacity="0.8" strokeWidth="2" strokeLinecap="round" />
-          </g>
-          <path className="arm-scan" d="M200 50L170 10H230Z" fill="var(--color-copper)" fillOpacity="0.12" opacity="0" />
-          <circle cx="200" cy="180" r="9" fill="var(--color-ink)" stroke="var(--color-copper)" strokeWidth="2" />
-          <circle cx="200" cy="86" r="5" fill="var(--color-copper)" />
-        </g>
+      <g stroke="var(--color-line)" strokeWidth="0.75" opacity="0.6">
+        {grid}
       </g>
-      <circle cx="200" cy="300" r="12" fill="var(--color-ink)" stroke="var(--color-copper)" strokeWidth="2" />
-      <circle cx="200" cy="300" r="3" fill="var(--color-copper)" />
+      {/* axes */}
+      <path d={"M" + X0 + " " + Y0 + "H" + (X1 + 14)} stroke="var(--color-mute)" />
+      <path d={"M" + X0 + " 318V82"} stroke="var(--color-mute)" />
+      <path d={"M" + (X1 + 14) + " " + Y0 + "l-6 -4v8z"} fill="var(--color-mute)" />
+      <path d={"M" + X0 + " 82l-4 6h8z"} fill="var(--color-mute)" />
+      <text x={X1 + 8} y={Y0 + 18} fontFamily="var(--font-mono)" fontSize="11" fill="var(--color-mute)">x</text>
+      <text x={X0 - 16} y="90" fontFamily="var(--font-mono)" fontSize="11" fill="var(--color-mute)">y</text>
+
+      <path d={CURVE} pathLength={1} strokeDasharray="1 1" className="m-curve" stroke="var(--color-paper)" strokeOpacity="0.85" strokeWidth="2" strokeLinecap="round" />
+
+      <g className="m-point">
+        <line className="m-drop-x" y2={Y0} stroke="var(--color-copper)" strokeOpacity="0.5" strokeDasharray="3 4" />
+        <line className="m-drop-y" x1={X0} stroke="var(--color-copper)" strokeOpacity="0.5" strokeDasharray="3 4" />
+        <line className="m-tangent" stroke="var(--color-copper)" strokeWidth="2" strokeLinecap="round" />
+        <circle className="m-dot" r="6" fill="var(--color-ink)" stroke="var(--color-copper)" strokeWidth="2.5" />
+      </g>
+
+      <text x={X0} y="52" fontFamily="var(--font-mono)" fontSize="13" fill="var(--color-paper)">f(x) = sin x</text>
+      <text className="m-read-x" x={X0} y="352" fontFamily="var(--font-mono)" fontSize="11" fill="var(--color-mute)" />
+      <text className="m-read-d" x={X0 + 120} y="352" fontFamily="var(--font-mono)" fontSize="11" fill="var(--color-copper)" />
     </svg>
   );
 }
