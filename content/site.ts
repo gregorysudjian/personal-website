@@ -25,9 +25,11 @@ export const person = {
     { label: "LinkedIn", href: "https://www.linkedin.com/in/gregorysutjian" },
     { label: "GitHub", href: "https://github.com/gregorysudjian-ui" },
   ],
-  // Add a photo later: put it in /public/images/ and set, for example:
-  // photo: { src: "/images/gregory.jpg", alt: { en: "Portrait of Gregory", fr: "Portrait de Gregory" } },
-  photo: null as null | { src: string; alt: Text },
+  // Photo shown in the datasheet card (About section). Put the file in /public/images/.
+  photo: {
+    src: "/images/gregory.webp",
+    alt: { en: "Portrait of Gregory Sutjian", fr: "Portrait de Gregory Sutjian" },
+  } as null | { src: string; alt: Text },
 };
 
 /* ------------------------------------------------------ search & sharing */
@@ -197,7 +199,16 @@ export type Project = {
     | {
         type: "slides";
         // fit "contain" shows the whole screen; scroll: true glides down a tall full-page screenshot
-        slides: { src: string; label: Text; caption: Text; alt: Text; fit?: "cover" | "contain"; scroll?: boolean }[];
+        // duration (ms) sets how long a slide stays up; src can differ per language
+        slides: {
+          src: Text;
+          label: Text;
+          caption: Text;
+          alt: Text;
+          fit?: "cover" | "contain";
+          scroll?: boolean;
+          duration?: number;
+        }[];
       };
   links: { label: Text; href: string }[];
   privateRepo?: boolean; // shows "Private repository" instead of a code link
@@ -242,8 +253,8 @@ export const projects = {
       },
       highlights: [
         {
-          en: "2,800+ businesses loaded from Overture Maps with DuckDB, ranked by a rule-based 0–100 score (no AI in the ranking)",
-          fr: "Plus de 2 800 commerces chargés depuis Overture Maps avec DuckDB, classés par un score de 0 à 100 fondé sur des règles (sans IA)",
+          en: "2,800+ businesses pulled from Overture Maps with DuckDB and stored in Supabase, ranked by a rule-based 0–100 score (no AI in the ranking)",
+          fr: "Plus de 2 800 commerces extraits d'Overture Maps avec DuckDB et stockés dans Supabase, classés par un score de 0 à 100 fondé sur des règles (sans IA)",
         },
         {
           en: "Claude writes the analysis and demo copy as schema-validated structured output",
@@ -349,10 +360,34 @@ export const projects = {
         en: "Password-protected dashboard with a signed session cookie, timing-safe checks and a rate-limited login. Integration tests boot the real production build to check the auth redirects, a forged cookie, the bot trap and saved requests.",
         fr: "Tableau de bord protégé par mot de passe avec cookie de session signé, vérifications à temps constant et connexion limitée en tentatives. Des tests d'intégration lancent la vraie version de production pour vérifier les redirections, un cookie falsifié, le piège à robots et l'enregistrement des demandes.",
       },
+      // The public site scrolls top to bottom, then the owner dashboard (shown with made-up demo data).
       media: {
-        type: "scroll",
-        src: { en: "/projects/clarte-en.webp", fr: "/projects/clarte-fr.webp" },
-        alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
+        type: "slides",
+        slides: [
+          {
+            src: { en: "/projects/clarte-en.webp", fr: "/projects/clarte-fr.webp" },
+            scroll: true,
+            duration: 13000,
+            label: { en: "Website", fr: "Site web" },
+            caption: {
+              en: "The public site families see, in English and French, with the request form at the bottom",
+              fr: "Le site public que voient les familles, en anglais et en français, avec le formulaire de demande en bas",
+            },
+            alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
+          },
+          {
+            src: "/projects/clarte-dashboard.webp",
+            label: { en: "Dashboard", fr: "Tableau de bord" },
+            caption: {
+              en: "My private dashboard: requests, upcoming lessons and payments at a glance (demo data)",
+              fr: "Mon tableau de bord privé : demandes, cours à venir et paiements en un coup d'œil (données de démo)",
+            },
+            alt: {
+              en: "The Clarté HQ overview with requests, upcoming lessons and payments",
+              fr: "La vue d'ensemble de Clarté HQ avec demandes, cours à venir et paiements",
+            },
+          },
+        ],
       },
       links: [{ label: viewSite, href: "https://clarte-math.vercel.app" }],
       privateRepo: true,

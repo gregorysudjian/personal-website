@@ -69,7 +69,7 @@ export default function Datasheet({ locale }: { locale: Locale }) {
               alt={t(person.photo.alt, locale)}
               fill
               sizes="(min-width: 768px) 500px, 90vw"
-              className="object-cover grayscale contrast-110"
+              className="object-cover object-[50%_35%]"
             />
           ) : (
             <Chip />

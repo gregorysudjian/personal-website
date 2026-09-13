@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { t, type Locale, type Text } from "@/lib/i18n";
 
 type Slide = {
-  src: string;
+  src: Text; // can differ per language
   label: Text;
   caption: Text;
   alt: Text;
@@ -62,14 +62,14 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
         {slides.map((slide, i) => {
           const on = i === active;
           return (
-            <div key={slide.src} className={`slide absolute inset-0 overflow-hidden ${on ? "is-active" : ""}`} aria-hidden={!on}>
+            <div key={i} className={`slide absolute inset-0 overflow-hidden ${on ? "is-active" : ""}`} aria-hidden={!on}>
               {slide.scroll ? (
                 // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
                 <img
                   ref={(el) => {
                     shots.current[i] = el;
                   }}
-                  src={slide.src}
+                  src={t(slide.src, locale)}
                   alt={t(slide.alt, locale)}
                   loading="lazy"
                   decoding="async"
@@ -84,7 +84,7 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
                 />
               ) : (
                 <Image
-                  src={slide.src}
+                  src={t(slide.src, locale)}
                   alt={t(slide.alt, locale)}
                   fill
                   sizes="(min-width: 768px) 58vw, 92vw"
@@ -100,7 +100,7 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
       <div className="shrink-0 border-t border-line bg-ink px-4 pb-3.5 pt-3 md:px-5">
         <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${slides.length}, minmax(0, 1fr))` }}>
           {slides.map((slide, i) => (
-            <button key={slide.src} type="button" onClick={() => setActive(i)} aria-pressed={i === active} className="group text-left">
+            <button key={i} type="button" onClick={() => setActive(i)} aria-pressed={i === active} className="group text-left">
               <span className="relative block h-[2px] overflow-hidden bg-paper/15">
                 <span
                   key={i === active ? `on-${active}` : "off"}
