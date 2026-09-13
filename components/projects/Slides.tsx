@@ -13,6 +13,7 @@ type Slide = {
   fit?: "cover" | "contain"; // still screens are shown whole ("contain") unless set to "cover"
   scroll?: boolean; // a tall full-page screenshot that scrolls down while it's showing
   duration?: number; // minimum ms this slide stays up
+  speed?: number; // scroll slides: px per second (default SCROLL_SPEED)
 };
 
 const STEP_MS = 4200;
@@ -34,7 +35,7 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
   const [playing, setPlaying] = useState(false);
   const [distance, setDistance] = useState(0);
   const current = slides[active];
-  const glide = Math.round((distance / SCROLL_SPEED) * 1000);
+  const glide = Math.round((distance / (current.speed ?? SCROLL_SPEED)) * 1000);
   const duration = current.scroll
     ? Math.max(current.duration ?? SCROLL_MS, glide + 2 * SCROLL_PAUSE)
     : (current.duration ?? STEP_MS);

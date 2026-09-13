@@ -99,8 +99,8 @@ export const about = {
       fr: "Avant l'université, j'ai passé beaucoup de temps à enseigner : les bases du code avec des kits LEGO WeDo et SPIKE à des enfants chez NinjaCO, puis les maths à des élèves à Beyrouth et à Montréal. Expliquer simplement une idée difficile reste la meilleure façon que je connaisse de la comprendre moi-même.",
     },
     {
-      en: "Lately I've been building projects with AI tools like Claude Code: two AI agents, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
-      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : deux agents IA, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
+      en: "Lately I've been building projects with AI tools like Claude Code: two AI agents I'm still working on, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
+      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : deux agents IA sur lesquels je travaille encore, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
     },
   ],
   facts: [
@@ -212,6 +212,7 @@ export type Project = {
           fit?: "cover" | "contain";
           scroll?: boolean;
           duration?: number;
+          speed?: number; // scroll slides: px per second, default 220
         }[];
       };
   links: { label: Text; href: string }[];
@@ -226,11 +227,11 @@ export const projects = {
   label: { en: "Projects", fr: "Projets" },
   heading: { en: "Things I've *built*.", fr: "Ce que j'ai *construit*." },
   intro: {
-    en: "Four projects I've built with AI tools like Claude Code: two AI agents, the website for my math tutoring, and this site.",
-    fr: "Quatre projets que j'ai développés avec des outils d'IA comme Claude Code : deux agents IA, le site de mon tutorat en maths et ce site.",
+    en: "Four projects I've built with AI tools like Claude Code: two AI agents (both still in progress), the website for my math tutoring, and this site.",
+    fr: "Quatre projets que j'ai développés avec des outils d'IA comme Claude Code : deux agents IA (toujours en cours), le site de mon tutorat en maths et ce site.",
   },
   labels: {
-    "in-progress": { en: "In development", fr: "En développement" },
+    "in-progress": { en: "In progress", fr: "En cours" },
     ready: { en: "Deploy-ready", fr: "Prêt à déployer" },
     live: { en: "Live", fr: "En ligne" },
     problem: { en: "Problem", fr: "Problème" },
@@ -291,7 +292,7 @@ export const projects = {
           fr: "Chaque site démo a son propre « génome » de design : 10 directions artistiques, des palettes testées pour le contraste et 29 polices",
         },
       ],
-      status: "live",
+      status: "in-progress",
       year: "2026",
       role: soloBuild,
       stack: ["Next.js", "TypeScript", "Supabase", "Claude API", "DuckDB", "Vitest"],
@@ -371,7 +372,7 @@ export const projects = {
           fr: "Boîte de réception en direct avec reprise par un humain, calendrier des réservations, rapports PDF mensuels et outils de conformité à la Loi 25",
         },
       ],
-      status: "prototype",
+      status: "in-progress",
       year: "2026",
       role: soloBuild,
       stack: ["TypeScript", "Node.js", "Express", "Claude API", "Meta Cloud API", "React", "SQLite"],
@@ -434,9 +435,10 @@ export const projects = {
         type: "slides",
         slides: [
           {
-            src: { en: "/projects/clarte-web-en.webp", fr: "/projects/clarte-web-fr.webp" },
+            src: { en: "/projects/clarte-laptop-en.webp", fr: "/projects/clarte-laptop-fr.webp" },
             mobile: { en: "/projects/clarte-web-en-m.webp", fr: "/projects/clarte-web-fr-m.webp" },
             scroll: true,
+            speed: 300,
             label: { en: "Website", fr: "Site web" },
             caption: {
               en: "The public site families see, in English and French, with the request form at the bottom",
@@ -445,9 +447,9 @@ export const projects = {
             alt: { en: "The Clarté Math homepage", fr: "La page d'accueil de Clarté Math" },
           },
           {
-            src: "/projects/clarte-dash.webp",
-            mobile: "/projects/clarte-dash-m.webp",
-            scroll: true,
+            src: "/projects/clarte-hq-overview.webp",
+            mobile: "/projects/clarte-hq-overview-m.webp",
+            duration: 6000,
             label: { en: "Dashboard", fr: "Tableau de bord" },
             caption: {
               en: "My private dashboard: requests, upcoming lessons and payments at a glance (demo data)",
