@@ -227,28 +227,30 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            {project.links.map((link, i) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noreferrer"
-                className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
-              >
-                {t(link.label, locale)} <span aria-hidden="true">↗</span>
-              </a>
-            ))}
-            {project.privateRepo && (
-              <span className="label-mono flex items-center gap-2 text-mute">
-                <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                  <rect x="3" y="7" width="10" height="7" rx="1" />
-                  <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
-                </svg>
-                {t(L.privateRepo, locale)}
-              </span>
-            )}
-          </div>
+          {(project.links.length > 0 || project.privateRepo) && (
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              {project.links.map((link, i) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
+                >
+                  {t(link.label, locale)} <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+              {project.privateRepo && (
+                <span className="label-mono flex items-center gap-2 text-mute">
+                  <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                    <rect x="3" y="7" width="10" height="7" rx="1" />
+                    <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+                  </svg>
+                  {t(L.privateRepo, locale)}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </article>

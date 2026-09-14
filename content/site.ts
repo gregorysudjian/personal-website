@@ -220,7 +220,8 @@ export type Project = {
 };
 
 const soloBuild = { en: "Solo project, AI-assisted", fr: "Projet solo, assisté par IA" };
-const viewCode = { en: "View code", fr: "Voir le code" };
+// All project repos are private, so there are no "View code" links. To add one back:
+// { label: { en: "View code", fr: "Voir le code" }, href: "https://github.com/..." }
 const viewSite = { en: "View website", fr: "Voir le site" };
 
 export const projects = {
@@ -346,10 +347,7 @@ export const projects = {
           },
         ],
       },
-      links: [
-        { label: viewSite, href: "https://ai-lead-agent-lac.vercel.app" },
-        { label: viewCode, href: "https://github.com/gregorysudjian-ui/ai-lead-agent" },
-      ],
+      links: [{ label: viewSite, href: "https://ai-lead-agent-lac.vercel.app" }],
     },
     {
       slug: "whatsapp-ai-agent",
@@ -391,7 +389,7 @@ export const projects = {
       },
       preview: "chat",
       media: null,
-      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/whatsapp-ai-agent" }],
+      links: [],
     },
     {
       slug: "clarte-math",
@@ -463,10 +461,7 @@ export const projects = {
           },
         ],
       },
-      links: [
-        { label: viewSite, href: "https://clarte-math.vercel.app" },
-        { label: viewCode, href: "https://github.com/gregorysudjian-ui/clarte-math" },
-      ],
+      links: [{ label: viewSite, href: "https://clarte-math.vercel.app" }],
     },
     {
       slug: "personal-website",
@@ -512,7 +507,7 @@ export const projects = {
         mobile: { en: "/projects/site-en-m.webp", fr: "/projects/site-fr-m.webp" },
         alt: { en: "The opening screen of this website", fr: "L'écran d'ouverture de ce site" },
       },
-      links: [{ label: viewCode, href: "https://github.com/gregorysudjian-ui/personal-website" }],
+      links: [],
     },
   ] satisfies Project[],
 };
