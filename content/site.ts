@@ -99,8 +99,8 @@ export const about = {
       fr: "Avant l'université, j'ai passé beaucoup de temps à enseigner : les bases du code avec des kits LEGO WeDo et SPIKE à des enfants chez NinjaCO, puis les maths à des élèves à Beyrouth et à Montréal. Expliquer simplement une idée difficile reste la meilleure façon que je connaisse de la comprendre moi-même.",
     },
     {
-      en: "Lately I've been building projects with AI tools like Claude Code: two AI agents I'm still working on, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
-      fr: "Dernièrement, j'ai développé des projets avec des outils d'IA comme Claude Code : deux agents IA sur lesquels je travaille encore, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
+      en: "Lately I've been building my own projects: two AI agents I'm still working on, a website for my math tutoring, and this site. Now I'm looking for an internship where I can work next to people who know more than I do, take on whatever the team needs, and learn as fast as I can.",
+      fr: "Dernièrement, j'ai développé mes propres projets : deux agents IA sur lesquels je travaille encore, un site pour mon tutorat en maths, et ce site. Aujourd'hui, je cherche un stage où travailler aux côtés de gens qui en savent plus que moi, prendre en charge ce dont l'équipe a besoin et apprendre le plus vite possible.",
     },
   ],
   facts: [
@@ -147,19 +147,19 @@ export const focus = {
       id: "software",
       title: { en: "Software", fr: "Logiciel" },
       text: {
-        en: "I started with Python and Java, and I'm learning data structures and algorithms at McGill. Every project I build teaches me something new.",
-        fr: "J'ai commencé avec Python et Java, et j'apprends les structures de données et les algorithmes à McGill. Chaque projet m'apprend quelque chose de nouveau.",
+        en: "I started with Python and Java, and now I'm learning C and Bash, along with data structures and algorithms at McGill.",
+        fr: "J'ai commencé avec Python et Java, et j'apprends maintenant le C et Bash, avec les structures de données et les algorithmes à McGill.",
       },
-      keywords: { en: "Python · Java · Algorithms", fr: "Python · Java · Algorithmes" },
+      keywords: { en: "Python · Java · C · Bash", fr: "Python · Java · C · Bash" },
     },
     {
       id: "ai",
       title: { en: "AI", fr: "IA" },
       text: {
-        en: "I use AI tools like Claude Code every day to build faster, and I'm learning how to make agents that take real work off people's plates.",
-        fr: "J'utilise chaque jour des outils d'IA comme Claude Code pour avancer plus vite, et j'apprends à créer des agents qui prennent en charge du vrai travail.",
+        en: "I use AI tools every day to build faster, and I'm learning how to make agents that take real work off people's plates.",
+        fr: "J'utilise chaque jour des outils d'IA pour avancer plus vite, et j'apprends à créer des agents qui prennent en charge du vrai travail.",
       },
-      keywords: { en: "Claude Code · Agents · Automation", fr: "Claude Code · Agents · Automatisation" },
+      keywords: { en: "Agents · Automation · LLM APIs", fr: "Agents · Automatisation · API de LLM" },
     },
     {
       id: "math",
@@ -219,7 +219,7 @@ export type Project = {
   privateRepo?: boolean; // shows "Private repository" instead of a code link
 };
 
-const soloBuild = { en: "Solo project, built with Claude Code", fr: "Projet solo, développé avec Claude Code" };
+const soloBuild = { en: "Solo project, AI-assisted", fr: "Projet solo, assisté par IA" };
 const viewCode = { en: "View code", fr: "Voir le code" };
 const viewSite = { en: "View website", fr: "Voir le site" };
 
@@ -227,8 +227,8 @@ export const projects = {
   label: { en: "Projects", fr: "Projets" },
   heading: { en: "Things I've *built*.", fr: "Ce que j'ai *construit*." },
   intro: {
-    en: "Four projects I've built with AI tools like Claude Code: two AI agents (both still in progress), the website for my math tutoring, and this site.",
-    fr: "Quatre projets que j'ai développés avec des outils d'IA comme Claude Code : deux agents IA (toujours en cours), le site de mon tutorat en maths et ce site.",
+    en: "Four projects, all built with the help of Claude Code: two AI agents (both still in progress), the website for my math tutoring, and this site.",
+    fr: "Quatre projets, tous développés avec l'aide de Claude Code : deux agents IA (toujours en cours), le site de mon tutorat en maths et ce site.",
   },
   labels: {
     "in-progress": { en: "In progress", fr: "En cours" },
@@ -313,35 +313,36 @@ export const projects = {
         type: "slides",
         slides: [
           {
-            src: "/projects/lf-search.webp",
-            mobile: "/projects/lf-search-m.webp",
-            label: { en: "Search", fr: "Recherche" },
+            src: "/projects/lf-overview.webp",
+            mobile: "/projects/lf-overview-m.webp",
+            label: { en: "Leads", fr: "Prospects" },
             caption: {
-              en: "Search and filter Montreal hair and beauty businesses, best prospects first",
-              fr: "Rechercher et filtrer les commerces de coiffure et de beauté de Montréal, les meilleurs prospects en premier",
+              en: "The dashboard: new leads ranked by priority, each with a transparent 0–100 score",
+              fr: "Le tableau de bord : les nouveaux prospects classés par priorité, chacun avec un score de 0 à 100 transparent",
             },
-            alt: { en: "Lead Finder's business search with trade and area filters", fr: "La recherche de commerces de Lead Finder avec filtres par métier et par secteur" },
+            alt: { en: "Lead Finder's dashboard with leads ranked by priority", fr: "Le tableau de bord de Lead Finder avec les prospects classés par priorité" },
           },
           {
-            src: "/projects/lf-grid.webp",
-            mobile: "/projects/lf-grid-m.webp",
-            label: { en: "Generate", fr: "Génération" },
+            src: "/projects/lf-designs.webp",
+            mobile: "/projects/lf-designs-m.webp",
+            label: { en: "Designs", fr: "Designs" },
             caption: {
-              en: "Each one gets its own generated design: layout, palette and typefaces",
-              fr: "Chacun reçoit son propre design généré : mise en page, palette et polices",
+              en: "Each business gets its own generated design: layout, palette and typefaces",
+              fr: "Chaque commerce reçoit son propre design généré : mise en page, palette et polices",
             },
             alt: { en: "A grid of generated demo websites", fr: "Une grille de sites démo générés" },
           },
           {
-            src: "/projects/lf-demo.webp",
-            mobile: "/projects/lf-demo-m.webp",
+            src: "/projects/lf-bakery.webp",
+            mobile: "/projects/lf-bakery-m.webp",
             scroll: true,
-            label: { en: "Review", fr: "Validation" },
+            speed: 520,
+            label: { en: "Demo", fr: "Démo" },
             caption: {
-              en: "A finished demo site, in French and English, ready for a person to review before anything is sent",
-              fr: "Un site démo terminé, en français et en anglais, à valider par une personne avant tout envoi",
+              en: "A finished demo site for a Montreal bakery, ready for a person to review before anything is sent",
+              fr: "Un site démo terminé pour une boulangerie montréalaise, à valider par une personne avant tout envoi",
             },
-            alt: { en: "A generated demo website for a Montreal barbershop", fr: "Un site démo généré pour un barbier montréalais" },
+            alt: { en: "A generated demo website for a Montreal bakery", fr: "Un site démo généré pour une boulangerie montréalaise" },
           },
         ],
       },
@@ -472,8 +473,8 @@ export const projects = {
       kicker: { en: "Personal website", fr: "Site personnel" },
       title: { en: "This website", fr: "Ce site" },
       summary: {
-        en: "The site you're on: a scroll-driven story where one copper circuit trace runs from the first screen to the contact section. Built with Claude Code, in English and French.",
-        fr: "Le site sur lequel vous êtes : une histoire guidée par le défilement, où une piste de cuivre relie le premier écran à la section contact. Développé avec Claude Code, en anglais et en français.",
+        en: "The site you're on: a scroll-driven story where one copper circuit trace runs from the first screen to the contact section, in English and French.",
+        fr: "Le site sur lequel vous êtes : une histoire guidée par le défilement, où une piste de cuivre relie le premier écran à la section contact, en anglais et en français.",
       },
       highlights: [
         {
@@ -600,17 +601,20 @@ export const skills = {
   },
   // The big scrolling band of words above the skills.
   marquee: [
+    { en: "Software", fr: "Logiciel" },
+    { en: "AI", fr: "IA" },
+    { en: "Math", fr: "Maths" },
     "Python",
     "Java",
-    "Claude Code",
+    "C",
+    "Bash",
     { en: "AI agents", fr: "Agents IA" },
-    { en: "Math", fr: "Maths" },
-    { en: "Automation", fr: "Automatisation" },
     { en: "Algorithms", fr: "Algorithmes" },
+    { en: "Automation", fr: "Automatisation" },
     { en: "Problem solving", fr: "Résolution de problèmes" },
   ] satisfies Text[],
   groups: [
-    { title: { en: "Languages", fr: "Langages" }, items: ["Python", "Java"] },
+    { title: { en: "Languages", fr: "Langages" }, items: ["Python", "Java", "C", "Bash"] },
     {
       title: { en: "Foundations", fr: "Fondamentaux" },
       items: [

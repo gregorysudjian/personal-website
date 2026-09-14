@@ -15,7 +15,7 @@ export default function Marquee({ words }: { words: string[] }) {
     () => {
       const mm = gsap.matchMedia();
       mm.add(FULL_MOTION, () => {
-        const loop = gsap.to(row.current, { xPercent: -50, ease: "none", duration: 38, repeat: -1 });
+        const loop = gsap.to(row.current, { xPercent: -50, ease: "none", duration: 30, repeat: -1 });
         // Start deep into the loop so it has room to run backwards too.
         loop.totalTime(loop.duration() * 500);
 
@@ -55,10 +55,10 @@ export default function Marquee({ words }: { words: string[] }) {
     ));
 
   return (
-    <div ref={root} className="overflow-hidden border-y border-line py-6 md:py-8" aria-hidden="true">
+    <div ref={root} className="overflow-hidden border-y border-line py-5 md:py-6" aria-hidden="true">
       <div
         ref={row}
-        className="flex w-max whitespace-nowrap text-[clamp(3rem,9vw,8.5rem)] font-semibold uppercase leading-none tracking-[-0.04em]"
+        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.04em]"
       >
         {set("a")}
         {set("b")}

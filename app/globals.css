@@ -447,8 +447,10 @@ html.has-cursor * {
 /* ------------------------------------------------------------------ focus */
 
 /* Keep in sync with HORIZONTAL in components/focus/Focus.tsx.
-   Phones held sideways (500px tall or less) get the stacked list: the panels wouldn't fit. */
-@media (min-width: 768px) and (min-height: 501px) and (prefers-reduced-motion: no-preference) {
+   Windows too small for the panels (phones held sideways, small narrow windows) get the stacked list. */
+@media (min-width: 768px) and (min-height: 900px) and (prefers-reduced-motion: no-preference),
+  (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
+  (min-width: 1200px) and (min-height: 580px) and (prefers-reduced-motion: no-preference) {
   html.js .focus-frame {
     position: sticky;
     top: 0;
@@ -470,6 +472,30 @@ html.has-cursor * {
   }
   html.js .focus-meter {
     display: flex;
+  }
+
+  /* Only when the text wouldn't fit (short laptop windows): sizes follow the screen height so the
+     whole panel shows. Set from Focus.tsx after measuring; everywhere else the look above is untouched. */
+  html.js .focus-compact .focus-frame {
+    padding-block: 5rem clamp(1.25rem, 4vh, 2.5rem);
+  }
+  html.js .focus-compact .focus-frame h2 {
+    font-size: clamp(2.6rem, min(6vw, 8.5vh), 6.2rem);
+  }
+  html.js .focus-compact .focus-track {
+    flex: 0 1 min(54vh, 560px);
+    min-height: 0;
+    margin-top: clamp(1.5rem, 4vh, 3rem);
+  }
+  html.js .focus-compact .focus-panel {
+    height: 100%;
+  }
+  html.js .focus-compact .focus-body {
+    padding: clamp(1.5rem, 4.5vh, 3rem);
+    gap: clamp(1rem, 3.5vh, 2.5rem);
+  }
+  html.js .focus-compact .focus-panel h3 {
+    font-size: clamp(2.2rem, min(5vw, 8vh), 5.2rem);
   }
 }
 
@@ -577,9 +603,12 @@ html.has-cursor * {
 
 /* ----------------------------------------------------------------- skills */
 
+/* Outlined words. The fill (same colour as the page) is painted over the inner half of a double-width
+   stroke, so the overlapping shapes inside letters like H don't show through. */
 .marquee-outline {
-  color: transparent;
-  -webkit-text-stroke: 1px var(--color-mute);
+  color: var(--color-ink);
+  -webkit-text-stroke: 2px var(--color-mute);
+  paint-order: stroke fill;
 }
 
 .chip {
