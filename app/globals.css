@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Wide and tall enough for the hero's full-screen layout (not phones, not landscape phones). */
-@custom-variant roomy (@media (min-width: 48rem) and (min-height: 700px));
+/* Tablets and laptops: the hero's original full-screen layout (not phones, upright or sideways). */
+@custom-variant roomy (@media (min-width: 48rem) and (min-height: 501px));
 /* Very short screens, e.g. a phone held sideways: the hero drops to a compact bottom row. */
 @custom-variant short (@media (max-height: 500px));
 
@@ -446,10 +446,9 @@ html.has-cursor * {
 
 /* ------------------------------------------------------------------ focus */
 
-/* Keep in sync with HORIZONTAL in components/focus/Focus.tsx. Shorter screens get the stacked list. */
-@media (min-width: 768px) and (min-height: 900px) and (prefers-reduced-motion: no-preference),
-  (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
-  (min-width: 1200px) and (min-height: 580px) and (prefers-reduced-motion: no-preference) {
+/* Keep in sync with HORIZONTAL in components/focus/Focus.tsx.
+   Phones held sideways (500px tall or less) get the stacked list: the panels wouldn't fit. */
+@media (min-width: 768px) and (min-height: 501px) and (prefers-reduced-motion: no-preference) {
   html.js .focus-frame {
     position: sticky;
     top: 0;
@@ -458,30 +457,16 @@ html.has-cursor * {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-block: 5rem clamp(1.25rem, 4vh, 2.5rem);
-  }
-  /* Sizes follow the screen height too, so on short laptop screens the whole panel still fits. */
-  html.js .focus-frame h2 {
-    font-size: clamp(2.6rem, min(6vw, 8.5vh), 6.2rem);
+    padding-block: 5rem 0;
   }
   html.js .focus-track {
     flex-direction: row;
     width: max-content;
-    flex: 0 1 min(54vh, 560px);
-    min-height: 0;
-    margin-top: clamp(1.5rem, 4vh, 3rem);
   }
   html.js .focus-panel {
     width: min(72vw, 1040px);
-    height: 100%;
+    height: min(54vh, 560px);
     flex-shrink: 0;
-  }
-  html.js .focus-body {
-    padding: clamp(1.5rem, 4.5vh, 3rem);
-    gap: clamp(1rem, 3.5vh, 2.5rem);
-  }
-  html.js .focus-panel h3 {
-    font-size: clamp(2.2rem, min(5vw, 8vh), 5.2rem);
   }
   html.js .focus-meter {
     display: flex;

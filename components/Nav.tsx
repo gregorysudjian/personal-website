@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { introReady, lockScroll, scrollToTarget, unlockScroll } from "@/lib/scroll";
@@ -128,7 +127,9 @@ export default function Nav({ locale }: { locale: Locale }) {
           </nav>
 
           <div className="flex items-center gap-5">
-            <Link
+            {/* A full page load on purpose: a client-side switch re-renders <html> and drops the
+                "js" class set by the boot script, which breaks the scroll-driven sections. */}
+            <a
               href={`/${other}`}
               hrefLang={other}
               aria-label={t(ui.switchLanguage, locale)}
@@ -137,7 +138,7 @@ export default function Nav({ locale }: { locale: Locale }) {
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
               <span className="text-line">/</span>
               <span className={locale === "fr" ? "text-paper" : ""}>FR</span>
-            </Link>
+            </a>
             <button
               ref={toggle}
               type="button"

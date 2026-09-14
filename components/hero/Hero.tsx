@@ -186,7 +186,7 @@ export default function Hero({ locale }: { locale: Locale }) {
 
         {/* Layer 3 — the name, with one quiet line above it.
             Short screens: it fills the space above the bottom row so the two never overlap. */}
-        <div className="hero-name-scroll relative flex min-h-0 flex-1 items-center pt-16 md:pt-20 roomy:absolute roomy:inset-0 roomy:pt-0">
+        <div className="hero-name-scroll relative flex min-h-0 flex-1 items-center pt-16 md:pt-20 roomy:absolute roomy:inset-0 roomy:pt-0!">
           <div className="hero-name-mouse gutter w-full">
             {/* wrapper fades on scroll; inner line is revealed by the intro (never both on one element) */}
             <div className="hero-eyebrow mb-6 md:mb-9 short:mb-3!">
@@ -198,7 +198,7 @@ export default function Hero({ locale }: { locale: Locale }) {
             <h1
               data-intro
               aria-label={person.name}
-              className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,26svh),17.5rem)]"
+              className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,16.4vw,17.5rem)] short:text-[clamp(3.4rem,min(16.4vw,26svh),17.5rem)]!"
             >
               <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em]">
                 {person.firstName}

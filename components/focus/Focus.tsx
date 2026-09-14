@@ -10,19 +10,13 @@ import { CodeWindow, MathPlot, NeuralNet } from "./Illustrations";
 
 const ART = { software: CodeWindow, ai: NeuralNet, math: MathPlot } as const;
 // Keep in sync with the focus rules in globals.css.
-const HORIZONTAL = [
-  "(min-width: 768px) and (min-height: 900px)",
-  "(min-width: 1000px) and (min-height: 700px)",
-  "(min-width: 1200px) and (min-height: 580px)",
-]
-  .map((size) => `${size} and (prefers-reduced-motion: no-preference)`)
-  .join(", ");
+const HORIZONTAL = "(min-width: 768px) and (min-height: 501px) and (prefers-reduced-motion: no-preference)";
 
 /**
  * The page pins and the three focus panels slide past sideways (desktop).
  * The sticky frame + transformed track keeps it smooth; the section's height is set
  * to exactly the horizontal distance so the scroll feels 1:1.
- * On phones, very short screens and with reduced motion the panels simply stack.
+ * On phones (upright or sideways) and with reduced motion the panels simply stack.
  */
 export default function Focus({ locale }: { locale: Locale }) {
   const root = useRef<HTMLElement>(null);
@@ -118,7 +112,7 @@ export default function Focus({ locale }: { locale: Locale }) {
                     <Art />
                   </div>
                 </div>
-                <div className="focus-body flex flex-col justify-between gap-10 p-8 md:p-12">
+                <div className="flex flex-col justify-between gap-10 p-8 md:p-12">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-sm text-copper">0{i + 1}</span>
                     <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" />
