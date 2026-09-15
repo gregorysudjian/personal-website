@@ -48,7 +48,7 @@ export default function Shot({
 
   return (
     <picture>
-      {mobile && <source media="(max-width: 767px)" srcSet={mobile} />}
+      {mobile && <source media="(max-width: 767px) and (orientation: portrait)" srcSet={mobile} />}
       {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized captures; tall ones need their natural height */}
       <img
         ref={(el) => {

@@ -228,7 +228,7 @@ export default function Nav({ locale }: { locale: Locale }) {
           {ui.nav.map((item) => (
             <li key={item.id} className="border-b border-line pb-3">
               {/* the mask for the rise-in sits inside the link, so the focus ring isn't clipped */}
-              <a href={`#${item.id}`} onClick={go(item.id)} className="flex items-center gap-4 text-paper">
+              <a href={`#${item.id}`} onClick={go(item.id)} className="flex min-h-11 items-center gap-4 text-paper">
                 <span className="h-px w-6 shrink-0 bg-copper" aria-hidden="true" />
                 <span className="overflow-hidden pb-1">
                   <span className="menu-item block text-5xl font-medium tracking-tight short:text-3xl">

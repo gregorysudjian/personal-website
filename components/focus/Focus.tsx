@@ -99,7 +99,7 @@ export default function Focus({ locale }: { locale: Locale }) {
     <section ref={root} id="focus" aria-labelledby="focus-title" className="focus relative">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
 
-      <div ref={frame} className="focus-frame py-28">
+      <div ref={frame} className="focus-frame py-28 short:py-16">
         <div className="gutter flex items-end justify-between gap-10">
           <SectionHeader id="focus-title" label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
           <div className="focus-meter hidden shrink-0 items-center gap-4 pb-3" aria-hidden="true">

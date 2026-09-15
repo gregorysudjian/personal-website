@@ -6,7 +6,7 @@ import ProjectCard from "./ProjectCard";
 
 export default function Projects({ locale }: { locale: Locale }) {
   return (
-    <section id="projects" aria-labelledby="projects-title" className="relative gutter pb-24 pt-32 md:pb-32 md:pt-48">
+    <section id="projects" aria-labelledby="projects-title" className="relative gutter pb-24 pt-32 md:pb-32 md:pt-48 short:py-20!">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
       <SectionHeader
         id="projects-title"
