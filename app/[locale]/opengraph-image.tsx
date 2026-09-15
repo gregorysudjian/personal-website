@@ -45,13 +45,22 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
           color: paper,
         }}
       >
-        {/* soften the grid toward the edges + copper horizon glow */}
+        {/* soften the grid toward the edges + copper horizon glow (one gradient per layer: the image
+            renderer drops a background with two) */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             display: "flex",
-            background: `radial-gradient(ellipse at 70% 60%, rgba(232,130,58,0.18), transparent 55%), radial-gradient(ellipse at 50% 50%, rgba(11,12,14,0.55), ${ink} 85%)`,
+            backgroundImage: `radial-gradient(ellipse at 50% 50%, rgba(11,12,14,0.55), ${ink} 85%)`,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            backgroundImage: "radial-gradient(ellipse at 70% 60%, rgba(232,130,58,0.18), transparent 55%)",
           }}
         />
 
@@ -68,13 +77,13 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
 
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 80px 60px 190px", width: "100%" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: "Geist Mono", fontSize: 22, letterSpacing: 4, color: mute }}>
-            <span style={{ color: copper }}>[00]</span>
+            <div style={{ width: 40, height: 2, background: copper }} />
             {t(hero.eyebrow, locale).toUpperCase()}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", fontSize: 150, lineHeight: 0.84, letterSpacing: -7 }}>
             <span>{person.firstName.toUpperCase()}</span>
-            <span>{person.lastName.toUpperCase()}</span>
+            <span style={{ alignSelf: "flex-end", marginRight: 60 }}>{person.lastName.toUpperCase()}</span>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontFamily: "Geist Mono", fontSize: 22, letterSpacing: 3, color: paper }}>

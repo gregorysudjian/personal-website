@@ -62,7 +62,7 @@ export const contactRoute: Route = (w, h, wrap) => {
   const r = railX(w);
   const c = offsetWithin(chip, section);
   const ty = Math.round(c.y + Math.min(c.h * 0.5, 180));
-  const tx = Math.round(c.x);
+  const tx = Math.round(c.x) - 5; // the end pad sits just outside the chip's border, not half under it
   const d = Math.max(0, Math.min(tx - r, 64));
   const pts = clean([
     [r, 0],
