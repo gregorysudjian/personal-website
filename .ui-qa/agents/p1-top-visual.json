@@ -1,0 +1,334 @@
+[
+  {
+    "section": "hero",
+    "viewport": "1280s (1280x620); also 1024x640, 1366x650, 1440x700, 1536x730, and FR at 1280x720, 1366x768, 1440x760",
+    "severity": "P1",
+    "description": "On short and common laptop windows the giant name runs into the bottom row. 'SUTJIAN' overlaps the tagline and the SCROLL hint. Measured at 1280x620: line-2 glyph box bottom is 505 while the tagline top is 458 (EN) or 429 (FR). The tagline's right edge is 481 and SUTJIAN starts at x=389, so they overlap by 92px horizontally and 47-76px vertically, and the SCROLL label top (500) sits under the letters. The same collision shows at 1366x650 (bottom 531 vs tagline 488/459), 1440x700 (566 vs 538), 1536x730 (594 vs 568) and 1024x640 (482 vs 449). In FR, where the tagline has 3 lines, it also happens at 1280x720 (555 vs 529), 1366x768 (590 vs 577, the most common laptop screen) and 1440x760 (596 vs 569, where 'aux' ends 3px from the S). On md+ the name size depends only on width (16.4vw) and is centered in the whole frame (roomy:absolute inset-0), with no account of how tall the bottom row is.",
+    "evidence": [
+      "shots/hero/p1/1280s/en-motion-atf.png",
+      "shots/hero/p1/1280s/fr-motion-atf.png",
+      "shots/hero/p1/agent-visual/fr-motion-1366x650-atf.png",
+      "shots/hero/p1/agent-visual/en-motion-1536x730-atf.png",
+      "shots/hero/p1/agent-visual/fr-motion-1440x760-atf.png",
+      "shots/hero/p1/agent-visual/en-motion-1024x640-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:201 (md:text-[clamp(3.4rem,16.4vw,17.5rem)] has no height term); components/hero/Hero.tsx:189 (roomy:absolute roomy:inset-0 centers the name over the full frame); app/globals.css:4 (roomy = min-height 501px, so 620-800px-tall windows get the full-screen layout)",
+    "suggested_fix": "Add a height cap on md+, e.g. md:text-[clamp(3.4rem,min(16.4vw,25svh),17.5rem)]. Or drop the absolute centering and use a flex column (name flex-1 centered, bottom row in normal flow) so the name can never extend into the HUD. Raising the roomy min-height (e.g. to 820px) also works.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "all (reduced motion): 375, 390, 768, 1440, 1920",
+    "severity": "P1",
+    "description": "With reduced motion, the hero stays a static sticky frame for 170-190vh while the fully lit copper page trace (z-10, drawn on top of the frame) scrolls over it. The line runs straight through the name, the eyebrow and the tagline. At 1920 it crosses the 'VIEW PROJECTS' button. At 1440 after 300px of scroll, the start pad sits inside the 'U' of SUTJIAN (720,570). The trace's start pad also comes loose from the SCROLL wire it is meant to hang from, because the wire stays pinned at the bottom of the frame while the pad scrolls up. With motion on, the hero fades to ink before the trace gets there, so only reduced-motion users see this, but they see it across the whole first screen.",
+    "evidence": [
+      "shots/hero/p1/1440/en-reduced-01.png",
+      "shots/hero/p1/1920/en-reduced-01.png",
+      "shots/hero/p1/390/en-reduced-01.png",
+      "shots/hero/p1/768/fr-reduced-01.png",
+      "shots/hero/p1/agent-visual/en-reduced-1440-scroll300.png",
+      "shots/hero/p1/agent-visual/en-reduced-390-scroll300.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:154 (h-[170vh] md:h-[190vh] also applies under reduced motion); components/hero/Hero.tsx:245 (CircuitTrace z-10 above the sticky frame); components/CircuitTrace.tsx:118-122 (reduced motion draws the full route at once)",
+    "suggested_fix": "Under prefers-reduced-motion, make the hero section h-svh (motion-reduce:h-svh) so it scrolls away with the page and the trace starts under the hint as designed. Or render the hero trace below the sticky frame's content (z-0 under a z-10 frame) in reduced motion.",
+    "confidence": 0.9,
+    "lens": "visual"
+  },
+  {
+    "section": "global (404)",
+    "viewport": "1440, 390",
+    "severity": "P1",
+    "description": "Unknown URLs (/de, /en/does-not-exist, /fr/nope) show the stock Next.js 404: a white page in the default system font with '404 | This page could not be found.' There is no dark theme, no brand mark, no navigation and no link back home. It is the only white screen on an otherwise all-dark site, it is English-only even under /fr, and it flashes bright on a dark-mode visit.",
+    "evidence": [
+      "shots/global/p1/1440/404-status404.png",
+      "shots/global/p1/1440/404-nested.png",
+      "shots/global/p1/390/404.png"
+    ],
+    "file_line": "app/[locale]/ has no not-found.tsx and app/ has no root not-found.tsx/layout.tsx; app/[locale]/layout.tsx:26 (dynamicParams=false sends every unknown locale to the framework default)",
+    "suggested_fix": "Add app/[locale]/not-found.tsx (and a root app/not-found.tsx with its own <html> for invalid locales) that uses the ink background, the Mark, a label-mono '404' eyebrow, a big paper headline, and a .btn-primary back to /en or /fr.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "statement",
+    "viewport": "844l (844x390) FR; 932x430 FR; 1280s FR",
+    "severity": "P1",
+    "description": "The pinned sentence is taller than short viewports and gets clipped at both ends. At 844x390 FR the label 'EN UNE PHRASE' starts at y=-1 (cut at the top edge) and the last line ends at 391 (descenders of 'pas encore essayé.' cut off). At 932x430 FR the label sits at y=2 and the text ends at 428. EN at 844x390 only just fits (label 23, bottom 367). At 1280x620 FR the label is at y=28-40, inside the 80px band where the header comes back on scroll-up, so the header covers it. The font size is width-only (clamp(2rem,5.4vw,5.6rem)) and the sticky frame is h-svh with justify-center and no minimum margins.",
+    "evidence": [
+      "shots/statement/p1/844l/fr-motion-00.png",
+      "shots/statement/p1/844l/fr-motion-01.png",
+      "shots/statement/p1/agent-visual/fr-motion-844x390-pinned.png",
+      "shots/statement/p1/agent-visual/fr-motion-932x430-pinned.png",
+      "shots/statement/p1/1280s/fr-motion-01.png"
+    ],
+    "file_line": "components/Statement.tsx:50 (text-[clamp(2rem,5.4vw,5.6rem)] has no height term); components/Statement.tsx:43 (sticky h-svh justify-center, no padding-block)",
+    "suggested_fix": "Cap the size by height, e.g. text-[clamp(1.6rem,min(5.4vw,7.2svh),5.6rem)], and give the sticky frame padding-block (pt-20 pb-8 on short screens) so the label clears the header. On very short screens, top-align the block (short:justify-start).",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "nav",
+    "viewport": "768, 1280s, 1440 (also 390 FR)",
+    "severity": "P2",
+    "description": "When the header comes back on scroll-up, its fade (ink/90 to ink/50 to transparent over 64-80px) is too light to separate it from large headings. The nav labels print right on top of the section headlines: 'GREGORY SUTJIAN', 'À PROPOS' and 'PROJETS' sit over the glyphs of 'Ce que j'ai construit' at 768, and 'GREGORY SUTJIAN' and 'ABOUT' over 'Things I've built.' at 1440. Both texts become hard to read and it looks like a layering bug.",
+    "evidence": [
+      "shots/nav/p1/768/fr-motion-header-over-content.png",
+      "shots/nav/p1/1440/en-motion-header-over-content.png",
+      "shots/nav/p1/1280s/fr-motion-header-over-content.png",
+      "shots/nav/p1/390/fr-motion-header-over-content.png"
+    ],
+    "file_line": "components/Nav.tsx:106",
+    "suggested_fix": "Once past the hero, give the header row a real backdrop, e.g. bg-ink/80 plus backdrop-blur-md for the h-16/h-20 bar with the gradient only below it. Or toggle a 'scrolled' class that makes the gradient's first stop fully opaque for the top 100% of the bar.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "nav",
+    "viewport": "768, 844l, 1280s, 1440, 1920",
+    "severity": "P2",
+    "description": "The group of nav links is not centered on the page. justify-between with a wide left block (Mark + name, 163px) and a narrow right block (EN/FR, 54px) pushes the group 54.6px right of center at every width: its center is at 774.6 vs 720 at 1440, 1014.6 vs 960 at 1920, 438.6 vs 384 at 768, and 476.6 vs 422 at 844l. The hero puts its SCROLL label, the wire and the copper start pad exactly on the page's center line, right below the nav, so two 'centered' elements visibly disagree by about 55px.",
+    "evidence": [
+      "shots/hero/p1/1440/en-motion-atf.png",
+      "shots/hero/p1/1920/en-motion-atf.png",
+      "shots/hero/p1/768/en-motion-atf.png"
+    ],
+    "file_line": "components/Nav.tsx:107 (flex justify-between); components/Nav.tsx:113",
+    "suggested_fix": "Lay the header row out as grid grid-cols-[1fr_auto_1fr] with the language cluster justify-self-end, so the nav stays truly centered.",
+    "confidence": 0.9,
+    "lens": "visual"
+  },
+  {
+    "section": "global (boot overlay)",
+    "viewport": "1440, 390",
+    "severity": "P2",
+    "description": "In the boot overlay the logo and name sit right on the glowing copper bar instead of above it. The class translate-y-[-3.25rem] is meant to hold the mark 52px above the line, but GSAP takes over the CSS translate and tweens y to 0. Measured at the end: computed translate 'none', transform identity, mark top 450 equals bar y 450. The mark slides down into the line on entry, and the bar's 18px glow bleeds over the icon and the 'GREGORY SUTJIAN' label, so the one-time intro looks crowded.",
+    "evidence": [
+      "shots/global/p1/1440/boot-300ms.png",
+      "shots/global/p1/1440/boot-900ms.png",
+      "shots/global/p1/1440/boot-1700ms.png",
+      "shots/global/p1/390/boot-900ms.png"
+    ],
+    "file_line": "components/Boot.tsx:37 (to .boot-mark {y:0}) with components/Boot.tsx:54 (translate-y-[-3.25rem])",
+    "suggested_fix": "Put the offset on the layout instead of a transform, e.g. top-[calc(50%-3.25rem)] or a wrapper div, then animate the inner mark with fromTo({y:8},{y:0}). Or tween to y:-52 explicitly.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "768 FR, 390 FR, 375 FR",
+    "severity": "P2",
+    "description": "In French the two hero CTAs don't fit on one row. 'VOIR LES PROJETS' and 'TÉLÉCHARGER LE CV' stack into two pills of different widths (179px vs 170px at 390; 179 vs 169 at 768; tops 885 and 941 at 768). On a tablet (768) this happens because the bottom grid [1fr_auto_1fr] leaves the left column only about 315px. The FR tagline also grows to 4 lines, so the left block is about 230px tall against a one-line status on the right. The row looks lopsided and different from EN, where both CTAs sit side by side.",
+    "evidence": [
+      "shots/hero/p1/768/fr-motion-atf.png",
+      "shots/hero/p1/768/en-motion-atf.png",
+      "shots/hero/p1/390/fr-motion-atf.png",
+      "shots/hero/p1/375/fr-motion-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:215 (md:grid-cols-[1fr_auto_1fr]); components/hero/Hero.tsx:220 (flex flex-wrap gap-3)",
+    "suggested_fix": "At md, give the text column more room (md:grid-cols-[minmax(0,1.6fr)_auto_1fr]). On phones, lay the CTAs out as grid grid-cols-2 (equal widths, text-center, slightly less padding) or as a deliberate full-width stack, so the wrap never looks accidental.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The type hierarchy is inverted in the bottom row. The primary CTAs use .btn-sm at 0.66rem (10.56px), which makes them the smallest text in the hero. They are smaller than the passive mono labels: eyebrow, status and nav at 0.72rem (11.52px), and the SCROLL hint. At 1920 'VIEW PROJECTS' reads weaker than 'OPEN TO INTERNSHIPS' next to it.",
+    "evidence": [
+      "shots/hero/p1/1920/en-motion-atf.png",
+      "shots/hero/p1/1440/en-motion-atf.png"
+    ],
+    "file_line": "app/globals.css:412-415 (.btn-sm font-size 0.66rem); components/hero/Hero.tsx:221,224",
+    "suggested_fix": "Make the hero CTAs at least 0.72rem (the label-mono size): use the regular .btn, or set .btn-sm to 0.72rem and adjust padding.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "nav (mobile menu)",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "The keyboard focus ring on the mobile menu items is clipped to one line. Each <li> is overflow-hidden (for the slide-up), so the 2px copper outline (offset 4px) of the full-width .menu-item link only shows its bottom edge. Focus looks like a second, brighter underline stacked on the item's border-b, not the boxed ring used everywhere else (nav links, logo, EN/FR, buttons).",
+    "evidence": [
+      "shots/nav/p1/390/en-motion-menu-tab.png",
+      "shots/nav/p1/375/en-motion-menu-tab.png",
+      "shots/global/p1/1440/en-motion-tab03.png"
+    ],
+    "file_line": "components/Nav.tsx:165 (li overflow-hidden); components/Nav.tsx:166; app/globals.css:58-62",
+    "suggested_fix": "Move overflow-hidden to an inner span that wraps the animated text (animate that span, not the <a>). Or give .menu-item focus-visible:outline-offset-[-2px] so the ring draws inside the clip.",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "global (OG image)",
+    "viewport": "og 1200x630 (en, fr)",
+    "severity": "P2",
+    "description": "The share card is missing its intended glow and edge fade. The overlay meant to 'soften the grid toward the edges + copper horizon glow' does not render. The pixel at the glow center (840,378) is exactly ink #0b0c0e, and grid lines are exactly #2a2d33 at the corners and in the center. The result is a flat, evenly harsh 60px grid behind and through the name, much plainer than the glowing, fading hero it is supposed to preview.",
+    "evidence": [
+      "shots/global/p1/og/og-en.png",
+      "shots/global/p1/og/og-fr.png"
+    ],
+    "file_line": "app/[locale]/opengraph-image.tsx:49-56",
+    "suggested_fix": "Satori doesn't render that 'background' shorthand with two 'ellipse at' radial gradients. Use two stacked absolute divs, each with a single backgroundImage: 'radial-gradient(circle at 70% 60%, rgba(232,130,58,0.18), transparent 55%)' and a vignette. Or bake the background into a static PNG and draw it with <img>.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "global (OG image)",
+    "viewport": "og 1200x630",
+    "severity": "P3",
+    "description": "The share card doesn't match the site hero. It prefixes the eyebrow with a copper '[00]' index that appears nowhere in the hero (the site uses a short copper rule), and it left-aligns both name lines where the site right-aligns 'SUTJIAN'. People who click through land on a different-looking composition.",
+    "evidence": [
+      "shots/global/p1/og/og-en.png",
+      "shots/hero/p1/1440/en-motion-atf.png"
+    ],
+    "file_line": "app/[locale]/opengraph-image.tsx:71, 75-78",
+    "suggested_fix": "Swap '[00]' for a 32x1 copper rule like the hero eyebrow, and set alignSelf:'flex-end' (or a left margin) on the last-name span to echo the hero's staggered name.",
+    "confidence": 0.5,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "390, 375 (EN and FR)",
+    "severity": "P3",
+    "description": "On phones the eyebrow wraps and leaves a one-word widow ('UNIVERSITY' in EN, 'MCGILL' in FR). Because the row is flex items-center, the copper rule floats midway between the two lines (y=279 between lines at 270 and 288 at 390) instead of lining up with the first line.",
+    "evidence": [
+      "shots/hero/p1/390/en-motion-atf.png",
+      "shots/hero/p1/375/fr-motion-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:193-194",
+    "suggested_fix": "Use items-start with the rule offset to the first line's center (mt-[0.8em]), and add text-wrap:balance on the label so the break is even.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "1440, 1920 (all md+)",
+    "severity": "P3",
+    "description": "The display name is optically inset from the gutter on both sides, so it doesn't line up with the column around it. At 1440 the 'G' ink starts at x=66 while the eyebrow rule, tagline and nav logo start at 56-57. At 1920 it is 68 vs 57. On the right, 'SUTJIAN' ends at 1374 against 1384 for 'OPEN TO INTERNSHIPS' and EN/FR (1853 vs 1864 at 1920). At 236-280px the letters' side bearings add up to about 10-12px.",
+    "evidence": [
+      "shots/hero/p1/1440/en-reduced-atf.png",
+      "shots/hero/p1/1920/en-reduced-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:203-207",
+    "suggested_fix": "Add optical compensation to the lines: first line ml-[-0.04em], second line mr-[-0.04em] (or on the h1: mx-[-0.04em]).",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "1440, 1280s, 1440x760",
+    "severity": "P3",
+    "description": "The decorative circuit traces aren't staying in the bands they were designed for. At 1440x900 one trace runs at y≈787, right under the tagline's second line and touching the descenders of 'always up… learning', and another at y≈727 runs just above line 1. On short windows the top band slides up behind the nav: at 1280x620 a trace at y=63 with a pad at (632,63) sits under 'PROJECTS', and at 1440x760 there are pads at (710,103) and (796,78). This happens because the SVG's 'slice' crop moves the bands as the aspect ratio changes, and the top mask only fades 4-16% of the height.",
+    "evidence": [
+      "shots/hero/p1/1440/en-reduced-atf.png",
+      "shots/hero/p1/1280s/en-motion-atf.png",
+      "shots/hero/p1/agent-visual/en-motion-1440x760-atf.png"
+    ],
+    "file_line": "components/hero/HeroCircuit.tsx:12-23, 56 (preserveAspectRatio xMidYMid slice); app/globals.css:172-178",
+    "suggested_fix": "Position the two trace bands relative to the layout (one SVG above the name and one above the HUD) instead of one sliced full-bleed board. Or make the top mask a fixed pixel fade (transparent 0-110px) so traces never reach the nav row.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "nav (mobile)",
+    "viewport": "375, 390",
+    "severity": "P3",
+    "description": "The EN/FR switch jumps sideways when the menu opens or closes. The toggle's label changes width (MENU → CLOSE / FERMER), so the language cluster shifts 8px left in EN (EN at x=258 → 250) and 17px in FR (243 → 226).",
+    "evidence": [
+      "shots/nav/p1/375/fr-motion-menu-closed.png",
+      "shots/nav/p1/375/fr-motion-menu-open.png",
+      "shots/nav/p1/390/en-motion-menu-closed.png",
+      "shots/nav/p1/390/en-motion-menu-open.png"
+    ],
+    "file_line": "components/Nav.tsx:142-151",
+    "suggested_fix": "Give the toggle a fixed width that fits the longest label (e.g. min-w-[6.5ch] justify-end), or stack both labels in one grid cell and toggle their visibility.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "844l (844x390)",
+    "severity": "P3",
+    "description": "The landscape-phone hero is cramped at the top and leaves a stray pad at the bottom. The header keeps its 80px desktop height (20% of the screen), so the eyebrow starts only 14px below it (y=94) and the name at 124. The page trace's start pad (422,360) also floats alone under the bottom row with a stub of wire, because the SCROLL hint it hangs from is hidden on short screens (short:hidden).",
+    "evidence": [
+      "shots/hero/p1/844l/en-motion-atf.png",
+      "shots/hero/p1/844l/fr-motion-atf.png"
+    ],
+    "file_line": "components/Nav.tsx:107 (h-16 md:h-20 with no short variant); components/hero/Hero.tsx:229 (hint short:hidden); lib/routes.ts:36 (heroRoute y0 = vh-30 regardless)",
+    "suggested_fix": "Add short:h-14 to the header row. On short screens, start the hero route below the fold (same as phones: y0 = vh + 24) or keep a mini hint.",
+    "confidence": 0.65,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "The status line sits a bit low next to the CTAs. 'OPEN TO INTERNSHIPS' is placed with a hard-coded md:pb-3 instead of being centered on the CTA row, so it lands about 3.5px low: text center ≈842 vs button center 838.5 at 1440, and ≈1022 vs 1018.5 at 1920.",
+    "evidence": [
+      "shots/hero/p1/1440/en-motion-atf.png",
+      "shots/hero/p1/1920/en-motion-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:233",
+    "suggested_fix": "Replace md:pb-3 with a value computed from the button height ((43px - 11.5px)/2 ≈ 16px → md:pb-4), or align the row with items-center on a wrapper that matches the CTA height.",
+    "confidence": 0.5,
+    "lens": "visual"
+  },
+  {
+    "section": "statement",
+    "viewport": "1440, 1920 (EN), 844l",
+    "severity": "P3",
+    "description": "The pinned display sentence has a ragged right edge with dangling one-letter words. Three of six lines end on a lone 'I' ('moment I', 'works. I', 'whatever I'), which is noticeable at 78-90px. The copper italic accent ('actually' / 'vraiment') also reads smaller than the words around it, because Instrument Serif's x-height is much lower than Geist's at the same font size.",
+    "evidence": [
+      "shots/statement/p1/1440/en-reduced-00.png",
+      "shots/statement/p1/1920/fr-motion-01.png",
+      "shots/statement/p1/844l/en-motion-01.png"
+    ],
+    "file_line": "components/Statement.tsx:50; app/globals.css:86-93 (.accent)",
+    "suggested_fix": "Add text-wrap:pretty on the statement paragraph (and check that SplitText autoSplit keeps it), and scale .accent to about 1.1em in display contexts (e.g. .text-display .accent {font-size:1.1em; line-height:0}).",
+    "confidence": 0.45,
+    "lens": "visual"
+  },
+  {
+    "section": "global (skip link)",
+    "viewport": "1440 (all desktop)",
+    "severity": "P3",
+    "description": "When focused, the skip link (fixed at 12px/12px, 160x36) lands on top of the header logo and leaves '…TJIAN' of the name sticking out to its right. It also has square corners, unlike every other control on the page (pill buttons, 3px chips).",
+    "evidence": [
+      "shots/global/p1/1440/skip-link.png",
+      "shots/global/p1/1440/en-motion-tab01.png"
+    ],
+    "file_line": "app/globals.css:97-109",
+    "suggested_fix": "Give it an opaque bar that covers the whole logo cluster (left: var(--gutter), min-width matching the logo block, top aligned to the header row) with border-radius 999px like .btn, or offset it below the header row (top: 5.5rem).",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "A focused nav link shows two stacked lines at the bottom. .link-underline also fires on :focus-visible, drawing a 1px underline 3px below the text, while the 2px focus outline sits 4px out. The result is an underline 1-2px inside the ring's bottom edge (ABOUT, PROJECTS, EXPERIENCE, CONTACT in tab03-06).",
+    "evidence": [
+      "shots/global/p1/1440/en-motion-tab03.png",
+      "shots/global/p1/1440/en-motion-tab04.png"
+    ],
+    "file_line": "app/globals.css:354-357 (.link-underline:focus-visible); app/globals.css:58-62",
+    "suggested_fix": "Drop :focus-visible from the .link-underline selector (the ring is enough), or raise the outline-offset for .link-underline to 7px so the two lines separate cleanly.",
+    "confidence": 0.5,
+    "lens": "visual"
+  },
+  {
+    "section": "statement",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "There is a large dead band after the statement. Its text is centered in a full-height sticky frame, so after the pin releases there are about 378px of empty ink (last line ends at y=270, About label at y=648 in the 1440 shot), more than 40% of the viewport. That is noticeably looser than the rhythm between the other sections.",
+    "evidence": [
+      "shots/statement/p1/1440/en-motion-02.png",
+      "shots/statement/p1/1440/fr-motion-02.png"
+    ],
+    "file_line": "components/Statement.tsx:41-43 (h-[220vh] with sticky h-svh justify-center)",
+    "suggested_fix": "Shorten the tail, e.g. end the section at calc(220vh - 20vh) or add a negative margin-bottom (-mb-[20svh]) to the section, so About arrives sooner once the last word lights.",
+    "confidence": 0.4,
+    "lens": "visual"
+  }
+]

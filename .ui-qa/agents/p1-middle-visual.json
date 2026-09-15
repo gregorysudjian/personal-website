@@ -1,0 +1,390 @@
+[
+  {
+    "section": "focus",
+    "viewport": "375, 390, 768, 1024, 1180, 1280 (every width below ~1400px, both modes)",
+    "severity": "P1",
+    "description": "The 'agent.py' code window in the Software panel clips its own code mid-token. The code window gets padded twice: .focus-art already has p-6/md:p-10, and CodeWindow's wrapper adds p-6/md:p-10 again. On top of that, the <pre> is overflow-hidden with whitespace-pre. Measured <pre> overflow (scrollWidth - clientWidth): 375 = 77px ('memory.recal', 'model.think(tas', 'tools.use'), 768 horizontal mode = 220px (the window is only 114px wide: 'run_a', 'conte'), 1024 = 127px, 1180 = 71px, 1280 = 35px, 1366 = 4px. Only 1440+ shows the full code. It reads as broken, not as a stylistic crop.",
+    "evidence": [
+      "shots/focus/p1/375/en-reduced-00.png",
+      "shots/focus/p1/768/fr-motion-00.png",
+      "shots/focus/p1/768/en-reduced-00.png",
+      "shots/focus/p1/agent-visual/focus-start-1024x768-fr-motion.png",
+      "shots/focus/p1/agent-visual/focus-start-1180x820-en-motion.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/focus/Illustrations.tsx:149-157 (wrapper p-6 md:p-10 + pre overflow-hidden text-[0.72rem] md:text-[0.8rem]); components/focus/Focus.tsx:125 (focus-art p-6 md:p-10)",
+    "suggested_fix": "Drop the wrapper padding in CodeWindow (Illustrations.tsx:149 → 'flex h-full w-full items-center justify-center'), since .focus-art already pads. Make the code size follow the art column: put @container on .focus-art and set the pre to text-[clamp(0.5rem,2.6cqi,0.8rem)], so the longest line (~32 chars plus the gutter) always fits. Keep overflow-hidden only as a safety net.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "768, 1024, 1180, 1280, 1366, 1440, 1920 (fr only; phones use the -m capture)",
+    "severity": "P1",
+    "description": "The French preview image for 'Ce site' (card 4) shows a broken hero. The giant 'SUTJIAN' line sits on top of the tagline ('J'aime construire des choses, des agents…' is overprinted by the S/U glyphs), the 'GÉNIE INFORMATIQUE' kicker is jammed right under the nav, and the two CTAs are stacked. The EN capture (site-en.webp) is laid out correctly. Visitors see the portfolio's own showcase shot looking broken, in the one card about visual craft.",
+    "evidence": [
+      "shots/projects/p1/agent-visual/card4-1180x820-fr-motion.png",
+      "shots/projects/p1/agent-visual/card4-1440x900-fr-motion.png",
+      "shots/projects/p1/1440/card4-hover.png"
+    ],
+    "file_line": "public/projects/site-fr.webp (referenced at content/site.ts:506)",
+    "suggested_fix": "Recapture site-fr.webp at the same 1760x1210 (2x of 880x605) framing as site-en.webp, with the FR hero fully settled after the intro, and check it has the same layout as the EN capture. If the FR hero really does overlap at 880x605, that's a hero bug to fix first (the top-band agents own it). Until then, fall back to the EN image for FR.",
+    "confidence": 0.9,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440, 1920, 1024, 1180 (xl and md desktop frames)",
+    "severity": "P2",
+    "description": "Both desktop captures of this site (site-en.webp and site-fr.webp) have an empty scrollbar gutter on the right: a flat #0c0b0e strip 30px wide at 2x (about 13-15 CSS px in the frame). The circuit lines and the grid stop hard at that edge, so the preview reads as a mis-cropped screenshot inside the browser frame (visible at x≈1369-1383 in the 1440 shots).",
+    "evidence": [
+      "shots/projects/p1/agent-visual/site-en-rightedge.png",
+      "shots/projects/p1/1440/card4-hover.png",
+      "shots/projects/p1/1440/en-reduced-04.png"
+    ],
+    "file_line": "public/projects/site-en.webp, public/projects/site-fr.webp (content/site.ts:504-508)",
+    "suggested_fix": "Recrop both desktop captures to remove the last 30px (x 1730-1760) and scale back to 1760 wide, or recapture with scrollbar-gutter:auto / a hidden scrollbar. The -m captures are clean.",
+    "confidence": 0.9,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1024, 1180 (md to xl, stacked layout)",
+    "severity": "P2",
+    "description": "Between md and xl, the stacked preview frame is full width at aspect 16/11, so it nearly fills the screen. At 1024x768 the frame is 942x683 (89% of the viewport height); at 1180x820 it's 1086x782 (95%). Title, summary and CTA all start below the fold for every card. The WhatsApp demo is worst: the frame is 683px tall and about 500px of it is empty dark space until the bubbles arrive one at a time. The details column is capped at max-w-2xl (672px), so its dividers and accordion end at x=713/719 while the frame above ends at x=983/1133. The right edge is ragged, 270-414px short.",
+    "evidence": [
+      "shots/projects/p1/agent-visual/card1-1180x820-en-motion.png",
+      "shots/projects/p1/agent-visual/card1-1024x768-en-motion.png",
+      "shots/projects/p1/agent-visual/card2-1024x768-fr-motion.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:99 (xl-only grid), :117 (md:aspect-[16/11]), :156 (max-w-2xl)",
+    "suggested_fix": "Cap the stacked frame: add lg:max-h-[72svh] to the aspect box, or switch to lg:aspect-[16/9] with max-w-[min(100%,calc(72svh*16/9))] and mx-auto. Alternatively, start the two-column layout at lg (1024) with col-span-7/5, like xl. Either way, match the details width to the frame (or center both at the same max width) so the dividers line up.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1280, 1366, 1440 (xl) and 768",
+    "severity": "P2",
+    "description": "In the side-by-side xl layout the 'real app screens' are too small to read. The Lead Finder and Clarté HQ captures are 2048/2400px-wide 2x shots of a 1024-1200px layout, drawn at scale 0.325 (1280), 0.368 (1440) and 0.344 (768). So their 11-12px UI text renders at about 7-8px ('Nail salon · Montréal', '80/100 · High' badges, 'Priority' legend). The frame promises 'Real app screens', but at these widths they come across only as texture.",
+    "evidence": [
+      "shots/projects/p1/agent-visual/card1-1280x800-fr-motion.png",
+      "shots/projects/p1/1440/en-reduced-01.png",
+      "shots/projects/p1/1440/en-reduced-slide2.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:98-103 (object-contain object-top on stills); content/site.ts:316-335, 448-451",
+    "suggested_fix": "For stills, crop to the meaningful region at xl. Either add a per-slide 'focus' (e.g. object-position and a scale(1.25) origin on the main panel with fit:'cover'), or capture tighter 2x screens at a ~860px layout width so the scale is ~0.45+. The WhatsApp demo and Clarté scroll slide are fine.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1280, 1440, 1920, 1024, 768 (every non-phone width; fr and en)",
+    "severity": "P2",
+    "description": "Two label/value lists sit on top of each other in the same card but don't share a value column. The Role/Stack <dl> uses grid-cols-[auto_1fr], so its values start at the width of the longest label, while the 'How it's built' specs use md:grid-cols-[7.5rem_1fr]. At 1440 EN the Role/Stack values start at x=933 and the Problem/Solution/How values at x=1003, a 70px step down the same column. In FR, 'TECHNOLOGIES' pushes the dl to x=993, still 10px off. The label colours also differ (Role/Stack text-mute, spec labels text-copper). With About's facts (8rem/10rem plus a dash) and the datasheet (7rem), this 'mono label → value' pattern ships in four column widths and two label colours.",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-specs-open.png",
+      "shots/projects/p1/1440/fr-reduced-specs-open.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:185-187 (grid-cols-[auto_1fr], dt text-mute), :219-220 (md:grid-cols-[7.5rem_1fr], label text-copper); components/about/About.tsx:36; components/about/Datasheet.tsx:81",
+    "suggested_fix": "Use one label column token for the card, e.g. md:grid-cols-[8.5rem_1fr] on both the dl (ProjectCard.tsx:185) and .spec rows (:219). 8.5rem fits 'FONCTIONNEMENT', which is 118px at 0.72rem. Pick one label colour: mute for field names, copper only as an accent. Ideally About facts (10rem) and the datasheet (7rem) use the same token.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "768 (en+fr), 375/390 (fr)",
+    "severity": "P2",
+    "description": "The datasheet's Status dot gets squashed and pushed away from its text. The dd is a flex row and the 6px .status-dot has no shrink-0, so when 'Always learning' / 'Toujours en apprentissage' wraps, the text node takes all the width. The dot shrinks to 5px (768 EN, 375 FR) or 3x6px, a vertical sliver (768 FR), and sits at the far right edge (x≈327 at 375, x≈286 at 768) instead of next to the word.",
+    "evidence": [
+      "shots/about/p1/agent-visual/ds-status-dot-768-fr-zoom.png",
+      "shots/about/p1/768/fr-reduced-01.png",
+      "shots/about/p1/375/fr-reduced-00.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:83-85",
+    "suggested_fix": "Wrap the value in a <span> and give the dot shrink-0: <dd className='flex items-center gap-2 …'><span>{value}</span>{status && <span className='status-dot shrink-0' …/>}</dd>. Or make the dd a block and render the dot inline (inline-block align-middle ml-2) so it follows the last word.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "768 (and 844l landscape)",
+    "severity": "P2",
+    "description": "The two-column About grid kicks in at md (768), where both columns are too narrow. The datasheet card is only 271px wide, so its values wrap ('Lebanon → / Montreal', 'Always / learning', 'Bâtisseur / curieux') because the fixed 7rem label column takes 112px of it. The text column is 333px, so the 24px lead paragraph runs 27 characters per line over 8 lines, with ~100px of empty gutter between the columns. In the facts list the md:grid-cols-[10rem_1fr] label column leaves ~150px for values, so 'Whatever I haven't learned yet' breaks into 3 lines and 'Internships and co-op / roles' leaves an orphan.",
+    "evidence": [
+      "shots/about/p1/768/en-reduced-00.png",
+      "shots/about/p1/768/fr-reduced-01.png",
+      "shots/about/p1/844l/en-motion-03.png",
+      "shots/about/p1/agent-visual/about-top-768x1024-en-motion.png"
+    ],
+    "file_line": "components/about/About.tsx:13-20 (md:grid-cols-12, md:col-span-5 / md:col-start-7), :36 (md:grid-cols-[10rem_1fr]); components/about/Datasheet.tsx:81 (grid-cols-[7rem_1fr])",
+    "suggested_fix": "Move the split to lg (lg:grid-cols-12, lg:col-span-5, lg:col-start-7, lg:sticky). Below lg, stack the card (max-w-[500px]) above the text, as on phones. Switch the facts to the wider label column at lg too, and consider grid-cols-[6rem_1fr] inside the datasheet.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "1920 (and wider)",
+    "severity": "P2",
+    "description": "At 1920 the datasheet is capped at max-w-[500px] inside a 730px column and left-aligned. That leaves a 424px dead band between the card (right edge x=555) and the text (x=980). Meanwhile the text column is 884px wide, so body paragraphs run 82-92 characters per line in EN and 101-106 in FR (text-lg, 18px), well past the ~75ch comfortable measure. At 1440 FR they're already 76-80.",
+    "evidence": [
+      "shots/about/p1/1920/fr-reduced-00.png",
+      "shots/about/p1/agent-visual/about-top-1920x1080-fr-motion.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/about/About.tsx:13-30; components/about/Datasheet.tsx:52 (max-w-[500px] md:mx-0)",
+    "suggested_fix": "Give the paragraphs a measure: max-w-[62ch] on the lead and max-w-[68ch] on the rest (About.tsx:23,27). Either let the datasheet grow (max-w-[560px] at 2xl) or right-align it in its column (md:ml-auto) so the gutter between card and copy stays about 1-2 grid columns.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "844l, 1280s (short windows)",
+    "severity": "P2",
+    "description": "The datasheet is md:sticky at top-28 (112px) but is taller than short windows can show: about 685px at 1280 wide and about 550px at 844 wide, against 620/390px viewports. While it sticks, its bottom half (Model/Type/Origin/Status rows and the footer) stays below the fold, so you see a photo that never resolves into the datasheet. The rows only show once the text column ends.",
+    "evidence": [
+      "shots/about/p1/1280s/fr-motion-00.png",
+      "shots/about/p1/1280s/fr-motion-01.png",
+      "shots/about/p1/844l/en-motion-01.png"
+    ],
+    "file_line": "components/about/About.tsx:15 (md:sticky md:top-28)",
+    "suggested_fix": "Only pin when the card fits. Add a custom variant like @custom-variant tall (@media (min-height: 820px)) and use tall:md:sticky. Or shrink the photo on short screens (short:aspect-[16/9] / [@media(max-height:700px)]:aspect-[16/10]) so card + top offset < 100svh.",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "844l (landscape phone), 768x1024 short scroll",
+    "severity": "P2",
+    "description": "On a landscape phone (844x390) the stacked preview frame is 776x534 (16/11, since the md aspect applies at ≥768 width). That's 137% of the viewport height, so the slides, their tabs and the caption are never visible together. The caption bar is below the fold whenever the screen is. It needs 1.4 screens to take in one preview.",
+    "evidence": [
+      "shots/projects/p1/844l/en-motion-01.png",
+      "shots/projects/p1/844l/en-motion-02.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:117 (aspect-[3/4] md:aspect-[16/11])",
+    "suggested_fix": "Use the existing 'short' variant (max-height:500px): short:aspect-auto short:h-[88svh] on the aspect box. Or cap it with max-h-[88svh], which keeps object-contain stills readable and lets scroll slides keep gliding.",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "375, 390 (fr)",
+    "severity": "P2",
+    "description": "In the Lead Finder slide tabs at phone width in French, the first tab label '01 · PROSPECTS' wraps to two lines ('01 · / PROSPECTS', line-height 1, lines nearly touching) while '02 · DESIGNS' and '03 · DÉMO' stay on one. The three labels sit on different baselines. The caption is also truncated with an ellipsis ('…chacun avec un score de 0 à…', 18px of text clipped by line-clamp-2), so the French visitor never reads the end of the sentence.",
+    "evidence": [
+      "shots/projects/p1/agent-visual/slide-tabs-caption-375-fr-zoom.png",
+      "shots/projects/p1/375/fr-reduced-01.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:130-136 (tab label text-[0.6rem] label-mono), :141 (line-clamp-2 min-h-[2lh])",
+    "suggested_fix": "Put whitespace-nowrap and truncate on the tab label, or drop the '0N · ' prefix below sm: <span className='max-sm:hidden'>0{i+1} · </span>. For the caption, reserve three lines on phones (max-md:line-clamp-3 max-md:min-h-[3lh]) or give the view a slightly shorter aspect so the bar can grow.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "375, 390, 768, 1024 (fr worst)",
+    "severity": "P2",
+    "description": "The keywords line under each Focus panel uses .label-mono, which forces line-height:1. When it wraps, the uppercase lines nearly collide: the pitch is 12px for 11.5px caps, and the accents on 'RÉSOLUTION / DE PROBLÈMES' touch the line above. It wraps at 375 FR ('AGENTS · AUTOMATISATION · API / DE LLM', which also splits the term 'API de LLM'), at 768 for all three panels, and on panel 3 at 1024 EN. The same leading:1 wrap shows on the '01 · / PROSPECTS' slide tab.",
+    "evidence": [
+      "shots/focus/p1/agent-visual/kw-leading-375-fr-zoom.png",
+      "shots/focus/p1/375/fr-reduced-02.png",
+      "shots/focus/p1/375/fr-reduced-04.png",
+      "shots/focus/p1/768/en-motion-01.png"
+    ],
+    "file_line": "app/globals.css:70-76 (@utility label-mono line-height:1); components/focus/Focus.tsx:140",
+    "suggested_fix": "Add leading-[1.6] to the keywords <p> (Focus.tsx:140). Better, change label-mono to line-height:1.4, since single-line uses don't change visually but wrapped ones get air. Use a non-breaking space inside multi-word keywords ('API de LLM', 'Problem solving') so they wrap between items.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "768x1024 (portrait tablet, horizontal mode), 1280s (compact), 375",
+    "severity": "P2",
+    "description": "Portrait tablets (768x1024) match '(min-width:768px) and (min-height:900px)', so they get horizontal panels that are only 553x553. Each column is 274px, so the drawings shrink to SVG scale 0.49 and their mono labels ('INPUT/HIDDEN/OUTPUT' fontSize 10, 'x = 1.57' / 'f′(x)' fontSize 11) render at ~5px. The code window is 114px wide. The body text runs 18-20 characters per line over 6-8 lines. The illegible-label problem also hits compact 1280x620 (INPUT/HIDDEN labels ~6px) and phones (scale 0.69 → 7px). The stacked list the site already has would read far better on a portrait tablet.",
+    "evidence": [
+      "shots/focus/p1/768/en-motion-01.png",
+      "shots/focus/p1/768/fr-motion-00.png",
+      "shots/focus/p1/1280s/fr-motion-01.png",
+      "shots/focus/p1/1280s/en-motion-02.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:13-17 + app/globals.css:451-453 (768/900 query); components/focus/Illustrations.tsx:95-96,107-109,238 (SVG text 10-13 units)",
+    "suggested_fix": "Drop the '(min-width:768px) and (min-height:900px)' clause from both HORIZONTAL and the CSS media query, so horizontal starts at 1000px wide, where panels are ≥737px. Separately, draw SVG labels at a scale-independent size by adding vector-effect-free text via an HTML overlay, or bump SVG text to fontSize 14-16 so they stay ≥9px at scale 0.6.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1024, 1180, 1920",
+    "severity": "P3",
+    "description": "The 16:9 stills (lf-overview, lf-designs, clarte-hq-overview; aspect 1.77) use object-contain object-top in a slide view that is taller than 16:9 at some widths. That leaves a white band under the screenshot: 25px at 1024, 42px at 1180, 36px at 1920. On the cream Clarté HQ shot the band is a visible seam (#f8f4ec above, #fff below). Both Lead Finder stills also end on a 15-20px sliver of the next card, cut at the bottom edge, which reads as an accidental crop at every width.",
+    "evidence": [
+      "shots/projects/p1/agent-visual/card1-1180x820-en-motion.png",
+      "shots/projects/p1/1440/en-reduced-slide2.png",
+      "shots/projects/p1/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:75 (bg-white), :102 (object-contain object-top)",
+    "suggested_fix": "Give stills fit:'cover' with object-top (the view is never narrower than 16:9 by more than ~7%, so the loss is small), or set the view's background to the screenshot's own page colour. Recrop lf-overview/lf-designs just above the partial next card.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The card uses six mono micro-sizes: slides badge and chat badge 0.58rem, tab labels and agent.log 0.6rem, slug and status pill 0.62rem, btn-sm 0.66rem, label-mono 0.72rem. On top of that, the status pill text (0.62rem) is smaller than the plain year next to it (0.72rem), so the pill looks weaker than its neighbour. In the title bar, the slug (0.62rem) and badge (0.58rem) sit on the same line at different sizes.",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-00.png",
+      "shots/projects/p1/1440/en-reduced-03.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:109,111,160,167; components/projects/Slides.tsx:131; components/projects/ChatPreview.tsx:70,98",
+    "suggested_fix": "Collapse to two steps, e.g. --text-micro 0.62rem (frame chrome: slug, badge, tabs, pill, agent.log) and label-mono 0.72rem (everything in the details column), with the year on the pill's size.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The radius and shadow system is inconsistent across the three sections. The project frame is rounded-[8px] with shadow 0 50px 120px -50px. The datasheet and focus panels are rounded-[6px], the datasheet with shadow 0 40px 120px -40px and the focus panels with none. The code window is rounded-md (6px) with 0 30px 80px -30px. Stack chips are rounded-full while the Skills chips are 3px. Set side by side, the preview frame is the odd one out.",
+    "evidence": [
+      "shots/about/p1/1440/en-reduced-01.png",
+      "shots/projects/p1/1440/en-reduced-01.png",
+      "shots/focus/p1/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:103,191; components/about/Datasheet.tsx:55; components/focus/Focus.tsx:121; components/focus/Illustrations.tsx:150; app/globals.css:620",
+    "suggested_fix": "Define --radius-card: 6px and a single --shadow-lift, and use rounded-[var(--radius-card)] on frame, datasheet and panels. Keep rounded-full only for pills and buttons, and decide whether stack chips are pills or .chip (3px).",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "all (en), 768 (fr)",
+    "severity": "P3",
+    "description": "The datasheet footer text is capped at max-w-[26ch]. With 0.12em tracking that is only ~20 real characters, so 'DESIGNED IN LEBANON. / ASSEMBLED IN / MONTREAL.' breaks over 3 lines, orphaning 'MONTREAL.'. There's ~150-250px of empty space to the barcode. Also, the card's bg-grid sits behind the translucent header bar, so its 72px grid lines show as stray vertical ticks inside the 'DATASHEET … GS-26' strip (x≈201/273/345/417 at 1440) and nowhere else on the card.",
+    "evidence": [
+      "shots/about/p1/1440/en-reduced-01.png",
+      "shots/about/p1/agent-visual/about-facts-1024x768-en-motion.png",
+      "shots/about/p1/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:92 (max-w-[26ch]), :57 (bg-grid under the header)",
+    "suggested_fix": "Break on the sentence boundary: render the two sentences as two block spans and remove the 26ch cap (or use max-w-[36ch]). Give the header bar an opaque bg-graphite so the grid only shows where intended, or start the grid below the header (top-[53px]).",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "1920, 1440 (reduced motion stacked on desktop)",
+    "severity": "P3",
+    "description": "With reduced motion on wide screens, each Focus panel becomes a 1807x404 bar (4.5:1) at 1920. Body text is capped at 38ch (~460px) in a 904px column, so the right ~45% of every panel is empty. The drawings sit small (~300px) in a 904px art column. It looks like a stretched version of a layout built for 1040px-wide cards.",
+    "evidence": [
+      "shots/focus/p1/1920/en-reduced-00.png",
+      "shots/focus/p1/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:114-121 (stacked track, md:grid-cols-2 at full width)",
+    "suggested_fix": "Cap the stacked panels on desktop, e.g. md:max-w-[1040px] like the horizontal panel width, or lg:grid-cols-[5fr_7fr] with the text allowed to max-w-[46ch]. Alternatively, use a 3-up grid of vertical cards at xl in the stacked mode.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "1440x900, 1920x1080 (horizontal)",
+    "severity": "P3",
+    "description": "The pinned frame reads as bottom-heavy. With padding-block 5rem 0 and justify-center, the content block (label → panel bottom) runs from y≈118 to y≈863 at 1440x900. That leaves 37px under the panels but ~118px above the label, so the cards crowd the bottom edge of the screen while they slide.",
+    "evidence": [
+      "shots/focus/p1/1440/en-motion-00.png",
+      "shots/focus/p1/1440/en-motion-01.png"
+    ],
+    "file_line": "app/globals.css:454-463 (padding-block: 5rem 0)",
+    "suggested_fix": "Use padding-block: 5rem 2.5rem, or clamp(1.5rem,5vh,3.5rem) at the bottom as compact mode already does, so the block centres optically below the nav.",
+    "confidence": 0.55,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "all (desktop most visible)",
+    "severity": "P3",
+    "description": "The vertical rhythm is uneven. Cards are 176px apart (md:gap-44), but the last card is 384px from the Experience label (Projects md:py-48 + Experience md:py-48), while About→Focus is ~208px (About md:pb-24 + Focus py-28). After card 4 (which has no CTA) there's a ~390px empty band at 1440 that reads as the page having ended.",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-05.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/projects/Projects.tsx:9 (py-32 md:py-48); components/Experience.tsx:11",
+    "suggested_fix": "Use pb-24/md:pb-32 on Projects (as About uses pb-24), so section boundaries land at ~300px and the card gap (176) stays the smaller rhythm.",
+    "confidence": 0.55,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "375 (fr)",
+    "severity": "P3",
+    "description": "In the WhatsApp frame chrome at 375 FR, both lines are truncated with ellipses: the slug ('WHATSAPP-AI-A…', squeezed by the 'DÉMO ILLUSTRATIVE' badge) and the chat header ('Commerce démo · Assista…', 2px overflow, squeezed by the 'AGENT IA' pill). In EN both fit.",
+    "evidence": [
+      "shots/projects/p1/375/fr-reduced-03.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:109-114; components/projects/ChatPreview.tsx:63-72",
+    "suggested_fix": "Below sm, hide the title-bar badge (max-sm:hidden, since the chat pill already says AI agent) and drop gap-3 to gap-2 in the chat header. Or use the shorter FR header 'Commerce démo' when the width is tight.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "375, 768, 1440 (en/fr)",
+    "severity": "P3",
+    "description": "Widows and orphans in the large type: the Projects intro ends with 'site.' alone on a line (1440, 768, FR 1440). The About FR lead paragraph ends with 'faut.' alone at 375. The Focus heading at 375 ends with 'to.' alone. French guillemets and colons use normal spaces, so '« génome / » de design' breaks with the » at the start of a line (Lead Finder highlight, 375 FR).",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-00.png",
+      "shots/about/p1/375/fr-reduced-01.png",
+      "shots/focus/p1/agent-visual/focus-start-375x667-en-motion.png",
+      "shots/projects/p1/375/fr-reduced-02.png"
+    ],
+    "file_line": "components/SectionHeader.tsx:23,28; components/about/About.tsx:23-27; content/site.ts:293 (and other FR strings with « » / ' : ')",
+    "suggested_fix": "Add text-pretty to paragraphs (About.tsx:23,27, SectionHeader.tsx:28, ProjectCard.tsx:174) and text-balance to h2/h3. In the FR strings, replace the space after « and before », :, ; and ! with U+202F or U+00A0. The copy meaning is unchanged.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "375, 390, 768, 1024",
+    "severity": "P3",
+    "description": "The type hierarchy flattens across sections. On phones the Focus panel titles (clamp(2.6rem,5vw,5.2rem)) render at 41.6px, the same size as the section heading 'Three things I keep coming back to.' (also clamped to 41.6px). The project titles, the page's main content, are smaller than the Focus titles at every width: 32 vs 41.6px at 768, 34.8 vs 51.2px at 1024, 49 vs 72px at 1440.",
+    "evidence": [
+      "shots/focus/p1/375/fr-reduced-02.png",
+      "shots/projects/p1/768/en-reduced-01.png",
+      "shots/projects/p1/agent-visual/measure-motion.json"
+    ],
+    "file_line": "components/focus/Focus.tsx:135; components/SectionHeader.tsx:23; components/projects/ProjectCard.tsx:171",
+    "suggested_fix": "Lower the Focus h3 minimum (clamp(2rem,4.4vw,4.6rem)) so it stays one step under the h2 on phones. Raise the project h3 (clamp(2.2rem,3.8vw,3.8rem)) so a project name is at least as prominent as a focus-area title.",
+    "confidence": 0.55,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The four cards don't end the same way. Lead Finder and Clarté end on a copper 'View website' button. The WhatsApp agent and This website end abruptly on the accordion's bottom border, because links is empty and privateRepo isn't set on any project, so the 'Private repository' note the component supports never renders, even though all repos are private. The card rhythm alternates between 'full' and 'cut-off' endings.",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-02.png",
+      "shots/projects/p1/1440/en-reduced-05.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:230-252; content/site.ts:350,392,464,510 (no privateRepo: true)",
+    "suggested_fix": "Set privateRepo: true on the four projects (they are all private per the site.ts comment at :223), so every card ends on the same footer row (button and/or lock note), aligned by mt-8.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440, 768, 1024 (reduced motion and the first seconds of motion)",
+    "severity": "P3",
+    "description": "The chat demo frame is mostly empty. The bubbles are bottom-aligned (justify-end), so with reduced motion the top ~45% of the chat column (y 205-445 at 1440) is flat ink, and the agent.log column is empty below its 4 steps (~300px). With motion the first 3-4 seconds show a completely blank frame at 1024 (one bubble in a 942x683 window). Next to the dense real-screen slides of cards 1 and 3, it looks unfinished.",
+    "evidence": [
+      "shots/projects/p1/1440/en-reduced-02.png",
+      "shots/projects/p1/agent-visual/card2-1024x768-fr-motion.png"
+    ],
+    "file_line": "components/projects/ChatPreview.tsx:75 (justify-end), :97-110",
+    "suggested_fix": "Add a quiet chat backdrop (e.g. a centred date chip like 'Aujourd'hui / Today' at the top, plus a faint grid or wallpaper pattern), and start the timeline with the first customer bubble already visible. In the log, stretch the steps or add a status footer ('● listening') at the bottom.",
+    "confidence": 0.5,
+    "lens": "visual"
+  }
+]

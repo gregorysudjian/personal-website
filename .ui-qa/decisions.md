@@ -1,0 +1,11 @@
+# Decisions log
+
+- **2026-09-16 00:00 — Environment.** `node_modules` was installed on Windows (only `*-win32-x64` native binaries), so `next dev` couldn't start on this Mac. I unpacked the matching darwin-arm64 packages (`@next/swc`, `@tailwindcss/oxide`, `lightningcss`, `@img/sharp` + libvips) straight into `node_modules` from `npm pack` tarballs. `package.json` and `package-lock.json` are untouched, and the Windows binaries are still there.
+- **Tooling outside the project.** I installed Playwright 1.63 and axe-core into the session scratchpad, not the project, so the project has no new dependencies.
+- **Screenshots aren't committed.** `.ui-qa/shots/` is ignored through `.ui-qa/.gitignore` (hundreds of PNGs). The report points at their local paths.
+- **Axes that don't exist here.** The site has no light theme, no auth and no server data. I cover FR (the longest strings), reduced motion, touch vs mouse, and short/landscape screens instead.
+- **Boot overlay.** I skip it in most captures by seeding `sessionStorage.gs-booted` and capture it separately once.
+- **How the critique fans out.** The page has 11 sections, and 4 lens agents per section per pass would mean 44 agents a pass. So I grouped the sections into 3 bands, each getting all 4 lenses (A visual, B mobile, C a11y, D interaction): **top** (global, nav, hero, statement), **middle** (about, focus, projects) and **bottom** (experience, skills, contact, footer). That's 12 agents a pass. Every finding still carries its own section id and is committed per section.
+- **Shots are captured at DPR 1.** Sub-pixel softness of 1px lines at 1x is noted, but only counts if it also shows at 2x.
+- **The agents never edit files.** Only the main loop edits, so fixes can be batched per file without clashing.
+- **Branded 404 (UI-009).** The root layout lives under `app/[locale]`, so a normal `app/not-found.tsx` has no layout to render inside. Next 16's documented fix for exactly this case is `app/global-not-found.tsx`, which needs `experimental.globalNotFound: true` in `next.config.ts`. That's the only config change. The page is bilingual because the language can't be known for an unknown URL. The copy is new, since the site had none for this.

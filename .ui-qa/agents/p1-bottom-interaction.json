@@ -1,0 +1,189 @@
+[
+  {
+    "section": "contact",
+    "viewport": "all (verified 1440x900)",
+    "severity": "P1",
+    "description": "A shared deep link to the contact section does not work on a first visit. Steps: new tab with no sessionStorage, open /en#contact, wait for the boot intro to finish (5s). Observed: page sits at scrollY 0 (hero), contact never scrolled to, board unpowered (lit 0/108). Expected: land on #contact like a returning visitor does (booted session lands at y=14579 with the board lit). Boot forces scrollTo(0,0) and scrollRestoration='manual' and never re-applies location.hash after the intro.",
+    "evidence": ["shots/contact/p1/agent-interaction/deeplink-firstvisit-1440.png", "shots/contact/p1/agent-interaction/deeplink-booted-1440.png"],
+    "file_line": "components/Boot.tsx:23-24",
+    "suggested_fix": "When location.hash is present either skip the boot overlay (add 'booted' in the inline bootScript if location.hash) or, in the timeline onComplete, call scrollToTarget(location.hash) after unlockScroll(). Don't call window.scrollTo(0,0) when a hash is present.",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "1100x650->1300x650, 600x900->800x900, iPad mini 744x1133 rotated to 1133x744",
+    "severity": "P1",
+    "description": "Resizing or rotating the window across the point where Focus switches to horizontal/pinned mode throws the reader back to the top of the page. Steps: 1100x650, scroll to #contact (y=15309), widen to 1300x650. Observed: scrollY 15309 -> 0 (hero on screen). The same happens on iPad mini rotation portrait->landscape (y 20006 -> 0), and 600->800 or 700->1440 wide at 900 tall. It never happens in the reverse direction, or on resizes that don't cross the Focus breakpoint (800->1100: position kept). Expected: stay on the contact section.",
+    "evidence": ["shots/contact/p1/agent-interaction/resize-1100-to-1300-jumps-to-top-before.png", "shots/contact/p1/agent-interaction/resize-1100-to-1300-jumps-to-top-after.png", "shots/contact/p1/agent-interaction/ipad-mini-rotate-jumps-to-top-before.png", "shots/contact/p1/agent-interaction/ipad-mini-rotate-jumps-to-top-after.png"],
+    "file_line": "components/focus/Focus.tsx:38-53",
+    "suggested_fix": "When the HORIZONTAL matchMedia context is created, record the scroll anchor first (topmost visible section id + offset), then restore it after the pin and section height are applied: ScrollTrigger.addEventListener('refresh', …) once, or gsap.matchMedia's context callback followed by ScrollTrigger.refresh() and scrollTo(anchor). At minimum, save window.scrollY before size() and put it back after the pin ScrollTrigger is created.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "experience",
+    "viewport": "1440x900, 1920x1080, 768x1024 (works at 390)",
+    "severity": "P1",
+    "description": "Reloading the page restores the wrong scroll position, 1000-1850px lower than where the reader was. Steps: 1440x900 in a booted session, wheel down to Experience (y=12600, Experience top -802), press reload. Observed: y=14446, Experience top -2648, so the reader lands in Skills/Contact. Also Skills y 14400 -> 15121 (bottom), 1920: 12960 -> 14336, 768: 14400 -> 15416. At 390 (Focus stays stacked) restoration is exact. The browser restores the pre-hydration offset, and Focus then grows the page (section.style.height plus the pin) above the reader.",
+    "evidence": ["shots/experience/p1/agent-interaction/reload-restores-wrong-place-1440.png"],
+    "file_line": "components/focus/Focus.tsx:50; components/SmoothScroll.tsx:12-27",
+    "suggested_fix": "Take over restoration: on pagehide store {sectionId, offsetWithinSection} in sessionStorage, set history.scrollRestoration='manual', and after the first ScrollTrigger.refresh() (fonts.ready) scroll to that section + offset. Or reserve Focus's final height in CSS so the layout doesn't change after hydration.",
+    "confidence": 0.75,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "GitHub button, all viewports",
+    "severity": "P1",
+    "description": "The GitHub social button leads to a 404. https://github.com/gregorysudjian-ui returns 404 and the GitHub API reports no such user (also checked gregorysutjian-ui and gregorysutjian: 404). Note the spelling 'sudjian' vs the name 'Sutjian'. A recruiter clicking the button sees a GitHub 'Not Found' page.",
+    "evidence": ["shots/contact/p1/agent-interaction/github-404.txt"],
+    "file_line": "content/site.ts:26",
+    "suggested_fix": "Put in the correct GitHub handle, or remove the GitHub button until the profile exists. Add a link check to CI.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "all (verified 1440x900, keyboard and mouse)",
+    "severity": "P2",
+    "description": "Copy gives no feedback when copying fails. Steps: navigator.clipboard undefined (plain-http preview or older webview) and document.execCommand('copy') returns false, then press Copy. Observed: the label stays 'Copy', role=status stays empty, and the only effect is an invisible selection of the mailto link (which is off the button and easy to miss). The user thinks nothing happened. Expected: an error state such as 'Press ⌘C / Ctrl+C to copy' or 'Couldn't copy' next to the selected address, announced in the status region. (Earlier failures are fixed: the rejection is caught, the fallback works, rapid clicks keep 'Copied' visible for 1.8s after the last click, and focus returns to the button.)",
+    "evidence": ["shots/contact/p1/agent-interaction/copy-both-fail-1440.png"],
+    "file_line": "components/contact/Contact.tsx:122-126",
+    "suggested_fix": "Add a third state, failed: show '⌘C to copy' / 'Ctrl+C pour copier' in the pill for ~3s, set the status text, and keep the selection on the address.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "1440x900 (all sizes behave the same)",
+    "severity": "P2",
+    "description": "The finale switches itself off while the contact box is still on screen. Steps: scroll to the bottom (board lit, 108/108 traces) and scroll up. Observed: after ~740px of scroll-up, the section loses is-powered, all traces retract in 0.5s, pads go dark and the glow fades. At that moment the chip box is still on screen (top at y=390 of 900), heading and email visible. Anyone who scrolls up a little to re-read the heading watches the board die. The same toggle fires again on the way back down, replaying the 1.1s plus stagger animation.",
+    "evidence": ["shots/contact/p1/agent-interaction/powered-off-after-scrollup-1440.png"],
+    "file_line": "components/CircuitTrace.tsx:156-159; components/contact/Board.tsx:63-66",
+    "suggested_fix": "Latch the finale: once onPowered(true) fires, ignore false until the contact section has fully left the viewport (a separate ScrollTrigger on #contact with onLeaveBack), or never power off. Hysteresis would also do (off only below progress 0.6).",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "1440x900, Slow 3G-like (500kbps, 400ms RTT) + 4x CPU throttle, dev build",
+    "severity": "P2",
+    "description": "Loading is indistinguishable from nothing. Steps: booted session, throttle, open /en#contact. Observed: from about 3s to 22s the viewport shows an empty chip box (border and corners only). Heading, text, email, Copy, CV and socials are all opacity:0 because html.js [data-reveal] hides them until GSAP runs. There is no board and the clock reads '--:--:--'. At ~23s the content fades in and the page jumps from y=12733 to 14579 as Focus grows above. There is no skeleton, no timeout fallback and no minimum content. Dev bundles exaggerate the delay, but on a real phone on a weak connection the gap is still a blank box where the contact details should be.",
+    "evidence": ["shots/contact/p1/agent-interaction/slow3g-t3s-1440.png", "shots/contact/p1/agent-interaction/slow3g-t8s-1440.png", "shots/contact/p1/agent-interaction/slow3g-t15s-1440.png"],
+    "file_line": "app/globals.css:124-126; app/[locale]/layout.tsx:68",
+    "suggested_fix": "Don't pre-hide the contact essentials (email row and buttons) at all, or add a CSS failsafe: html.js [data-reveal]{animation: reveal-failsafe 0s 3s forwards} that sets opacity 1 if Reveals hasn't mounted (Reveals adds html.reveals-ready to cancel it).",
+    "confidence": 0.65,
+    "lens": "interaction"
+  },
+  {
+    "section": "experience",
+    "viewport": "1440x900 (all)",
+    "severity": "P2",
+    "description": "If the JS bundles fail to load (flaky network, CDN error, content blocker, old browser that fails to parse them), Experience, Skills and Contact stay invisible forever. The inline head script has already added html.js, so every [data-reveal] element stays at opacity:0 with nothing to reveal it. Observed with /_next/static/*.js blocked: Experience shows only the top border line of the list, no rows (10/10 reveal elements at opacity 0). The contact chip is empty. On a first visit it is worse: the boot overlay (.boot stays display:block because 'booted' is never added) covers the whole page in ink. Real no-JS (JS disabled) is fine, because html.js is never set.",
+    "evidence": ["shots/experience/p1/agent-interaction/js-failed-experience-1440.png", "shots/contact/p1/agent-interaction/js-failed-contact-1440.png", "shots/contact/p1/agent-interaction/blockjs-top-1440.png"],
+    "file_line": "app/globals.css:124-126; app/[locale]/layout.tsx:68",
+    "suggested_fix": "Add a timed CSS failsafe for html.js [data-reveal] and .boot (e.g. an animation that forces opacity 1 / display none after 4s unless a class set by the React tree cancels it), or set html.js from the first client component instead of a pre-bundle inline script.",
+    "confidence": 0.75,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "390x844 <-> 844x390 rotation; 1440->1200 desktop resize",
+    "severity": "P2",
+    "description": "Rotating or resizing loses the reader's place, even when it doesn't jump to the top. The absolute scrollY is kept while the content above reflows. Steps (phone): at 390x844 scroll to #contact, rotate to landscape (it clamps to the bottom), rotate back to portrait. Observed: y=14757, so the reader is in Experience with contact 2902px below. Desktop: at #contact (1440x900) narrow to 1200. Observed: contact top at +2750px, Experience on screen. Rotating at Experience row 2 lands in Contact.",
+    "evidence": ["shots/contact/p1/agent-interaction/rotate-to-landscape-844l.png", "shots/contact/p1/agent-interaction/resize-1440-to-1200-lost-place.png"],
+    "file_line": "components/SmoothScroll.tsx:20-27",
+    "suggested_fix": "In ScrollTrigger 'refreshInit', record the element at the top of the viewport and its offset. On 'refresh', scroll so it is back at the same offset (lenis.scrollTo(..., {immediate:true}) or window.scrollTo).",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "A repeat Copy click gets no confirmation. Steps: click Copy, click again 0.8s later. Observed: the role=status region changes once ('Email address copied') and is cleared 1.8s after the second click. The second click produces no announcement and no visible change, because the pill already says 'Copied ✓'. The user can't tell that the second click did anything.",
+    "evidence": ["shots/contact/p1/agent-interaction/copy-copied-375-en.png"],
+    "file_line": "components/contact/Contact.tsx:127-129,146-148",
+    "suggested_fix": "On a repeat success, clear the status text and set it again on the next frame, and give the ✓ a short pulse or re-run the label transition.",
+    "confidence": 0.55,
+    "lens": "interaction"
+  },
+  {
+    "section": "contact",
+    "viewport": "desktop resize 600->1440 (any resize or rotation that adds traces)",
+    "severity": "P3",
+    "description": "The lit board partly replays after a resize. Board regenerates on every ResizeObserver change and useGSAP re-runs the power-on tweens with the stagger. After growing from 600 to 1440, only 29/108 traces are lit at +60ms. The new traces draw in over ~1.5s and pads fade in again, so the finished board flickers into a half-built state on every window resize or phone rotation.",
+    "evidence": ["shots/contact/p1/agent-interaction/after-resize-800.png"],
+    "file_line": "components/contact/Board.tsx:38-62",
+    "suggested_fix": "Track whether the power-on has already played. If powered is unchanged and only geo changed, gsap.set(lit,{strokeDashoffset:0}) and set the pads' colours instantly instead of tweening with a stagger.",
+    "confidence": 0.6,
+    "lens": "interaction"
+  },
+  {
+    "section": "experience",
+    "viewport": "1440x900 (all motion viewports)",
+    "severity": "P3",
+    "description": "Rows un-power while the reader is looking at them. is-powered is removed as soon as the trace retreats above a row's pad, which happens when the row drops below the 62% anchor line. Scrolling up a little turns the row you just read back to mute grey mid-screen, with the copper rule retracting. In the mid-section test, rows at y=827 and y=976 of 900 were unpowered while visible. Same latch question as the contact board.",
+    "evidence": ["shots/experience/p1/agent-interaction/after-reload-mid-1440.png"],
+    "file_line": "components/CircuitTrace.tsx:148-154",
+    "suggested_fix": "Latch pads/targets on (only call setPad(k,false) when progress returns to 0 or the section leaves the viewport), or move the anchor lower for the un-power direction (hysteresis).",
+    "confidence": 0.5,
+    "lens": "interaction"
+  },
+  {
+    "section": "experience",
+    "viewport": "1440, 1920, 1280s (hover-capable)",
+    "severity": "P3",
+    "description": "Rows look clickable but aren't. Hovering an Experience row slides the organisation name 10px to the right, the usual 'this row is a link' cue, but rows have no link, no cursor change and no action. Clicking does nothing.",
+    "evidence": ["shots/experience/p1/1440/en-motion-00.png"],
+    "file_line": "app/globals.css:655",
+    "suggested_fix": "Drop the hover nudge, or make the rows real links (e.g. to the organisation or a detail) with a visible arrow.",
+    "confidence": 0.5,
+    "lens": "interaction"
+  },
+  {
+    "section": "skills",
+    "viewport": "1440, 1920, 1280s (hover-capable)",
+    "severity": "P3",
+    "description": "Skill chips look like buttons or filter tags but are plain <li>. On hover the border turns copper, a glow appears and the side pins light up. Clicking does nothing (no filter, no link). With the marquee now pausing on hover too, the whole section reacts to the pointer without offering any action.",
+    "evidence": ["shots/skills/p1/1440/en-motion-00.png"],
+    "file_line": "app/globals.css:704-712",
+    "suggested_fix": "Tone the hover down to a pure decoration (pins only, no border/glow), or wire chips to something, e.g. highlight the projects that use that skill.",
+    "confidence": 0.45,
+    "lens": "interaction"
+  },
+  {
+    "section": "skills",
+    "viewport": "all motion viewports",
+    "severity": "P3",
+    "description": "The marquee's per-frame tick keeps running after the band is paused. gsap.ticker.add(tick) is registered once and never removed while the band is off screen, so loop.timeScale() is set 60 times a second for the life of the page (the loop itself is paused, measured delta 0 when off screen). This is wasted main-thread work on phones and competes with the scroll-driven CircuitTrace renders.",
+    "evidence": ["shots/skills/p1/390/en-motion-00.png"],
+    "file_line": "components/skills/Marquee.tsx:26-31,41",
+    "suggested_fix": "Add the tick in onToggle when active and remove it when inactive, alongside loop.play()/pause().",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "footer",
+    "viewport": "all, with reduced motion",
+    "severity": "P3",
+    "description": "The clock placeholder doesn't match what replaces it under reduced motion. Server HTML and first paint show '--:--:--' (8 chars). After mount with prefers-reduced-motion the clock renders 'HH:MM' (5 chars), so the text changes format and gets ~3 characters narrower. On slow connections '--:--:--' stays up until hydration (about 20s in the throttled dev test).",
+    "evidence": ["shots/footer/p1/1440/en-reduced-00.png", "shots/contact/p1/agent-interaction/slow3g-t15s-1440.png"],
+    "file_line": "components/Footer.tsx:46,53",
+    "suggested_fix": "Use '--:--' as the placeholder when seconds are hidden (or always show HH:MM in the placeholder), and give <time> a min-width in ch so the swap never changes width.",
+    "confidence": 0.55,
+    "lens": "interaction"
+  },
+  {
+    "section": "footer",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The © year is computed at render in a statically generated client component. The prerendered HTML freezes the build year, so from January 1 until the next deploy the client renders a different year. That is a text hydration mismatch: React logs a recoverable error and re-renders on the client, and the year visibly changes after load.",
+    "evidence": ["shots/footer/p1/1440/en-motion-00.png"],
+    "file_line": "components/Footer.tsx:19",
+    "suggested_fix": "Render the year inside a suppressHydrationWarning span, or set it after mount like the clock. Alternatively, accept the build year and rebuild yearly.",
+    "confidence": 0.5,
+    "lens": "interaction"
+  }
+]

@@ -1,0 +1,233 @@
+[
+  {
+    "section": "nav",
+    "viewport": "390 (all touch widths < 768)",
+    "severity": "P1",
+    "description": "Tapping Menu quickly (3 taps, 60 to 250 ms apart, the way people tap when the first tap seems not to register) leaves the page frozen. The button says 'Close' and aria-expanded is true, the page stays scroll-locked and #main and the footer stay inert, but the drawer has display:none. The user sees the normal page and can't scroll or tap anything in it. Only a tap on the small 'Close' label gets them out. Repro: /en on a phone, tap Menu 3 times fast, try to scroll. Observed (every gap tested): expanded=true, menuDisplay=none, locked=true, mainInert=true, and elementFromPoint over the CTA returns BODY. Expected: the drawer's visibility always matches its open state. Cause: the close tween (gsap.to autoAlpha 0 with an onComplete that sets display:none) is never killed when the menu reopens, so it finishes after the reopen and hides the open menu.",
+    "evidence": ["shots/nav/p1/agent-interaction/m390-menu-triple-tap-gap150-stuck-v2.png", "shots/nav/p1/agent-interaction/m390-menu-rapid-tap-gap60-stuck.png"],
+    "file_line": "components/Nav.tsx:116-121 (close tween + onComplete display:none); components/Nav.tsx:86-87 (open path doesn't kill it)",
+    "suggested_fix": "Call gsap.killTweensOf(el) at the top of both the open and close branches (or give both tweens overwrite:true). In the close onComplete, only set display:none if !openRef.current.",
+    "confidence": 0.95,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "390, 375, 768 (touch)",
+    "severity": "P1",
+    "description": "Tapping to skip the boot intro also taps whatever is under your finger. The skip listens for window 'pointerdown' and hides the overlay right away, so the browser then sends the tap's click to the page underneath. Repro: new tab, /en on a phone, tap the lower-left area during the boot. If the tap lands on 'Download CV', the PDF download starts (download event fired). If it lands on 'View projects', the page scrolls to Projects (y=7971). Expected: a tap on the overlay only skips the intro. On desktop, mouse clicks are retargeted and are harmless.",
+    "evidence": ["shots/global/p1/agent-interaction/m390-boot-skipped-with-tap.png"],
+    "file_line": "components/Boot.tsx:42-45",
+    "suggested_fix": "Skip on the overlay's own 'click' (root.current.addEventListener('click', skip)) instead of window pointerdown. Alternatively, keep pointerdown but add a one-time capture-phase 'click' listener that calls preventDefault()+stopPropagation(), so the tap that skipped the intro can't reach the page.",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "all (tablet rotation, desktop window resize)",
+    "severity": "P1",
+    "description": "Resizing into the size where Focus scrolls sideways sends the page back to the very top. Repros: iPad-mini sized 744x1133 rotated to 1133x744 at y=3000 or 12000 lands at y=0; a desktop window 700x900 to 800x900 or 900x600 to 1000x720 also lands at y=0; with the mobile menu open at y=2400, widening past 768 closes the menu and lands at y=0. Resizes that stay within one Focus layout keep their position (1440x900 to 1200x900, 760x600 to 780x600). The reader loses their place completely, and a tablet rotation is a common way to hit this.",
+    "evidence": ["shots/global/p1/agent-interaction/rotate-744x1133-to-1133x744-jumps-top.png", "shots/global/p1/agent-interaction/resize-700x900-to-800x900-jumps-top.png", "shots/nav/p1/agent-interaction/1100-desktop-window-menu-open-then-widen.png"],
+    "file_line": "components/focus/Focus.tsx:85 (synchronous ScrollTrigger.refresh() inside the matchMedia add callback); components/focus/Focus.tsx:50 (section height set during refreshInit)",
+    "suggested_fix": "Remove the extra ScrollTrigger.refresh() inside mm.add: gsap.matchMedia already refreshes after the callbacks run. If a refresh is still needed, save window.scrollY first and restore it afterwards (or call ScrollTrigger.refresh(true) in a rAF). Test by crossing the HORIZONTAL query at y>0.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 1920, 1280s (any size where Focus scrolls sideways)",
+    "severity": "P2",
+    "description": "Reload and Back put you one section lower than you were once you're past the Focus section. Reload at y=9600 (Projects) lands at 11446 (Experience). Reload at 13000 (Experience) lands at 14846 (Contact). Switching EN to FR and pressing Back from 5900 (Focus) lands at 8326 (Projects). Positions above Focus restore exactly, and phones restore exactly. Cause: the browser restores the saved scrollY against the layout before JS runs. Focus.tsx then makes the section 1848px taller, and CSS scroll anchoring moves the view by the same amount. With `*{overflow-anchor:none}` injected, restoration was exact (9600 to 9600).",
+    "evidence": ["shots/nav/p1/agent-interaction/d1440-before-langswitch-y9000.png", "shots/nav/p1/agent-interaction/d1440-after-back-y9000.png", "shots/nav/p1/agent-interaction/d1440-before-langswitch-y5900.png", "shots/nav/p1/agent-interaction/d1440-after-back-y5900.png"],
+    "file_line": "components/focus/Focus.tsx:50; app/globals.css:34 (html rule)",
+    "suggested_fix": "Add `overflow-anchor: none` to html in globals.css (the page's heights are driven by JS and ScrollTrigger anyway), or reserve the Focus section's height in CSS so the height doesn't change after JS runs. Note: tested on the dev server, where bfcache is off. A production Back may be served from bfcache, but reload is affected either way.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "all",
+    "severity": "P1",
+    "description": "If the JS doesn't arrive (flaky mobile network, a content blocker, a failed CDN chunk), the page stays blank forever. The inline bootScript adds html.js before first paint, and only the app JS undoes it. On a first visit the .boot overlay (two ink halves) covers the viewport permanently. On a repeat visit every [data-intro] element (the name, tagline, CTAs, status) stays visibility:hidden. Repro: block /_next/static/chunks/*.js and load /en. After 5s the whole viewport is flat #0b0c0e, with elementFromPoint returning DIV.boot-half--bottom (first visit) or empty hero wrappers (repeat visit).",
+    "evidence": ["shots/global/p1/agent-interaction/d1440-js-failed-firstvisit.png", "shots/global/p1/agent-interaction/m390-js-failed-booted.png"],
+    "file_line": "app/[locale]/layout.tsx:68 (bootScript); app/globals.css:123 (html.js [data-intro] hidden), app/globals.css:142-143 (.boot shown whenever html.js and not booted)",
+    "suggested_fix": "Add a failsafe to bootScript: setTimeout(()=>{ if(!window.__gsReady){ d.classList.remove('js'); d.classList.add('booted'); } }, 4000), and set window.__gsReady=true in Boot's useGSAP. A pure-CSS fallback also works: html.js:not(.hydrated) [data-intro] { animation: reveal 0s 4s forwards }.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "390, 1440 (Fast-3G + 4x CPU)",
+    "severity": "P2",
+    "description": "Slow loads show nothing at all: no skeleton, no mark, no progress. With Fast-3G and 4x CPU throttling, a first visit shows a plain black screen from 0 to about 9s. The boot overlay is painted, but its mark and copper bar start invisible and only GSAP brings them in. After that comes the 3.3s boot animation. A repeat visit shows an empty dark page for 6 to 9s because the hero is hidden until JS. Visitors can't tell a slow load from a broken page. Absolute times are inflated by dev bundles, but the pattern (nothing shows until JS arrives) doesn't depend on the build.",
+    "evidence": ["shots/global/p1/agent-interaction/m390-fast3g-cpu4x-first-3000ms.png", "shots/global/p1/agent-interaction/m390-fast3g-cpu4x-first-6000ms.png", "shots/global/p1/agent-interaction/m390-fast3g-cpu4x-booted-6000ms.png", "shots/global/p1/agent-interaction/m390-fast3g-cpu4x-first-10000ms.png", "shots/global/p1/agent-interaction/d1440-js-delayed-2500ms-booted.png"],
+    "file_line": "components/Boot.tsx:60-68 (.boot-mark starts invisible opacity-0; bar scale-x-0); app/globals.css:123",
+    "suggested_fix": "Make the pre-JS overlay show progress on its own: render .boot-mark visible and run the copper bar as a CSS keyframe (scaleX 0 to 0.8 over ~2s), then let GSAP take over and finish it. For repeat visits, reveal [data-intro] with a CSS fallback animation after ~1.5s if JS hasn't run yet.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "hero",
+    "viewport": "390, 1440 (all motion-enabled)",
+    "severity": "P2",
+    "description": "After a small scroll, the CTAs are invisible but still clickable. The gate timeline fades .hero-hud-scroll to opacity 0 within the first ~120px of scroll, using opacity only (on purpose, so the CTAs stay in the tab order). 'View projects' and 'Download CV' still receive clicks and taps until the hero ends (~810px at 1440). Repro: scroll to y=300 and tap or click the empty lower-left area. A PDF download starts (download event fired at both 390 and 1440). On desktop the custom cursor ring also grows over blank space.",
+    "evidence": ["shots/hero/p1/agent-interaction/m390-invisible-ctas-still-clickable-y300.png", "shots/hero/p1/agent-interaction/d1440-invisible-ctas-still-clickable-y300.png"],
+    "file_line": "components/hero/Hero.tsx:99",
+    "suggested_fix": "Add .set(q('.hero-hud-scroll .pointer-events-auto'), { pointerEvents: 'none' }, 0.15) to the gate timeline (it reverses automatically when scrolling back). Keyboard focus still works because the focusin handler scrolls the hero back to y=0.",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "hero",
+    "viewport": "1440, 390 (all motion-enabled)",
+    "severity": "P2",
+    "description": "Scrolling during the ~2.5s intro clips the name. The lines get overflow:hidden for the rise-in, and only the intro's onComplete sets overflow back to visible. If you scroll while the intro is running (repro: load, wait ~0.9s after hydration, scroll to y=260), the gate spreads the letters and the line boxes cut off the outer letters: the 'G' is sliced at x~25 and the 'N' at x~1410. Letters that are still rising are cut off at the bottom. When the intro ends they pop out unclipped, which is a visible jump.",
+    "evidence": ["shots/hero/p1/agent-interaction/d1440-scroll260-during-intro.png", "shots/hero/p1/agent-interaction/d1440-scroll260-after-intro.png"],
+    "file_line": "components/hero/Hero.tsx:33, components/hero/Hero.tsx:44",
+    "suggested_fix": "Clip only vertically while the letters rise, e.g. gsap.set(lines, { clipPath: 'inset(0 -100vw 0 -100vw)' }) instead of overflow:hidden, and clear it in onComplete. Or, in the gate ScrollTrigger's onUpdate, set overflow visible as soon as progress > 0.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440 (keyboard)",
+    "severity": "P2",
+    "description": "Using the skip link breaks reload for the rest of the visit. The skip link writes #main into the URL. From then on, a reload always snaps back to the top: scroll to y=6500 and reload, and you land at y=0. Cause: SmoothScroll now scrolls to location.hash once fonts are ready on every load, and this overrides the browser's restored position. The same happens with any hash URL reloaded after scrolling away (/en#projects, then read Contact, then reload, and you're back at Projects).",
+    "evidence": ["shots/global/p1/agent-interaction/d1440-reload-after-skiplink.png"],
+    "file_line": "components/SmoothScroll.tsx:14-17; app/[locale]/layout.tsx:84",
+    "suggested_fix": "Only honour the hash on a fresh navigation: const nav = performance.getEntriesByType('navigation')[0]; if (nav?.type === 'navigate') {...}. Also, the skip link could move focus without writing a hash (onClick: preventDefault, then #main.focus()).",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440 (keyboard)",
+    "severity": "P2",
+    "description": "Skipping the boot with Space, PageDown or ArrowDown also scrolls the page. The keydown skip unlocks scrolling inside the handler, and the key's default scroll then runs too. Space lands at y=860, so the visitor's first view of the site is the name already torn apart by the gate. ArrowDown lands at y=40. Tab and Enter behave well.",
+    "evidence": ["shots/global/p1/agent-interaction/d1440-boot-skipped-with-Space.png", "shots/global/p1/agent-interaction/d1440-boot-skipped-with-ArrowDown.png"],
+    "file_line": "components/Boot.tsx:43-44",
+    "suggested_fix": "const skip = (e) => { if (e.type === 'keydown' && [' ', 'PageDown', 'ArrowDown', 'End', 'ArrowUp', 'PageUp', 'Home'].includes(e.key)) e.preventDefault(); tl.progress(1); } (register keydown with passive:false).",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "Switching language always drops you at the top of the other locale, so you lose your place. Repro: open /en#projects, then tap EN/FR. You land on /fr at y=0 (the hero), not on Projects. This happens every time someone switches language mid-page, on /fr too. Deep links with a hash already land correctly now, so the switch could carry the current section along.",
+    "evidence": ["shots/nav/p1/agent-interaction/m390-before-langswitch-projects.png", "shots/nav/p1/agent-interaction/m390-after-langswitch-lands-top.png"],
+    "file_line": "components/Nav.tsx:170-171",
+    "suggested_fix": "On click, find the section nearest the top of the viewport (for example the last main > section[id] whose top is at or above 40% of the viewport height) and go to `/${other}#${id}`. The full page load is kept on purpose; only the hash is added.",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440, 1920 (desktop nav) and mobile menu",
+    "severity": "P2",
+    "description": "Section links never touch the URL or history. go() calls preventDefault and never pushes or replaces state. After clicking About and then Projects, the URL is still /en and history.length hasn't changed, so Back leaves the site (Playwright goBack went to about:blank) instead of returning to the previous section. The address bar can't be copied to share a section, even though hash deep links now work. The skip link is the only thing that writes a hash.",
+    "evidence": ["shots/nav/p1/agent-interaction/d1440-after-click-about.png"],
+    "file_line": "components/Nav.tsx:125-126; components/hero/Hero.tsx (toProjects, same pattern)",
+    "suggested_fix": "In go() and toProjects, call history.replaceState(null, '', `#${id}`), which fixes sharing without flooding history. Or use pushState plus a popstate listener that calls scrollToTarget(location.hash || 0) if Back should step through sections.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "390 portrait to 844x390 landscape",
+    "severity": "P3",
+    "description": "Rotating a phone moves the reading position by hundreds or thousands of pixels. At y=3000, rotating 390x844 to 844x390 lands at 1564; at 12000 it lands at 8795. The hero (170vh) and Statement (220vh) scale with viewport height, and nothing keeps the current section in view. The reader ends up a section or two away from where they were.",
+    "evidence": [],
+    "file_line": "components/hero/Hero.tsx:166 (h-[170vh]); components/Statement.tsx (h-[220vh]); lib/gsap.ts:12 (ignoreMobileResize covers only height-only changes)",
+    "suggested_fix": "On an orientation or width change, record the top-most visible section and its progress through that section. Restore both after the ScrollTrigger 'refresh' event.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "390 (touch), also any width on each repeat load",
+    "severity": "P3",
+    "description": "For about 1s after every load (repeat visits, language switches), the header is invisible but can still be tapped. The intro now fades opacity only (no visibility) and has delay 0.9, so the Menu button and EN/FR sit at opacity 0 while still being hit targets. Measured: opacity 0.00 for the first ~1s, with elementFromPoint over Menu returning the button. A tap at the top right in that window opens an invisible menu or switches language.",
+    "evidence": ["shots/nav/p1/agent-interaction/m390-header-invisible-but-tappable.png"],
+    "file_line": "components/Nav.tsx:26-29",
+    "suggested_fix": "Set pointerEvents:'none' in the fromTo's from-state and 'auto' in onStart or when opacity passes 0.5. Or shorten the delay on repeat visits.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "The designed 1.6s ease-out-quart nav scroll never runs. Lenis is created with anchors:true, so its window-level click handler also calls lenis.scrollTo(hash) with the default lerp for every same-page #link. That runs after go() or toProjects have called scrollToTarget(..., {duration:1.6, easing}), and replaces it. Measured trajectory to Projects: 44% of the distance in the first 100ms and 80% by 400ms, settling at ~2.2s. The quart curve would give ~23% and ~68%, done at 1.6s.",
+    "evidence": [],
+    "file_line": "components/SmoothScroll.tsx:44",
+    "suggested_fix": "Set anchors:false, since every in-page link already goes through scrollToTarget. Or pass the same {duration, easing} as the anchors option.",
+    "confidence": 0.75,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "The nav hides as soon as you use it to go down. Clicking About or Projects from the top scrolls down, the hide-on-scroll-down rule fires, and the header ends at translateY(-88px). Going on to another section means scrolling up first to get the nav back (Playwright couldn't click Contact after About because the header was off-screen). There is also no active-section state (no aria-current or highlight) to confirm where you landed.",
+    "evidence": ["shots/nav/p1/agent-interaction/d1440-after-click-about.png", "shots/nav/p1/agent-interaction/d1440-about-from-below-header-overlap.png"],
+    "file_line": "components/Nav.tsx:39-47",
+    "suggested_fix": "Ignore direction changes while a scroll started by scrollToTarget is running (set a flag in scrollToTarget and clear it in Lenis onComplete), and leave the header shown when it lands. Optionally mark the current section's link with aria-current='location'.",
+    "confidence": 0.55,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "390, 375 (JavaScript disabled)",
+    "severity": "P3",
+    "description": "With JS off, phones have no navigation. The Menu button renders and looks tappable, but the drawer is class 'hidden' and only JS opens it. After tapping, aria-expanded stays false and the menu stays display:none. The desktop links are hidden below md, so a JS-off phone visitor has a dead control and no way to jump to any section.",
+    "evidence": ["shots/global/p1/agent-interaction/m390-nojs-atf.png", "shots/nav/p1/agent-interaction/m390-nojs-menu-tapped.png"],
+    "file_line": "components/Nav.tsx:186-190 (button), components/Nav.tsx:203 (#mobile-menu hidden)",
+    "suggested_fix": "Hide the button under html:not(.js) and show the menu's link list as a plain inline list there. Or make the button an <a href='#mobile-menu'> with a #mobile-menu:target { display:flex } fallback.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "statement",
+    "viewport": "1440, 390 (slow load or reload mid-section)",
+    "severity": "P3",
+    "description": "The sentence renders fully lit before JS arrives, then snaps back to dim. Repro: reload while the Statement is on screen with JS delayed 4s. Before hydration every word is at opacity 1. When SplitText runs, all words not yet reached drop to 0.2 in one frame, so the text visibly 'goes out'. The header is also missing until JS arrives.",
+    "evidence": ["shots/statement/p1/agent-interaction/d1440-reload-before-js.png", "shots/statement/p1/agent-interaction/d1440-reload-after-js.png"],
+    "file_line": "components/Statement.tsx:25-27",
+    "suggested_fix": "Give the paragraph a pre-split dim state under html.js (e.g. a class on the <p>: html.js .statement-text { color: rgb(237 235 230 / .2) }), and set the words' own colour/opacity once split. That way the only change is words lighting up, never the whole block dimming.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 390 (first visit)",
+    "severity": "P3",
+    "description": "When the boot halves finish sliding away, the page looks ready but isn't clickable yet. The transparent .boot root (fixed inset-0 z-90) stays until the timeline's onComplete, so for ~0.5 to 0.8s (t≈3.0 to 3.3s) elementFromPoint returns DIV.boot. A desktop click in that window is used up as a 'skip' and does nothing on the page, so the user has to click again.",
+    "evidence": ["shots/global/p1/1440/boot-2600ms.png"],
+    "file_line": "components/Boot.tsx:60 (root div), timeline 'split' label",
+    "suggested_fix": "Add tl.set(root.current, { pointerEvents: 'none' }, 'split+=0.5') (or right at 'split'), so the page takes input as soon as it's visible.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "390, 1440",
+    "severity": "P3",
+    "description": "The 404 page doesn't follow the URL's language. /fr/nope shows the English-first 404 (lang='en', 'Page not found.' first, logo links to /en, primary button 'Back to the site' goes to /en), so a French visitor gets English first. global-not-found has no params, but the URL is known on the client.",
+    "evidence": ["shots/global/p1/agent-interaction/m390-404_fr_nope.png"],
+    "file_line": "app/global-not-found.tsx:23, 27, 42",
+    "suggested_fix": "Add a tiny inline script: if (location.pathname.startsWith('/fr')) set documentElement.lang='fr-CA', point the logo at /fr and swap which button is primary (e.g. with a data-fr attribute and CSS order).",
+    "confidence": 0.6,
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "390",
+    "severity": "P3",
+    "description": "Offline, the language switch throws the visitor onto Chrome's offline error page (chrome-error://chromewebdata/). The switch is a full page load and there's no service worker or cached fallback. Download CV fails the same way. That's acceptable for a portfolio, but it's the only in-page control that can leave the site in a broken state.",
+    "evidence": ["shots/nav/p1/agent-interaction/m390-offline-language-switch.png"],
+    "file_line": "components/Nav.tsx:170",
+    "suggested_fix": "Optional: in the switch's onClick, if (!navigator.onLine) preventDefault and show a small 'You're offline' note next to EN/FR.",
+    "confidence": 0.4,
+    "lens": "interaction"
+  }
+]
