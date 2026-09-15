@@ -31,7 +31,7 @@ export default function Contact({ locale }: { locale: Locale }) {
         <span className="chip-corner bottom-0 right-0 border-b border-r" aria-hidden="true" />
 
         <p data-reveal className="label-mono flex items-center gap-3 text-mute">
-          <span className="h-px w-8 bg-copper" aria-hidden="true" />
+          <span className="section-index h-px w-8 bg-copper" aria-hidden="true" />
           {t(contact.label, locale)}
         </p>
         {/* phones get a smaller minimum so a long word ("Construisons") still fits the box at 320px */}
@@ -46,7 +46,7 @@ export default function Contact({ locale }: { locale: Locale }) {
           {t(contact.text, locale)}
         </p>
 
-        <div data-reveal className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-5 border-t border-line pt-8">
+        <div data-reveal className="mt-12 flex flex-wrap items-baseline gap-x-6 gap-y-5 border-t border-line pt-8">
           <span className="label-mono text-mute">{t(contact.emailLabel, locale)}</span>
           {/* wraps before the @ if it has to, never in the middle of a word */}
           <a
