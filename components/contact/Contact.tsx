@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { t, type Locale } from "@/lib/i18n";
 import { contact, person } from "@/content/site";
 import CircuitTrace from "../CircuitTrace";
@@ -69,17 +69,49 @@ export default function Contact({ locale }: { locale: Locale }) {
   );
 }
 
+/** Copies the address. Falls back to the old copy command where the Clipboard API is missing
+ *  (plain-http previews, older browsers); if both fail, the address is selected for a manual copy. */
 function CopyEmail({ copy, copied }: { copy: string; copied: string }) {
   const [done, setDone] = useState(false);
+  const timer = useRef(0);
+
+  const fallback = () => {
+    const field = document.createElement("textarea");
+    field.value = person.email;
+    field.setAttribute("readonly", "");
+    field.style.cssText = "position:fixed;opacity:0;pointer-events:none";
+    document.body.appendChild(field);
+    field.select();
+    let ok = false;
+    try {
+      ok = document.execCommand("copy");
+    } catch {}
+    field.remove();
+    return ok;
+  };
+
+  const onCopy = async () => {
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(person.email);
+      ok = true;
+    } catch {
+      ok = fallback();
+    }
+    if (!ok) {
+      const link = document.querySelector<HTMLAnchorElement>(`#contact a[href^="mailto:"]`);
+      if (link) window.getSelection()?.selectAllChildren(link);
+      return;
+    }
+    setDone(true);
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setDone(false), 1800);
+  };
+
   return (
     <button
       type="button"
-      onClick={() =>
-        navigator.clipboard?.writeText(person.email).then(() => {
-          setDone(true);
-          setTimeout(() => setDone(false), 1800);
-        })
-      }
+      onClick={onCopy}
       className="label-mono rounded-full border border-line px-3 py-2 text-mute transition-colors hover:border-copper hover:text-copper"
     >
       <span aria-live="polite">{done ? `${copied} ✓` : copy}</span>
