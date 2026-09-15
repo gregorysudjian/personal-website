@@ -52,6 +52,8 @@ export const ui = {
   menu: { en: "Menu", fr: "Menu" },
   close: { en: "Close", fr: "Fermer" },
   switchLanguage: { en: "Voir le site en français", fr: "View the site in English" },
+  // Read by screen readers only, after links that open in a new tab.
+  newTab: { en: "(opens in a new tab)", fr: "(s'ouvre dans un nouvel onglet)" },
   nav: [
     { id: "about", label: { en: "About", fr: "À propos" } },
     { id: "projects", label: { en: "Projects", fr: "Projets" } },
@@ -637,6 +639,9 @@ export const contact = {
   emailLabel: { en: "Email", fr: "Courriel" },
   copy: { en: "Copy", fr: "Copier" },
   copied: { en: "Copied", fr: "Copié" },
+  // Read by screen readers only: what the Copy button does, and the message once it's done.
+  copyLabel: { en: "Copy email address", fr: "Copier l'adresse courriel" },
+  copiedStatus: { en: "Email address copied", fr: "Adresse courriel copiée" },
   cvLabel: { en: "Download CV", fr: "Télécharger le CV" },
 };
 
