@@ -2,11 +2,13 @@ import Rich from "./Rich";
 
 /** Section label + big heading + optional intro. The label gets a pad on the copper rail. */
 export default function SectionHeader({
+  id,
   label,
   heading,
   intro,
   className = "",
 }: {
+  id?: string; // the heading's id, so the section can be labelled by it (aria-labelledby)
   label: string;
   heading: string;
   intro?: string;
@@ -19,6 +21,7 @@ export default function SectionHeader({
         {label}
       </p>
       <h2
+        id={id}
         data-reveal="lines"
         className="mt-6 max-w-[16ch] text-[clamp(2.6rem,6vw,6.2rem)] font-medium leading-[1.02] tracking-[-0.04em] text-paper"
       >

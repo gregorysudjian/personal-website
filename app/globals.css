@@ -55,10 +55,17 @@ body {
   color: var(--color-ink);
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-copper);
-  outline-offset: 4px;
-  border-radius: 2px;
+/* In the base layer so utilities (rounded-full pills) keep their own shape; the outline follows it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 4px;
+  }
+}
+
+/* The skip-link / back-to-top focus target: a container, so no ring around the whole page. */
+#main:focus {
+  outline: none;
 }
 
 /* -------------------------------------------------------------- utilities */
@@ -110,10 +117,14 @@ body {
 
 /* ---------------------------------------------------- intro / boot states */
 
-/* Elements the intro / scroll reveals animate in start hidden, but only when JS is running. */
-html.js [data-intro],
-html.js [data-reveal] {
+/* Elements the intro / scroll reveals animate in start hidden, but only when JS is running.
+   Scroll reveals only go transparent (never visibility:hidden), so content that hasn't scrolled
+   into view yet can still be reached with Tab and read by screen readers. */
+html.js [data-intro] {
   visibility: hidden;
+}
+html.js [data-reveal] {
+  opacity: 0;
 }
 
 /* Keep descenders (g, y, p) inside the line masks of revealed headings. */
@@ -129,9 +140,11 @@ html.booted .boot {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-intro],
-  html.js [data-reveal] {
+  html.js [data-intro] {
     visibility: visible;
+  }
+  html.js [data-reveal] {
+    opacity: 1;
   }
   .boot {
     display: none;
@@ -351,9 +364,20 @@ html.has-cursor * {
   padding-bottom: 3px;
   transition: background-size 0.6s var(--ease-out-expo);
 }
-.link-underline:hover,
 .link-underline:focus-visible {
   background-size: 100% 1px;
+}
+/* On touch there's no hover to reveal it, so the email shows as a link from the start. */
+@media (hover: none) {
+  #contact .link-underline {
+    background-size: 100% 1px;
+  }
+}
+/* Hover looks only where there's a real hover; on touch they'd stick after a tap. */
+@media (hover: hover) {
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* Bigger invisible touch area for small text controls; what you see doesn't change. */
@@ -408,14 +432,27 @@ header.is-scrolled .header-solid {
   transform: translateY(101%);
   transition: transform 0.6s var(--ease-out-expo);
 }
-.btn:hover,
 .btn:focus-visible {
   color: var(--color-ink);
   border-color: var(--color-paper);
 }
-.btn:hover::before,
 .btn:focus-visible::before {
   transform: translateY(0);
+}
+@media (hover: hover) {
+  .btn:hover {
+    color: var(--color-ink);
+    border-color: var(--color-paper);
+  }
+  .btn:hover::before {
+    transform: translateY(0);
+  }
+}
+/* Touch: a short press state instead of a hover that never goes away. */
+@media (hover: none) {
+  .btn:active {
+    opacity: 0.75;
+  }
 }
 .btn-primary {
   background: var(--color-copper);
@@ -657,14 +694,16 @@ header.is-scrolled .header-solid {
 .chip::after {
   right: -6px;
 }
-.chip:hover {
-  border-color: var(--color-copper);
-  color: var(--color-paper);
-  box-shadow: 0 0 26px -6px rgb(232 130 58 / 0.55);
-}
-.chip:hover::before,
-.chip:hover::after {
-  background: repeating-linear-gradient(to bottom, var(--color-copper) 0 1px, transparent 1px 4px);
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-copper);
+    color: var(--color-paper);
+    box-shadow: 0 0 26px -6px rgb(232 130 58 / 0.55);
+  }
+  .chip:hover::before,
+  .chip:hover::after {
+    background: repeating-linear-gradient(to bottom, var(--color-copper) 0 1px, transparent 1px 4px);
+  }
 }
 
 /* ---------------------------------------------------------------- contact */
@@ -704,8 +743,18 @@ header.is-scrolled .header-solid {
   -webkit-text-stroke: 1px var(--color-trace);
   transition: -webkit-text-stroke-color 0.8s var(--ease-out-expo);
 }
-.footer-mark:hover {
-  -webkit-text-stroke-color: var(--color-copper);
+@media (hover: hover) {
+  .footer-mark:hover {
+    -webkit-text-stroke-color: var(--color-copper);
+  }
+}
+/* High-contrast mode would fill the outlined name solid; keep it a quiet outline. */
+@media (forced-colors: active) {
+  .footer-mark {
+    forced-color-adjust: none;
+    color: transparent;
+    -webkit-text-stroke-color: GrayText;
+  }
 }
 
 /* ------------------------------------------------ reduced motion: be still */

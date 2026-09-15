@@ -10,6 +10,8 @@ import { gsap, SplitText, useGSAP, FULL_MOTION } from "@/lib/gsap";
  *   data-reveal="clip"     wipes open from top to bottom
  *   data-parallax="0.1"    drifts against the scroll (fraction of its height)
  * With reduced motion, everything is simply shown.
+ * Only opacity is animated (never autoAlpha/visibility): content waiting to be revealed must stay
+ * focusable and readable by screen readers.
  */
 export default function Reveals() {
   useGSAP(() => {
@@ -29,7 +31,7 @@ export default function Reveals() {
                 mask: "lines",
                 autoSplit: true,
                 onSplit: (self) => {
-                  gsap.set(el, { visibility: "visible" });
+                  gsap.set(el, { opacity: 1 });
                   return gsap.from(self.lines, {
                     yPercent: 110,
                     duration: 1.4,
@@ -44,18 +46,18 @@ export default function Reveals() {
             );
             break;
           case "stagger":
-            gsap.set(el, { visibility: "visible" });
-            gsap.from(el.children, { autoAlpha: 0, y: 32, duration: 1.2, stagger: 0.08, delay, scrollTrigger });
+            gsap.set(el, { opacity: 1 });
+            gsap.from(el.children, { opacity: 0, y: 32, duration: 1.2, stagger: 0.08, delay, scrollTrigger });
             break;
           case "clip":
             gsap.fromTo(
               el,
-              { autoAlpha: 1, clipPath: "inset(0% 0% 100% 0%)" },
+              { opacity: 1, clipPath: "inset(0% 0% 100% 0%)" },
               { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "expo.inOut", delay, scrollTrigger },
             );
             break;
           default:
-            gsap.fromTo(el, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.3, delay, scrollTrigger });
+            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.3, delay, scrollTrigger });
         }
       });
 
