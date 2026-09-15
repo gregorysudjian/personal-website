@@ -165,7 +165,12 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
                     gliding || i === leaving
                       ? ({
                           "--glide-to": `${-distanceOf(i)}px`,
-                          animation: `slide-glide ${i === leaving ? leavingGlide : glide}ms cubic-bezier(0.4, 0.1, 0.6, 0.9) ${SCROLL_PAUSE}ms both`,
+                          // longhand (not the `animation` shorthand): play state changes on its own
+                          animationName: "slide-glide",
+                          animationDuration: `${i === leaving ? leavingGlide : glide}ms`,
+                          animationTimingFunction: "cubic-bezier(0.4, 0.1, 0.6, 0.9)",
+                          animationDelay: `${SCROLL_PAUSE}ms`,
+                          animationFillMode: "both",
                           animationPlayState: i === leaving || advancing || stopped ? "running" : "paused",
                         } as React.CSSProperties)
                       : undefined
