@@ -49,7 +49,9 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
   const duration = current.scroll
     ? Math.max(current.duration ?? SCROLL_MS, glide + 2 * SCROLL_PAUSE)
     : (current.duration ?? STEP_MS);
-  const advancing = auto && playing && !held && !stopped;
+  // A scroll slide's countdown only starts once its capture has loaded (its length depends on it).
+  const ready = !current.scroll || loaded[active];
+  const advancing = auto && playing && !held && !stopped && ready;
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
