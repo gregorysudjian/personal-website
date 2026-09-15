@@ -28,8 +28,6 @@ export default function Marquee({ words }: { words: string[] }) {
           speed += (target - speed) * 0.12;
           loop.timeScale(speed);
         };
-        gsap.ticker.add(tick);
-
         const st = ScrollTrigger.create({
           trigger: root.current,
           start: "top bottom",
@@ -38,9 +36,19 @@ export default function Marquee({ words }: { words: string[] }) {
             direction = self.direction;
             if (!held) target = direction * (1 + Math.min(6, Math.abs(self.getVelocity()) / 250));
           },
-          onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
+          // runs (and ticks) only while on screen
+          onToggle: (self) => {
+            if (self.isActive) {
+              loop.play();
+              gsap.ticker.add(tick);
+            } else {
+              loop.pause();
+              gsap.ticker.remove(tick);
+            }
+          },
         });
-        if (!st.isActive) loop.pause();
+        if (st.isActive) gsap.ticker.add(tick);
+        else loop.pause();
 
         const el = root.current!;
         const hold = (e: PointerEvent) => {
@@ -67,10 +75,11 @@ export default function Marquee({ words }: { words: string[] }) {
     ));
 
   return (
-    <div ref={root} className="overflow-hidden border-y border-line py-5 md:py-6" aria-hidden="true">
+    // Above the copper rail (it passes under the band), on the page colour.
+    <div ref={root} className="relative z-[2] overflow-hidden border-y border-line bg-ink py-5 md:py-6" aria-hidden="true">
       <div
         ref={row}
-        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.04em]"
+        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.04em] motion-reduce:pl-[var(--gutter)]"
       >
         {set("a")}
         {set("b")}
