@@ -609,6 +609,10 @@ header.is-scrolled .header-solid {
 .slide-progress {
   animation: slide-progress 4.2s linear forwards;
 }
+@keyframes slide-glide {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--glide-to, 0)); }
+}
 @keyframes slide-progress {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }

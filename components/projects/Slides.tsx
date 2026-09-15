@@ -93,6 +93,25 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
     };
   }, [active, current.scroll]);
 
+  // The slide that was just left keeps its glide until the crossfade is over.
+  const [leaving, setLeaving] = useState(-1);
+  const [leavingGlide, setLeavingGlide] = useState(0);
+  const lastDistance = useRef<number[]>([]);
+  lastDistance.current[active] = distance;
+  const distanceOf = (i: number) => (i === active ? distance : (lastDistance.current[i] ?? 0));
+  const prevActive = useRef(active);
+  useEffect(() => {
+    const prev = prevActive.current;
+    prevActive.current = active;
+    if (prev === active || !slides[prev].scroll) return;
+    setLeaving(prev);
+    const id = setTimeout(() => setLeaving(-1), 800);
+    return () => clearTimeout(id);
+  }, [active, slides]);
+  useEffect(() => {
+    if (current.scroll) setLeavingGlide(glide);
+  }, [current.scroll, glide]);
+
   const markLoaded = (i: number) => () => setLoaded((l) => (l[i] ? l : l.map((v, k) => (k === i ? true : v))));
 
   return (
@@ -128,13 +147,18 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
                   alt={t(slide.alt, locale)}
                   onLoad={markLoaded(i)}
                   className={`${manual ? "relative" : "absolute inset-x-0 top-0"} w-full will-change-transform`}
-                  style={{
-                    transform: `translateY(${gliding ? -distance : 0}px)`,
-                    // an outgoing slide keeps its place until it has faded out, then rewinds unseen
-                    transition: gliding
-                      ? `transform ${glide}ms cubic-bezier(0.4, 0.1, 0.6, 0.9) ${SCROLL_PAUSE}ms`
-                      : "transform 0s linear 0.8s",
-                  }}
+                  // The glide is a CSS animation so it pauses and resumes together with the countdown
+                  // (mouse over it, keyboard focus inside, scrolled away). A slide that's just been left keeps
+                  // its place until it has faded out, then rewinds unseen.
+                  style={
+                    gliding || i === leaving
+                      ? ({
+                          "--glide-to": `${-distanceOf(i)}px`,
+                          animation: `slide-glide ${i === leaving ? leavingGlide : glide}ms cubic-bezier(0.4, 0.1, 0.6, 0.9) ${SCROLL_PAUSE}ms both`,
+                          animationPlayState: i === leaving || advancing || stopped ? "running" : "paused",
+                        } as React.CSSProperties)
+                      : undefined
+                  }
                 />
               ) : (
                 <Shot
