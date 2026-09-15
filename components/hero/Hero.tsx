@@ -29,8 +29,9 @@ export default function Hero({ locale }: { locale: Locale }) {
       // Split the name once; the intro raises the letters, the scroll parts them.
       const splits = reduce ? [] : lines.map((line) => SplitText.create(line, { type: "chars" }));
       const allChars = splits.flatMap((s) => s.chars);
-      // Each line masks its letters only while they rise; without the intro nothing is clipped.
-      if (allChars.length) gsap.set(lines, { overflow: "hidden" });
+      // Each line masks its letters only while they rise, and only top and bottom (scrolling mid-intro
+      // spreads the letters sideways, which must not be cut); without the intro nothing is clipped.
+      if (allChars.length) gsap.set(lines, { clipPath: "inset(0 -100vw 0 -100vw)" });
       if (allChars.length) gsap.set(allChars, { yPercent: 118 });
 
       /* ---------- intro (after the boot sequence) ---------- */
@@ -41,7 +42,7 @@ export default function Hero({ locale }: { locale: Locale }) {
         const tl = gsap.timeline({
           defaults: { ease: "expo.out" },
           // Letters can now fly past their line's edges when the gate opens.
-          onComplete: () => gsap.set(lines, { overflow: "visible" }),
+          onComplete: () => gsap.set(lines, { clearProps: "clipPath" }),
         });
 
         tl.from(q(".hero-glow"), { autoAlpha: 0, scale: 0.5, duration: 2.6 }, 0)
@@ -97,6 +98,8 @@ export default function Hero({ locale }: { locale: Locale }) {
 
         // Opacity only, so the CTAs stay in the tab order (focusing one brings the hero back, below).
         s.to(q(".hero-hud-scroll, .hero-eyebrow"), { opacity: 0, y: -28, duration: 0.15 }, 0)
+          // faded out, the buttons can't be clicked by accident (reverses when scrolling back up)
+          .set(q(".hero-hud-scroll .pointer-events-auto"), { pointerEvents: "none" }, 0.12)
           .to(q(".hero-name-scroll"), { scale: small ? 1.35 : 1.55, ease: "power2.in", duration: 0.75 }, 0)
           .to(q(".hero-name-scroll"), { autoAlpha: 0, duration: 0.32 }, 0.4)
           .to(q(".hero-circuit-scroll"), { scale: small ? 1.45 : 1.7, duration: 1 }, 0)
@@ -224,7 +227,9 @@ export default function Hero({ locale }: { locale: Locale }) {
 
         {/* Layer 4 — bottom row: who, what next, status */}
         <div className="hero-hud-scroll gutter pointer-events-none relative pb-8 md:pb-10 roomy:absolute roomy:inset-x-0 roomy:bottom-0">
-          <div className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr] short:grid-cols-[auto_1fr]!">
+          {/* From lg the text column gets more room (French CTAs fit side by side) and the scroll hint is centred
+              on its own, so it stays right above the point where the copper trace starts */}
+          <div className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr] lg:grid-cols-[minmax(0,1.5fr)_1fr] short:grid-cols-[auto_1fr]!">
             <div data-intro className="hero-hud pointer-events-auto">
               <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg short:hidden">
                 {t(hero.tagline, locale)}
@@ -239,11 +244,15 @@ export default function Hero({ locale }: { locale: Locale }) {
                 </a>
               </div>
             </div>
-            <div data-intro className="hero-hud hidden flex-col items-center gap-3 md:flex short:hidden!" aria-hidden="true">
+            <div
+              data-intro
+              className="hero-hud hidden flex-col items-center gap-3 md:flex lg:absolute lg:bottom-10 lg:left-1/2 lg:-translate-x-1/2 short:hidden!"
+              aria-hidden="true"
+            >
               <span className="label-mono text-mute">{t(hero.scrollHint, locale)}</span>
               <span className="hint-wire" />
             </div>
-            <p data-intro className="hero-hud label-mono flex items-center gap-3 whitespace-nowrap text-paper/80 md:justify-end md:pb-3 short:justify-end! short:pb-3!">
+            <p data-intro className="hero-hud label-mono flex items-center gap-3 whitespace-nowrap text-paper/80 md:justify-end md:pb-4 short:justify-end! short:pb-4!">
               <span className="status-dot" aria-hidden="true" />
               {t(hero.status, locale)}
             </p>
