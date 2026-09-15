@@ -44,7 +44,13 @@ export default function Statement({ locale }: { locale: Locale }) {
 
   return (
     // With reduced motion it's a normal block of text (nothing to light up, so no pinned, frozen screen).
-    <section ref={root} className="relative h-[220vh] motion-reduce:h-auto" aria-labelledby="statement-label">
+    // Pulled up under the hero's faded-out end and a little into About's top padding, so neither
+    // hand-over leaves an empty screen.
+    <section
+      ref={root}
+      className="relative h-[220vh] motion-safe:-mb-[12svh] motion-safe:-mt-[22svh] motion-reduce:h-auto"
+      aria-labelledby="statement-label"
+    >
       <CircuitTrace route="rail" />
       <div className="gutter sticky top-0 flex h-svh flex-col justify-center-safe motion-reduce:static motion-reduce:h-auto motion-reduce:py-32 short:pt-14">
         <p id="statement-label" className="label-mono mb-8 flex items-center gap-3 text-mute md:mb-12 short:mb-4!">
