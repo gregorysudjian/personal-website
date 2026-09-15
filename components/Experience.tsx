@@ -39,14 +39,20 @@ function Group({ id, title, items, locale }: { id: string; title: string; items:
             <div className="lg:col-span-4 lg:col-start-4 lg:row-start-1">
               <h4 className="xp-org text-2xl font-medium tracking-[-0.02em] md:text-3xl">{t(item.org, locale)}</h4>
               <p className="mt-2 text-paper/60">
-                {t(item.role, locale)} <span className="text-line" aria-hidden="true">/</span>
-                <span className="sr-only">,</span> {t(item.place, locale)}
+                {t(item.role, locale)}{" "}
+                {/* the slash travels with the place, so a wrapped line never ends on it */}
+                <span className="whitespace-nowrap">
+                  <span className="text-line" aria-hidden="true">
+                    /
+                  </span>
+                  <span className="sr-only">,</span> {t(item.place, locale)}
+                </span>
               </p>
             </div>
             <span className="xp-dates label-mono order-first pt-1.5 leading-[1.45] text-mute lg:order-none lg:col-span-3 lg:col-start-1 lg:row-start-1">
               {t(item.dates, locale)}
             </span>
-            <p className="max-w-2xl leading-relaxed text-paper/65 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-w-none">{t(item.text, locale)}</p>
+            <p className="max-w-2xl leading-relaxed text-paper/65 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-w-[60ch]">{t(item.text, locale)}</p>
           </li>
         ))}
       </ol>
