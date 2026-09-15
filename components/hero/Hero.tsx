@@ -192,7 +192,7 @@ export default function Hero({ locale }: { locale: Locale }) {
             <div className="hero-eyebrow mb-6 md:mb-9 short:mb-3!">
               <p data-intro className="hero-hud label-mono flex items-center gap-3 leading-[1.6] text-mute">
                 <span className="h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
-                {t(hero.eyebrow, locale)}
+                <span className="text-balance">{t(hero.eyebrow, locale)}</span>
               </p>
             </div>
             <h1
