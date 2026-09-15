@@ -81,6 +81,8 @@ export const hero = {
 
 /* -------------------------------------------------------------- statement */
 
+export const statementLabel: Text = { en: "In one sentence", fr: "En une phrase" };
+
 export const statement: Text = {
   en: "My favourite part of building something is the moment I understand how it *actually* works. I chase that feeling everywhere: in code, in math, and in whatever I haven't tried yet.",
   fr: "Mon moment préféré quand je construis quelque chose, c'est celui où je comprends comment ça marche *vraiment*. Je cours après ce moment partout : dans le code, dans les maths, et dans tout ce que je n'ai pas encore essayé.",
