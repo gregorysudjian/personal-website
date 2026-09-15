@@ -63,9 +63,9 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-/* Runs before first paint: flags JS, and skips the boot sequence on repeat visits
-   or when the visitor prefers reduced motion. */
-const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(sessionStorage.getItem('gs-booted')||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('booted')}catch(e){d.classList.add('booted')}})();`;
+/* Runs before first paint: flags JS, and skips the boot sequence on repeat visits, when the visitor
+   prefers reduced motion, or when the link points at a section (#projects…) so it can land there. */
+const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(sessionStorage.getItem('gs-booted')||location.hash||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('booted')}catch(e){d.classList.add('booted')}})();`;
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;

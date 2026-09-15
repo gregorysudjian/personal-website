@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 
-const QUERY = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+// Never replaces the system pointer for people who've asked for more contrast or use high-contrast mode.
+const QUERY =
+  "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) and (forced-colors: none) and (prefers-contrast: no-preference)";
 
 /**
  * A small dot that tracks the pointer exactly, and a ring that follows with a little lag.

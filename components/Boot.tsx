@@ -23,6 +23,9 @@ export default function Boot() {
       history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
       lockScroll();
+      // Nothing behind the overlay can be focused while it plays.
+      const page = [document.querySelector<HTMLElement>("header"), document.getElementById("main"), document.querySelector<HTMLElement>("body > footer")];
+      page.forEach((el) => el?.setAttribute("inert", ""));
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -30,9 +33,16 @@ export default function Boot() {
             sessionStorage.setItem(BOOT_KEY, "1");
           } catch {}
           html.classList.add("booted");
+          page.forEach((el) => el?.removeAttribute("inert"));
           unlockScroll();
+          window.removeEventListener("keydown", skip);
+          window.removeEventListener("pointerdown", skip);
         },
       });
+      // Any key or tap skips the rest of the intro.
+      const skip = () => tl.progress(1);
+      window.addEventListener("keydown", skip, { once: true });
+      window.addEventListener("pointerdown", skip, { once: true });
 
       tl.to(".boot-mark", { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.1)
         .to(".boot-bar", { scaleX: 1, duration: 1.1, ease: "power3.inOut" }, 0.2)

@@ -123,8 +123,13 @@ body {
 html.js [data-intro] {
   visibility: hidden;
 }
-html.js [data-reveal] {
+html.js [data-reveal],
+html.js .header {
   opacity: 0;
+}
+/* Sections are focus targets for in-page links (see lib/scroll.ts); no ring around a whole section. */
+section[tabindex="-1"]:focus {
+  outline: none;
 }
 
 /* Keep descenders (g, y, p) inside the line masks of revealed headings. */
@@ -143,7 +148,8 @@ html.booted .boot {
   html.js [data-intro] {
     visibility: visible;
   }
-  html.js [data-reveal] {
+  html.js [data-reveal],
+  html.js .header {
     opacity: 1;
   }
   .boot {
@@ -460,6 +466,7 @@ header.is-scrolled .header-solid {
   color: var(--color-ink);
 }
 .btn-sm {
+  min-height: 44px;
   padding: 0.8rem 1.2rem;
   font-size: 0.66rem;
 }

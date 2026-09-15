@@ -10,7 +10,12 @@ import { setLenis } from "@/lib/scroll";
 export default function SmoothScroll() {
   useEffect(() => {
     // Web fonts change text heights; re-measure every scroll animation once they're in.
-    document.fonts.ready.then(() => ScrollTrigger.refresh());
+    // A link to a section (#projects) lands on it once the page has its final height.
+    document.fonts.ready.then(() => {
+      ScrollTrigger.refresh();
+      const target = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+      if (target) window.scrollTo(0, target.getBoundingClientRect().top + window.scrollY);
+    });
 
     // Anything that changes the page height later (a project's "How it's built" panel, a late image)
     // shifts every scroll animation below it: without a re-measure the skills band freezes on screen
