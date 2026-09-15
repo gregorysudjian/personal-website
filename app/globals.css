@@ -363,7 +363,20 @@ html.has-cursor * {
 .tap-area::before {
   content: "";
   position: absolute;
-  inset: -12px -6px;
+  inset: -16px -8px;
+}
+
+/* Header backdrop once the page has scrolled (see Nav.tsx): the gradient alone lets text show through. */
+.header-solid {
+  background: rgb(11 12 14 / 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgb(42 45 51 / 0.7);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out-expo);
+}
+header.is-scrolled .header-solid {
+  opacity: 1;
 }
 
 .btn {
