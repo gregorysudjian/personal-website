@@ -32,10 +32,10 @@ export default function About({ locale }: { locale: Locale }) {
                 className="fact-row group grid grid-cols-[6.5rem_1fr] items-center gap-4 border-b border-line py-5 sm:grid-cols-[8rem_1fr] sm:gap-6 md:grid-cols-[10rem_1fr]"
               >
                 <dt className="label-mono flex items-center gap-2 text-mute">
-                  <span className="h-px w-3 shrink-0 bg-line transition-all duration-500 group-hover:w-6 group-hover:bg-copper" />
+                  <span className="h-px w-3 shrink-0 bg-line transition-all duration-500 group-hover:bg-copper motion-safe:group-hover:w-6" />
                   {t(fact.label, locale)}
                 </dt>
-                <dd className="text-lg text-paper transition-transform duration-500 group-hover:translate-x-1">
+                <dd className="text-lg text-paper transition-transform duration-500 motion-safe:group-hover:translate-x-1">
                   {t(fact.value, locale)}
                 </dd>
               </div>

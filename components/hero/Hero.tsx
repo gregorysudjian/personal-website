@@ -166,7 +166,7 @@ export default function Hero({ locale }: { locale: Locale }) {
   return (
     // With reduced motion nothing animates the gate, so the frame simply scrolls away (no frozen screen,
     // and the lit trace below never slides over the name).
-    <section ref={root} id="top" className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh]">
+    <section ref={root} id="top" aria-labelledby="hero-title" className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh]">
       <div className="sticky top-0 flex h-svh flex-col overflow-hidden motion-reduce:relative">
         {/* Layer 0 — horizon glow */}
         <div className="hero-glow-scroll pointer-events-none absolute inset-x-0 top-[58%] flex -translate-y-1/2 justify-center">
@@ -211,6 +211,7 @@ export default function Hero({ locale }: { locale: Locale }) {
               </p>
             </div>
             <h1
+              id="hero-title"
               data-intro
               aria-label={person.name}
               className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_15.5rem)*1.25)),17.5rem)] short:text-[clamp(3rem,min(16.4vw,21svh),17.5rem)]! [@media(max-height:340px)]:text-[clamp(2.6rem,16svh,17.5rem)]!"

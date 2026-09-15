@@ -162,7 +162,7 @@ export default function Nav({ locale }: { locale: Locale }) {
             <span className="label-mono hidden sm:inline">{person.name}</span>
           </a>
 
-          <nav aria-label={locale === "fr" ? "Navigation principale" : "Main navigation"} className="hidden md:block">
+          <nav aria-label={t(ui.mainNav, locale)} className="hidden md:block">
             <ul className="flex items-center gap-9">
               {ui.nav.map((item) => (
                 <li key={item.id}>
@@ -221,7 +221,7 @@ export default function Nav({ locale }: { locale: Locale }) {
         id="mobile-menu"
         onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         className="gutter fixed inset-0 z-40 hidden flex-col overflow-y-auto overscroll-contain bg-ink pb-16 pt-24 opacity-0 md:hidden short:pb-8"
-        aria-label={t(ui.menu, locale)}
+        aria-label={t(ui.mainNav, locale)}
       >
         <div className="bg-grid pointer-events-none fixed inset-0 opacity-40 [mask-image:linear-gradient(to_top,black,transparent_70%)]" />
         <ul className="relative mt-auto flex flex-col gap-2">

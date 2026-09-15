@@ -50,6 +50,7 @@ export const meta = {
 export const ui = {
   skipToContent: { en: "Skip to content", fr: "Aller au contenu" },
   menu: { en: "Menu", fr: "Menu" },
+  mainNav: { en: "Main navigation", fr: "Navigation principale" },
   close: { en: "Close", fr: "Fermer" },
   switchLanguage: { en: "Voir le site en français", fr: "View the site in English" },
   // Read by screen readers only, after links that open in a new tab.
