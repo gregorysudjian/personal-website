@@ -16,7 +16,7 @@ export default function Footer({ locale }: { locale: Locale }) {
     <footer className="relative overflow-hidden border-t border-line">
       <div className="gutter grid gap-5 py-10 md:grid-cols-2 md:items-center md:gap-x-10 lg:grid-cols-4">
         <p className="label-mono text-mute">
-          © {new Date().getFullYear()} {person.name}
+          © <span suppressHydrationWarning>{new Date().getFullYear()}</span> {person.name}
         </p>
         <p className="label-mono text-mute">{t(footer.builtIn, locale)}</p>
         <p className="label-mono flex items-center gap-2 text-mute">
@@ -60,7 +60,8 @@ function LocalTime() {
     return () => clearInterval(id);
   }, []);
   return (
-    <time className="tabular-nums" suppressHydrationWarning>
+    // a fixed width, so neither the placeholder swap nor the ticking seconds move the row
+    <time className="inline-block min-w-[8ch] tabular-nums" suppressHydrationWarning>
       {time}
     </time>
   );
