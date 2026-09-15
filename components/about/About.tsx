@@ -45,7 +45,7 @@ export default function About({ locale }: { locale: Locale }) {
                   <span className="h-px w-3 shrink-0 bg-line transition-all duration-500 group-hover:bg-copper motion-safe:group-hover:w-6" />
                   {t(fact.label, locale)}
                 </dt>
-                <dd className="text-lg text-paper transition-transform duration-500 motion-safe:group-hover:translate-x-1">
+                <dd className="text-lg text-paper">
                   {t(fact.value, locale)}
                 </dd>
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { t, type Locale } from "@/lib/i18n";
 import { about, person } from "@/content/site";
@@ -12,6 +12,7 @@ const QUERY = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: n
 export default function Datasheet({ locale }: { locale: Locale }) {
   const root = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
+  const [photoBroken, setPhotoBroken] = useState(false);
   const ds = about.datasheet;
 
   useGSAP(
@@ -70,22 +71,19 @@ export default function Datasheet({ locale }: { locale: Locale }) {
         </div>
 
         <div className="relative flex aspect-[5/4] items-center justify-center border-b border-line">
-          {/* the chip drawing sits behind the portrait: it shows while the photo loads (or if it can't) */}
-          {person.photo && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Chip />
-            </div>
-          )}
-          {person.photo ? (
+          {/* the chip drawing sits behind the portrait: it shows while the photo loads, and stays if it can't */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Chip />
+          </div>
+          {person.photo && !photoBroken && (
             <Image
               src={person.photo.src}
               alt={t(person.photo.alt, locale)}
               fill
               sizes="(min-width: 768px) 500px, 90vw"
               className="object-cover object-[50%_35%]"
+              onError={() => setPhotoBroken(true)}
             />
-          ) : (
-            <Chip />
           )}
         </div>
 

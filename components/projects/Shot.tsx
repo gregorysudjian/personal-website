@@ -15,7 +15,7 @@ export default function Shot({
   className,
   style,
   ref,
-  onLoad,
+  onSettled,
 }: {
   src: string;
   mobile?: string;
@@ -23,7 +23,8 @@ export default function Shot({
   className?: string;
   style?: CSSProperties;
   ref?: Ref<HTMLImageElement>;
-  onLoad?: () => void;
+  /** Called once the capture is in — or once it's clear it isn't coming. */
+  onSettled?: (ok: boolean) => void;
 }) {
   const img = useRef<HTMLImageElement | null>(null);
   const [failed, setFailed] = useState(false);
@@ -32,11 +33,22 @@ export default function Shot({
   useEffect(() => {
     const el = img.current;
     if (el?.complete) {
-      if (el.naturalWidth > 0) onLoad?.();
-      else setFailed(true);
+      if (el.naturalWidth > 0) onSettled?.(true);
+      else {
+        setFailed(true);
+        onSettled?.(false);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // A capture that failed while offline is worth another try once the connection is back.
+  useEffect(() => {
+    if (!failed) return;
+    const retry = () => setFailed(false);
+    addEventListener("online", retry);
+    return () => removeEventListener("online", retry);
+  }, [failed]);
 
   if (failed) {
     return (
@@ -62,8 +74,11 @@ export default function Shot({
         decoding="async"
         className={className}
         style={style}
-        onLoad={onLoad}
-        onError={() => setFailed(true)}
+        onLoad={() => onSettled?.(true)}
+        onError={() => {
+          setFailed(true);
+          onSettled?.(false);
+        }}
       />
     </picture>
   );

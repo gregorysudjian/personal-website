@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
@@ -18,6 +18,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   const frame = useRef<HTMLDivElement>(null);
   const specs = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false); // before hydration the panel must not be inert (see globals.css)
   const specsId = useId();
   const titleId = useId();
   const flip = index % 2 === 1;
@@ -31,6 +32,8 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
       : media?.type === "slides"
         ? t(L.cursorSlides, locale)
         : t(L.cursorImage, locale);
+
+  useEffect(() => setMounted(true), []);
 
   useGSAP(
     () => {
@@ -96,7 +99,11 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   return (
     <article ref={root} aria-labelledby={titleId} className="project grid items-start gap-10 xl:grid-cols-12 xl:gap-12">
       {/* details */}
-      <div className={`max-w-2xl xl:col-span-5 xl:row-start-1 xl:max-w-none ${flip ? "xl:col-start-1" : "xl:col-start-8"}`}>
+      {/* The name block comes first in the markup (screen readers hear the project before its screens) and
+          second on screen below xl; the preview after it keeps Tab moving forwards through the card. */}
+      <div
+        className={`max-w-2xl xl:col-span-5 xl:row-start-1 xl:max-w-none ${flip ? "xl:col-start-1" : "xl:col-start-8"}`}
+      >
         <div data-reveal="stagger">
           <div className="flex flex-wrap items-center gap-3">
             <span
@@ -116,95 +123,14 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
           </h3>
           <p className="mt-5 text-pretty text-lg leading-relaxed text-paper/70">{t(project.summary, locale)}</p>
 
-          <ul className="mt-7 flex flex-col gap-3">
-            {project.highlights.map((h) => (
-              <li key={t(h, locale)} className="flex gap-3 leading-relaxed text-paper/85">
-                <span className="mt-[0.7em] h-px w-3 shrink-0 bg-copper" aria-hidden="true" />
-                {t(h, locale)}
-              </li>
-            ))}
-          </ul>
-
-          {/* one label column shared with the "How it's built" list below */}
-          <dl className="mt-8 grid grid-cols-1 gap-y-2 border-t border-line pt-6 sm:grid-cols-[auto_1fr] sm:gap-x-8 sm:gap-y-4 md:grid-cols-[8.5rem_1fr] md:gap-x-6">
-            <dt className="label-mono pt-1 text-mute">{t(L.role, locale)}</dt>
-            <dd className="text-paper">{t(project.role, locale)}</dd>
-            <dt className="label-mono pt-1.5 text-mute max-sm:mt-3">{t(L.stack, locale)}</dt>
-            <dd>
-              <ul className="flex flex-wrap gap-2">
-                {project.stack.map((s) => (
-                  <li key={t(s, locale)} className="rounded-full border border-line px-3 py-1 font-mono text-xs text-paper/80">
-                    {t(s, locale)}
-                  </li>
-                ))}
-              </ul>
-            </dd>
-          </dl>
-
-          {hasSpecs && (
-            <div className="mt-8 border-y border-line">
-              <button
-                type="button"
-                onClick={toggle}
-                aria-expanded={open}
-                aria-controls={specsId}
-                className="group flex w-full items-center justify-between py-4 text-left"
-              >
-                <span className="label-mono text-paper transition-colors group-hover:text-copper">{t(L.specs, locale)}</span>
-                <span className="relative h-3 w-3" aria-hidden="true">
-                  <span className="absolute left-0 top-1/2 h-px w-3 bg-copper" />
-                  <span
-                    className={`absolute left-1/2 top-0 h-3 w-px bg-copper transition-transform duration-500 ${open ? "scale-y-0" : ""}`}
-                  />
-                </span>
-              </button>
-              <div ref={specs} id={specsId} className="h-0 overflow-hidden" inert={!open} aria-hidden={!open}>
-                <dl className="flex flex-col gap-6 pb-6">
-                  {(["problem", "solution", "how"] as const).map((key) =>
-                    project[key] ? (
-                      <div key={key} className="spec grid gap-2 md:grid-cols-[8.5rem_1fr] md:gap-6">
-                        <dt className="label-mono pt-1 text-copper">{t(L[key], locale)}</dt>
-                        <dd className="leading-relaxed text-paper/75">{t(project[key]!, locale)}</dd>
-                      </div>
-                    ) : null,
-                  )}
-                </dl>
-              </div>
-            </div>
-          )}
-
-          {(project.links.length > 0 || project.privateRepo) && (
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              {project.links.map((link, i) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
-                >
-                  {t(link.label, locale)} <span aria-hidden="true">↗</span>
-                  <span className="sr-only"> {t(ui.newTab, locale)}</span>
-                </a>
-              ))}
-              {project.privateRepo && (
-                <span className="label-mono flex items-center gap-2 text-mute">
-                  <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                    <rect x="3" y="7" width="10" height="7" rx="1" />
-                    <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
-                  </svg>
-                  {t(L.privateRepo, locale)}
-                </span>
-              )}
-            </div>
-          )}
         </div>
       </div>
+
       {/* preview window (stays in view while the details scroll past); stacked full width above the text
           below 1280px so tablets get a big, readable preview, but never taller than ~3/4 of the screen.
           It comes after the details in the markup (name first for screen readers) and is placed first by CSS. */}
       <div
-        className={`order-first md:max-xl:max-w-[calc(75svh*16/11)] xl:sticky xl:top-28 xl:order-none xl:col-span-7 xl:row-start-1 ${flip ? "xl:col-start-6" : "xl:col-start-1"}`}
+        className={`order-first md:max-xl:max-w-[calc(75svh*16/11)] xl:sticky xl:top-28 xl:order-none xl:col-span-7 xl:row-span-2 xl:row-start-1 ${flip ? "xl:col-start-6" : "xl:col-start-1"}`}
       >
         <div data-reveal="clip" data-cursor={cursorLabel}>
           <div
@@ -265,6 +191,100 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
         </div>
       </div>
 
+      <div
+        className={`max-w-2xl xl:col-span-5 xl:row-start-2 xl:max-w-none ${flip ? "xl:col-start-1" : "xl:col-start-8"}`}
+      >
+        <div data-reveal="stagger">
+          <ul className="mt-7 flex flex-col gap-3">
+            {project.highlights.map((h) => (
+              <li key={t(h, locale)} className="flex gap-3 leading-relaxed text-paper/85">
+                <span className="mt-[0.7em] h-px w-3 shrink-0 bg-copper" aria-hidden="true" />
+                {t(h, locale)}
+              </li>
+            ))}
+          </ul>
+
+          {/* one label column shared with the "How it's built" list below */}
+          <dl className="mt-8 grid grid-cols-1 gap-y-2 border-t border-line pt-6 sm:grid-cols-[auto_1fr] sm:gap-x-8 sm:gap-y-4 md:grid-cols-[8.5rem_1fr] md:gap-x-6">
+            <dt className="label-mono pt-1 text-mute">{t(L.role, locale)}</dt>
+            <dd className="text-paper">{t(project.role, locale)}</dd>
+            <dt className="label-mono pt-1.5 text-mute max-sm:mt-3">{t(L.stack, locale)}</dt>
+            <dd>
+              <ul className="flex flex-wrap gap-2">
+                {project.stack.map((s) => (
+                  <li key={t(s, locale)} className="rounded-full border border-line px-3 py-1 font-mono text-xs text-paper/80">
+                    {t(s, locale)}
+                  </li>
+                ))}
+              </ul>
+            </dd>
+          </dl>
+
+          {hasSpecs && (
+            <div className="mt-8 border-y border-line">
+              <button
+                type="button"
+                onClick={toggle}
+                aria-expanded={open}
+                aria-controls={specsId}
+                className="specs-toggle group flex w-full items-center justify-between py-4 text-left"
+              >
+                <span className="label-mono text-paper transition-colors group-hover:text-copper">{t(L.specs, locale)}</span>
+                <span className="relative h-3 w-3" aria-hidden="true">
+                  <span className="absolute left-0 top-1/2 h-px w-3 bg-copper" />
+                  <span
+                    className={`absolute left-1/2 top-0 h-3 w-px bg-copper transition-transform duration-500 ${open ? "scale-y-0" : ""}`}
+                  />
+                </span>
+              </button>
+              <div
+                ref={specs}
+                id={specsId}
+                className="specs-panel h-0 overflow-hidden"
+                inert={mounted ? !open : undefined}
+                aria-hidden={mounted ? !open : undefined}
+              >
+                <dl className="flex flex-col gap-6 pb-6">
+                  {(["problem", "solution", "how"] as const).map((key) =>
+                    project[key] ? (
+                      <div key={key} className="spec grid gap-2 md:grid-cols-[8.5rem_1fr] md:gap-6">
+                        <dt className="label-mono pt-1 text-copper">{t(L[key], locale)}</dt>
+                        <dd className="leading-relaxed text-paper/75">{t(project[key]!, locale)}</dd>
+                      </div>
+                    ) : null,
+                  )}
+                </dl>
+              </div>
+            </div>
+          )}
+
+          {(project.links.length > 0 || project.privateRepo) && (
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              {project.links.map((link, i) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
+                >
+                  {t(link.label, locale)} <span aria-hidden="true">↗</span>
+                  <span className="sr-only"> {t(ui.newTab, locale)}</span>
+                </a>
+              ))}
+              {project.privateRepo && (
+                <span className="label-mono flex items-center gap-2 text-mute">
+                  <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                    <rect x="3" y="7" width="10" height="7" rx="1" />
+                    <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+                  </svg>
+                  {t(L.privateRepo, locale)}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </article>
   );
 }

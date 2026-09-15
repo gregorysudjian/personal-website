@@ -37,7 +37,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
   const [playing, setPlaying] = useState(false); // on screen
   const [held, setHeld] = useState(false); // mouse over it or keyboard focus inside: hold the current slide
   const [stopped, setStopped] = useState(false); // the visitor picked a step: no more autoplay
-  const [loaded, setLoaded] = useState<boolean[]>(() => slides.map(() => false));
+  const [loaded, setLoaded] = useState<boolean[]>(() => slides.map(() => false)); // in, or known not to be coming
   const [distance, setDistance] = useState(0);
   const [viewH, setViewH] = useState(560);
   const remaining = useRef(0);
@@ -49,8 +49,9 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
   const duration = current.scroll
     ? Math.max(current.duration ?? SCROLL_MS, glide + 2 * SCROLL_PAUSE)
     : (current.duration ?? STEP_MS);
-  // A scroll slide's countdown only starts once its capture has loaded (its length depends on it).
-  const ready = !current.scroll || loaded[active];
+  // A slide's countdown starts once its capture is in (or clearly isn't coming, see the timeout below):
+  // a scroll slide's length depends on it, and a still slide shouldn't flash past before it's visible.
+  const ready = loaded[active];
   const advancing = auto && playing && !held && !stopped && ready;
 
   useEffect(() => {
@@ -116,6 +117,13 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
 
   const markLoaded = (i: number) => () => setLoaded((l) => (l[i] ? l : l.map((v, k) => (k === i ? true : v))));
 
+  // Never wait forever: a capture that neither loads nor errors (a stalled connection) releases the step.
+  useEffect(() => {
+    if (loaded[active]) return;
+    const id = setTimeout(markLoaded(active), 6000);
+    return () => clearTimeout(id);
+  }, [active, loaded]);
+
   return (
     <div
       ref={root}
@@ -129,7 +137,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
       <div ref={view} className="relative flex-1 overflow-hidden bg-graphite">
         {slides.map((slide, i) => {
           const on = i === active;
-          const gliding = on && playing && auto;
+          const gliding = on && auto; // stays applied while off screen; animationPlayState pauses it
           // Without motion a tall page can't glide, so it scrolls by hand instead.
           const manual = slide.scroll && !auto;
           return (
@@ -148,7 +156,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
                   src={t(slide.src, locale)}
                   mobile={slide.mobile && t(slide.mobile, locale)}
                   alt={t(slide.alt, locale)}
-                  onLoad={markLoaded(i)}
+                  onSettled={markLoaded(i)}
                   className={`${manual ? "relative" : "absolute inset-x-0 top-0"} w-full will-change-transform`}
                   // The glide is a CSS animation so it pauses and resumes together with the countdown
                   // (mouse over it, keyboard focus inside, scrolled away). A slide that's just been left keeps
@@ -168,7 +176,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
                   src={t(slide.src, locale)}
                   mobile={slide.mobile && t(slide.mobile, locale)}
                   alt={t(slide.alt, locale)}
-                  onLoad={markLoaded(i)}
+                  onSettled={markLoaded(i)}
                   className={`absolute inset-0 h-full w-full object-top ${slide.fit === "cover" ? "object-cover" : "object-contain"}`}
                 />
               )}
@@ -182,7 +190,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
         <div
           role="group"
           aria-label={name}
-          className="grid gap-2"
+          className="slide-steps grid gap-2"
           style={{ gridTemplateColumns: `repeat(${slides.length}, minmax(0, 1fr))` }}
         >
           {slides.map((slide, i) => (
