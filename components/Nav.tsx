@@ -22,10 +22,11 @@ export default function Nav({ locale }: { locale: Locale }) {
       const reduce = window.matchMedia(REDUCED_MOTION).matches;
       let cancelled = false;
 
+      // Opacity only (never visibility), so the header's links can be tabbed to while it fades in.
       introReady.then(() => {
         if (cancelled) return;
-        if (reduce) gsap.set(el, { autoAlpha: 1 });
-        else gsap.fromTo(el, { autoAlpha: 0, y: -16 }, { autoAlpha: 1, y: 0, duration: 1.4, delay: 0.9 });
+        if (reduce) gsap.set(el, { opacity: 1 });
+        else gsap.fromTo(el, { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 1.4, delay: 0.9 });
       });
 
       let hidden = false;
@@ -48,7 +49,10 @@ export default function Nav({ locale }: { locale: Locale }) {
       });
 
       // Never leave keyboard focus on a header that's slid off screen.
-      const onFocus = () => show(true);
+      const onFocus = () => {
+        gsap.set(el, { opacity: 1 });
+        show(true);
+      };
       el.addEventListener("focusin", onFocus);
 
       return () => {
@@ -68,14 +72,19 @@ export default function Nav({ locale }: { locale: Locale }) {
     const reduce = window.matchMedia(REDUCED_MOTION).matches;
 
     // While the menu covers the page, what's behind it can't be reached with Tab or a screen reader.
-    const behind = [document.getElementById("main"), document.querySelector<HTMLElement>("body > footer")];
+    const behind = [
+      document.getElementById("main"),
+      document.querySelector<HTMLElement>("body > footer"),
+      document.querySelector<HTMLElement>(".skip-link"),
+    ];
 
     if (open) {
       wasOpen.current = true;
       lockScroll();
       behind.forEach((b) => b?.setAttribute("inert", ""));
-      gsap.set(el, { display: "flex" });
-      gsap.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: reduce ? 0 : 0.4, ease: "power2.out" });
+      // Visible (but transparent) before the fade, so focus can move into it right away.
+      gsap.set(el, { display: "flex", visibility: "visible" });
+      gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.4, ease: "power2.out" });
       gsap.fromTo(
         el.querySelectorAll(".menu-item"),
         { yPercent: 100 },
@@ -83,11 +92,15 @@ export default function Nav({ locale }: { locale: Locale }) {
       );
       el.querySelector<HTMLElement>("a")?.focus();
 
-      const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+      const close = () => {
+        setOpen(false);
+        toggle.current?.focus();
+      };
+      const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
       window.addEventListener("keydown", onKey);
       // The menu only exists below md; growing the window past it closes the menu (and unlocks the page).
       const wide = window.matchMedia("(min-width: 768px)");
-      const onWide = () => wide.matches && setOpen(false);
+      const onWide = () => wide.matches && close();
       wide.addEventListener("change", onWide);
       return () => {
         window.removeEventListener("keydown", onKey);
@@ -113,19 +126,22 @@ export default function Nav({ locale }: { locale: Locale }) {
     e.preventDefault();
     const wasOpen = openRef.current;
     setOpen(false);
-    if (wasOpen) {
-      toggle.current?.focus();
-      requestAnimationFrame(() => scrollToTarget(`#${id}`));
-    } else scrollToTarget(`#${id}`);
+    if (wasOpen) requestAnimationFrame(() => scrollToTarget(`#${id}`));
+    else scrollToTarget(`#${id}`);
   };
 
   return (
     <>
-      <header ref={header} data-intro className="fixed inset-x-0 top-0 z-50">
+      <header ref={header} className="header fixed inset-x-0 top-0 z-50">
         <div className="pointer-events-none absolute inset-0 -bottom-8 bg-gradient-to-b from-ink/90 via-ink/50 to-transparent" />
         <div className="header-solid pointer-events-none absolute inset-0" />
-        <div className="gutter relative flex h-16 items-center justify-between md:h-20">
-          <a href="#top" onClick={go("top")} className="tap-area flex items-center gap-3 text-paper" aria-label={person.name}>
+        <div className="gutter relative flex h-16 items-center justify-between md:h-20 short:h-14!">
+          <a
+            href="#top"
+            onClick={go("top")}
+            className="tap-area -mx-2 flex items-center gap-3 px-2 text-paper"
+            aria-label={person.name}
+          >
             <Mark className="h-6 w-6" />
             <span className="label-mono hidden sm:inline">{person.name}</span>
           </a>
@@ -148,44 +164,59 @@ export default function Nav({ locale }: { locale: Locale }) {
 
           <div className="flex items-center gap-5">
             {/* A full page load on purpose: a client-side switch re-renders <html> and drops the
-                "js" class set by the boot script, which breaks the scroll-driven sections. */}
+                "js" class set by the boot script, which breaks the scroll-driven sections.
+                Its name keeps the visible "EN / FR" (for voice control) plus a phrase in the other language. */}
             <a
               href={`/${other}`}
               hrefLang={other}
-              aria-label={t(ui.switchLanguage, locale)}
               className="tap-area label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
             >
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
-              <span className="text-line">/</span>
+              <span className="text-line" aria-hidden="true">
+                /
+              </span>
               <span className={locale === "fr" ? "text-paper" : ""}>FR</span>
+              <span className="sr-only" lang={other}>
+                {" "}
+                {t(ui.switchLanguage, locale)}
+              </span>
             </a>
+            {/* Both labels share one cell so switching Menu/Close never shifts the row. */}
             <button
               ref={toggle}
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls="mobile-menu"
-              className="tap-area label-mono flex h-10 items-center text-paper md:hidden"
+              className="tap-area label-mono grid h-10 items-center justify-items-end text-paper md:hidden"
             >
-              {t(open ? ui.close : ui.menu, locale)}
+              <span className={`col-start-1 row-start-1 ${open ? "invisible" : ""}`}>{t(ui.menu, locale)}</span>
+              <span className={`col-start-1 row-start-1 ${open ? "" : "invisible"}`}>{t(ui.close, locale)}</span>
             </button>
           </div>
         </div>
       </header>
 
+      {/* Tall enough to clear the header, scrolls on short (sideways) phones; a tap on the empty backdrop closes it. */}
       <nav
         ref={menu}
         id="mobile-menu"
-        className="gutter fixed inset-0 z-40 hidden flex-col justify-end bg-ink pb-16 opacity-0 md:hidden"
+        onClick={(e) => e.target === e.currentTarget && setOpen(false)}
+        className="gutter fixed inset-0 z-40 hidden flex-col overflow-y-auto overscroll-contain bg-ink pb-16 pt-24 opacity-0 md:hidden short:pb-8"
         aria-label={t(ui.menu, locale)}
       >
-        <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_top,black,transparent_70%)]" />
-        <ul className="relative flex flex-col gap-2">
+        <div className="bg-grid pointer-events-none fixed inset-0 opacity-40 [mask-image:linear-gradient(to_top,black,transparent_70%)]" />
+        <ul className="relative mt-auto flex flex-col gap-2">
           {ui.nav.map((item) => (
-            <li key={item.id} className="overflow-hidden border-b border-line pb-3">
-              <a href={`#${item.id}`} onClick={go(item.id)} className="menu-item flex items-center gap-4 text-paper">
-                <span className="h-px w-6 bg-copper" aria-hidden="true" />
-                <span className="text-5xl font-medium tracking-tight">{t(item.label, locale)}</span>
+            <li key={item.id} className="border-b border-line pb-3">
+              {/* the mask for the rise-in sits inside the link, so the focus ring isn't clipped */}
+              <a href={`#${item.id}`} onClick={go(item.id)} className="flex items-center gap-4 text-paper">
+                <span className="h-px w-6 shrink-0 bg-copper" aria-hidden="true" />
+                <span className="overflow-hidden pb-1">
+                  <span className="menu-item block text-5xl font-medium tracking-tight short:text-3xl">
+                    {t(item.label, locale)}
+                  </span>
+                </span>
               </a>
             </li>
           ))}

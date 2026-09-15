@@ -29,16 +29,18 @@ export function unlockScroll() {
 }
 
 export function scrollToTarget(target: string | number | HTMLElement) {
-  if (lenis) {
-    lenis.scrollTo(target, { duration: 1.6, easing: (x) => 1 - Math.pow(1 - x, 4) });
-    return;
-  }
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
-  if (typeof target === "number") window.scrollTo({ top: target, behavior });
+  const el = typeof target === "number" ? null : typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
+  if (lenis) lenis.scrollTo(target, { duration: 1.6, easing: (x) => 1 - Math.pow(1 - x, 4) });
   else {
-    const el = typeof target === "string" ? document.querySelector(target) : target;
-    el?.scrollIntoView({ behavior });
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+    if (typeof target === "number") window.scrollTo({ top: target, behavior });
+    else el?.scrollIntoView({ behavior });
+  }
+  // Keyboard focus goes along with the scroll, so the next Tab continues from the section just reached.
+  if (el) {
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");
+    requestAnimationFrame(() => el.focus({ preventScroll: true }));
   }
 }
 
