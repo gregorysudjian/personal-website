@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
-import { projects, type Project } from "@/content/site";
+import { projects, ui, type Project } from "@/content/site";
 import ChatPreview from "./ChatPreview";
 import Shot from "./Shot";
 import Slides from "./Slides";
@@ -95,29 +95,32 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   return (
     <article ref={root} className="project grid items-start gap-10 xl:grid-cols-12 xl:gap-12">
       {/* preview window (stays in view while the details scroll past); stacked full width above the text
-          below 1280px so tablets get a big, readable preview */}
-      <div className={`xl:sticky xl:top-28 xl:col-span-7 ${flip ? "xl:order-2 xl:col-start-6" : ""}`}>
+          below 1280px so tablets get a big, readable preview, but never taller than ~3/4 of the screen */}
+      <div
+        className={`md:max-xl:max-w-[calc(75svh*16/11)] xl:sticky xl:top-28 xl:col-span-7 ${flip ? "xl:order-2 xl:col-start-6" : ""}`}
+      >
         <div data-reveal="clip" data-cursor={cursorLabel}>
           <div
             ref={frame}
-            className="overflow-hidden rounded-[8px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
+            className="overflow-hidden rounded-[6px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
           >
             {/* the window dots give way on phones so the name and badge both fit */}
             <div className="flex items-center gap-2 border-b border-line px-4 py-3">
               <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
               <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
               <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
-              <span className="label-mono truncate text-[0.62rem] text-mute sm:ml-3">{project.slug}</span>
+              <span className="label-mono truncate text-[0.62rem] text-mute max-sm:text-[0.66rem] max-sm:tracking-[0.08em] sm:ml-3">{project.slug}</span>
               {(project.preview || media?.type === "slides") && (
-                <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">
+                <span className="label-mono ml-auto shrink-0 text-[0.62rem] text-copper max-sm:text-[0.66rem] max-sm:tracking-[0.08em]">
                   {t(project.preview ? L.demo : L.slidesBadge, locale)}
                 </span>
               )}
             </div>
-            {/* taller on phones, where a wide frame would leave the screens too small to read */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-ink [contain:layout_paint] md:aspect-[16/11]">
+            {/* taller on phones, where a wide frame would leave the screens too small to read; on a phone
+                held sideways it's capped to the screen height so the tabs and caption stay in view */}
+            <div className="relative aspect-[3/4] overflow-hidden bg-ink [contain:layout_paint] md:aspect-[16/11] short:aspect-auto! short:h-[85svh]">
               {project.preview === "chat" && <ChatPreview locale={locale} />}
-              {media?.type === "slides" && <Slides slides={media.slides} locale={locale} />}
+              {media?.type === "slides" && <Slides slides={media.slides} name={t(project.title, locale)} locale={locale} />}
               {media?.type === "image" && (
                 <Shot
                   src={t(media.src, locale)}
@@ -172,7 +175,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
           <h3 className="mt-3 text-[clamp(2rem,3.4vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.035em] text-paper">
             {t(project.title, locale)}
           </h3>
-          <p className="mt-5 text-lg leading-relaxed text-paper/70">{t(project.summary, locale)}</p>
+          <p className="mt-5 text-pretty text-lg leading-relaxed text-paper/70">{t(project.summary, locale)}</p>
 
           <ul className="mt-7 flex flex-col gap-3">
             {project.highlights.map((h) => (
@@ -183,10 +186,11 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             ))}
           </ul>
 
-          <dl className="mt-8 grid grid-cols-[auto_1fr] gap-x-8 gap-y-4 border-t border-line pt-6">
+          {/* one label column shared with the "How it's built" list below */}
+          <dl className="mt-8 grid grid-cols-1 gap-y-2 border-t border-line pt-6 sm:grid-cols-[auto_1fr] sm:gap-x-8 sm:gap-y-4 md:grid-cols-[8.5rem_1fr] md:gap-x-6">
             <dt className="label-mono pt-1 text-mute">{t(L.role, locale)}</dt>
             <dd className="text-paper">{t(project.role, locale)}</dd>
-            <dt className="label-mono pt-1.5 text-mute">{t(L.stack, locale)}</dt>
+            <dt className="label-mono pt-1.5 text-mute max-sm:mt-3">{t(L.stack, locale)}</dt>
             <dd className="flex flex-wrap gap-2">
               {project.stack.map((s) => (
                 <span key={t(s, locale)} className="rounded-full border border-line px-3 py-1 font-mono text-xs text-paper/80">
@@ -214,16 +218,16 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                 </span>
               </button>
               <div ref={specs} id={specsId} className="h-0 overflow-hidden" inert={!open} aria-hidden={!open}>
-                <div className="flex flex-col gap-6 pb-6">
+                <dl className="flex flex-col gap-6 pb-6">
                   {(["problem", "solution", "how"] as const).map((key) =>
                     project[key] ? (
-                      <div key={key} className="spec grid gap-2 md:grid-cols-[7.5rem_1fr] md:gap-6">
-                        <p className="label-mono pt-1 text-copper">{t(L[key], locale)}</p>
-                        <p className="leading-relaxed text-paper/75">{t(project[key]!, locale)}</p>
+                      <div key={key} className="spec grid gap-2 md:grid-cols-[8.5rem_1fr] md:gap-6">
+                        <dt className="label-mono pt-1 text-copper">{t(L[key], locale)}</dt>
+                        <dd className="leading-relaxed text-paper/75">{t(project[key]!, locale)}</dd>
                       </div>
                     ) : null,
                   )}
-                </div>
+                </dl>
               </div>
             </div>
           )}
@@ -239,6 +243,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
                   className={`btn btn-sm ${i === 0 ? "btn-primary" : ""}`}
                 >
                   {t(link.label, locale)} <span aria-hidden="true">↗</span>
+                  <span className="sr-only"> {t(ui.newTab, locale)}</span>
                 </a>
               ))}
               {project.privateRepo && (

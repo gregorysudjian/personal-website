@@ -259,6 +259,8 @@ export const projects = {
     chat: {
       header: { en: "Demo business · Assistant", fr: "Commerce démo · Assistant" },
       badge: { en: "AI agent", fr: "Agent IA" },
+      // Read by screen readers only, before each message.
+      speakers: { customer: { en: "Customer", fr: "Client" }, agent: { en: "Assistant", fr: "Assistant" } },
       messages: [
         { from: "customer", text: { en: "Hi! Can I book a haircut this week?", fr: "Bonjour ! Je peux réserver une coupe cette semaine ?" } },
         {
