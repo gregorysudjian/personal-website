@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
-import { introReady, lockScroll, scrollToTarget, unlockScroll } from "@/lib/scroll";
+import { introReady, isAutoScrolling, lockScroll, saveAnchor, scrollToTarget, unlockScroll } from "@/lib/scroll";
 import { otherLocale, t, type Locale } from "@/lib/i18n";
 import { person, ui } from "@/content/site";
 import Mark from "./Mark";
@@ -26,7 +26,17 @@ export default function Nav({ locale }: { locale: Locale }) {
       introReady.then(() => {
         if (cancelled) return;
         if (reduce) gsap.set(el, { opacity: 1 });
-        else gsap.fromTo(el, { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 1.4, delay: 0.9 });
+        else {
+          // not tappable while it's still invisible (the delay), keyboard focus can still reach it
+          gsap.set(el, { pointerEvents: "none" });
+          gsap.fromTo(el, { opacity: 0, y: -16 }, {
+            opacity: 1,
+            y: 0,
+            duration: 1.4,
+            delay: 0.9,
+            onStart: () => gsap.set(el, { clearProps: "pointerEvents" }),
+          });
+        }
       });
 
       let hidden = false;
@@ -42,7 +52,8 @@ export default function Nav({ locale }: { locale: Locale }) {
         onUpdate: (self) => {
           // Away from the top the header gets a solid backdrop, so page text doesn't run through it.
           el.classList.toggle("is-scrolled", self.scroll() > 120);
-          if (openRef.current || el.querySelector(":focus-visible")) return;
+          // stays in view while a nav link's own scroll runs, so the next section is one click away
+          if (openRef.current || el.querySelector(":focus-visible") || isAutoScrolling()) return;
           if (self.scroll() < 120) show(true);
           else show(self.direction !== 1);
         },
@@ -77,6 +88,9 @@ export default function Nav({ locale }: { locale: Locale }) {
       document.querySelector<HTMLElement>("body > footer"),
       document.querySelector<HTMLElement>(".skip-link"),
     ];
+
+    // Quick repeated taps: never let an old open/close tween finish on top of the new state.
+    gsap.killTweensOf(el);
 
     if (open) {
       wasOpen.current = true;
@@ -117,7 +131,7 @@ export default function Nav({ locale }: { locale: Locale }) {
       autoAlpha: 0,
       duration: reduce ? 0 : 0.3,
       onComplete: () => {
-        gsap.set(el, { display: "none" });
+        if (!openRef.current) gsap.set(el, { display: "none" });
       },
     });
   }, [open]);
@@ -135,11 +149,13 @@ export default function Nav({ locale }: { locale: Locale }) {
       <header ref={header} className="header fixed inset-x-0 top-0 z-50">
         <div className="pointer-events-none absolute inset-0 -bottom-8 bg-gradient-to-b from-ink/90 via-ink/50 to-transparent" />
         <div className="header-solid pointer-events-none absolute inset-0" />
-        <div className="gutter relative flex h-16 items-center justify-between md:h-20 short:h-14!">
+        {/* three columns from lg, so the links sit at the true centre whatever the logo and switch widths
+            (at tablet width there's no room to spare, so they're simply spread out) */}
+        <div className="gutter relative flex h-16 items-center justify-between md:h-20 lg:grid lg:grid-cols-[1fr_auto_1fr] short:h-14!">
           <a
             href="#top"
             onClick={go("top")}
-            className="tap-area -mx-2 flex items-center gap-3 px-2 text-paper"
+            className="tap-area -mx-2 flex w-fit items-center gap-3 px-2 text-paper"
             aria-label={person.name}
           >
             <Mark className="h-6 w-6" />
@@ -162,13 +178,15 @@ export default function Nav({ locale }: { locale: Locale }) {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 lg:justify-self-end">
             {/* A full page load on purpose: a client-side switch re-renders <html> and drops the
-                "js" class set by the boot script, which breaks the scroll-driven sections.
+                "js" class set by the boot script, which breaks the scroll-driven sections. The other
+                language opens at the same place in the page.
                 Its name keeps the visible "EN / FR" (for voice control) plus a phrase in the other language. */}
             <a
               href={`/${other}`}
               hrefLang={other}
+              onClick={() => saveAnchor(`/${other}`, true)}
               className="tap-area label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
             >
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
