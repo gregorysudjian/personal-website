@@ -7,7 +7,7 @@ import Datasheet from "./Datasheet";
 export default function About({ locale }: { locale: Locale }) {
   const [first, ...rest] = about.paragraphs;
   return (
-    <section id="about" aria-labelledby="about-title" className="relative gutter pb-20 pt-32 md:pb-24 md:pt-48">
+    <section id="about" aria-labelledby="about-title" className="relative gutter pb-32 pt-32 md:pb-48 md:pt-48">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
 
       {/* The text comes first for screen readers; the datasheet still shows first (above on phones, left on laptops).

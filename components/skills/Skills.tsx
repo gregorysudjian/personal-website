@@ -7,7 +7,7 @@ import Marquee from "./Marquee";
 /** Skills as little chips: pins on each side that light up on hover. */
 export default function Skills({ locale }: { locale: Locale }) {
   return (
-    <section id="skills" aria-labelledby="skills-title" className="relative pb-32 pt-16 md:pb-44 md:pt-24 short:py-20!">
+    <section id="skills" aria-labelledby="skills-title" className="relative pb-24 pt-16 md:pb-28 md:pt-24 short:py-20!">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
       <Marquee words={skills.marquee.map((w) => t(w, locale))} />
 

@@ -103,7 +103,7 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-paper">{t(chat.header, locale)}</p>
           </div>
-          <span className="label-mono rounded-full border border-copper/40 px-2 py-1 text-[0.58rem] text-copper">
+          <span className="label-mono rounded-full border border-copper/40 px-2 py-1 text-[0.62rem] text-copper max-sm:text-[0.66rem] max-sm:tracking-[0.08em]">
             {t(chat.badge, locale)}
           </span>
         </div>

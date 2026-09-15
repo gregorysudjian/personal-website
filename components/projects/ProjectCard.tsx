@@ -100,7 +100,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
         <div data-reveal="stagger">
           <div className="flex flex-wrap items-center gap-3">
             <span
-              className={`label-mono flex items-center gap-2 rounded-full border px-3 py-1.5 text-[0.62rem] ${
+              className={`label-mono flex items-center gap-2 rounded-full border px-3 py-1.5 text-[0.62rem] max-sm:text-[0.66rem] max-sm:tracking-[0.08em] ${
                 project.status === "in-progress" ? "border-copper/40 text-copper" : "border-paper/25 text-paper/85"
               }`}
             >

@@ -38,7 +38,7 @@ export default function Contact({ locale }: { locale: Locale }) {
         <h2
           id="contact-title"
           data-reveal="lines"
-          className="mt-8 text-[clamp(2.3rem,11.5vw,3rem)] font-medium leading-[0.96] tracking-[-0.045em] text-paper md:text-[clamp(3rem,8.2vw,8.6rem)]"
+          className="mt-6 text-[clamp(2.3rem,11.5vw,3rem)] font-medium leading-[0.96] tracking-[-0.045em] text-paper md:text-[clamp(3rem,8.2vw,8.6rem)]"
         >
           <Rich text={t(contact.heading, locale)} />
         </h2>

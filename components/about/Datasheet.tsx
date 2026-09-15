@@ -60,7 +60,7 @@ export default function Datasheet({ locale }: { locale: Locale }) {
         <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
         <div className="datasheet-glare pointer-events-none absolute inset-0" />
 
-        <div className="relative flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="relative flex items-center justify-between border-b border-line bg-graphite px-5 py-4">
           <span id="datasheet-title" className="label-mono text-paper">
             {t(ds.title, locale)}
           </span>
@@ -94,8 +94,8 @@ export default function Datasheet({ locale }: { locale: Locale }) {
             <div key={t(row.label, locale)} className="grid grid-cols-[5.5rem_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[7rem_1fr] sm:px-5">
               <dt className="label-mono text-mute">{t(row.label, locale)}</dt>
               <dd className="flex items-center gap-2 text-sm text-paper">
+                {row.label.en === "Status" && <span className="status-dot" aria-hidden="true" />}
                 <span>{t(row.value, locale)}</span>
-                {row.label.en === "Status" && <span className="status-dot ml-1" aria-hidden="true" />}
               </dd>
             </div>
           ))}

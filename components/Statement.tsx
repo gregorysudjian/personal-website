@@ -53,7 +53,7 @@ export default function Statement({ locale }: { locale: Locale }) {
     >
       <CircuitTrace route="rail" />
       <div className="gutter sticky top-0 flex h-svh flex-col justify-center-safe motion-reduce:static motion-reduce:h-auto motion-reduce:py-32 short:pt-14">
-        <p id="statement-label" className="label-mono mb-8 flex items-center gap-3 text-mute md:mb-12 short:mb-4!">
+        <p id="statement-label" className="label-mono mb-6 flex items-center gap-3 text-mute short:mb-4!">
           <span className="h-px w-8 bg-copper" aria-hidden="true" />
           {t(statementLabel, locale)}
         </p>
