@@ -120,7 +120,7 @@ export default function Focus({ locale }: { locale: Locale }) {
               <article
                 key={item.id}
                 data-reveal
-                className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2"
+                className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2 lg:max-w-[1100px]"
               >
                 {/* square on phones, but never taller than most of a sideways phone's screen */}
                 <div className="relative aspect-square overflow-hidden border-b border-line max-md:max-h-[60svh] max-md:w-full md:aspect-auto md:border-b-0 md:border-r">
