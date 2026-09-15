@@ -10,21 +10,17 @@ export default function About({ locale }: { locale: Locale }) {
     <section id="about" aria-labelledby="about-title" className="relative gutter pb-20 pt-32 md:pb-24 md:pt-48">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
 
-      <div className="grid gap-20 md:grid-cols-12 md:gap-10">
-        <div className="md:col-span-5">
-          <div data-reveal className="md:sticky md:top-28">
-            <Datasheet locale={locale} />
-          </div>
-        </div>
-
-        <div className="md:col-span-6 md:col-start-7">
+      {/* The text comes first for screen readers; the datasheet still shows first (above on phones, left on laptops).
+          Two columns only from lg: at tablet width both would be too narrow. */}
+      <div className="grid gap-20 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1">
           <SectionHeader id="about-title" label={t(about.label, locale)} heading={t(about.heading, locale)} />
 
-          <p data-reveal className="mt-12 text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5]">
+          <p data-reveal className="mt-12 max-w-[62ch] text-pretty text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5]">
             {t(first, locale)}
           </p>
           {rest.map((p, i) => (
-            <p key={i} data-reveal className="mt-6 text-lg leading-relaxed text-paper/70">
+            <p key={i} data-reveal className="mt-6 max-w-[68ch] text-pretty text-lg leading-relaxed text-paper/70">
               {t(p, locale)}
             </p>
           ))}
@@ -33,10 +29,10 @@ export default function About({ locale }: { locale: Locale }) {
             {about.facts.map((fact) => (
               <div
                 key={t(fact.label, locale)}
-                className="fact-row group grid grid-cols-[8rem_1fr] items-center gap-6 border-b border-line py-5 md:grid-cols-[10rem_1fr]"
+                className="fact-row group grid grid-cols-[6.5rem_1fr] items-center gap-4 border-b border-line py-5 sm:grid-cols-[8rem_1fr] sm:gap-6 md:grid-cols-[10rem_1fr]"
               >
                 <dt className="label-mono flex items-center gap-2 text-mute">
-                  <span className="h-px w-3 bg-line transition-all duration-500 group-hover:w-6 group-hover:bg-copper" />
+                  <span className="h-px w-3 shrink-0 bg-line transition-all duration-500 group-hover:w-6 group-hover:bg-copper" />
                   {t(fact.label, locale)}
                 </dt>
                 <dd className="text-lg text-paper transition-transform duration-500 group-hover:translate-x-1">
@@ -45,6 +41,13 @@ export default function About({ locale }: { locale: Locale }) {
               </div>
             ))}
           </dl>
+        </div>
+
+        {/* pinned beside the text only on screens tall enough to show the whole card */}
+        <div className="order-first lg:order-none lg:col-span-5 lg:col-start-1 lg:row-start-1">
+          <div data-reveal className="lg:tall:sticky lg:tall:top-28">
+            <Datasheet locale={locale} />
+          </div>
         </div>
       </div>
     </section>

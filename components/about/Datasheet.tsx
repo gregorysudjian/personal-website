@@ -36,6 +36,7 @@ export default function Datasheet({ locale }: { locale: Locale }) {
         const leave = () => {
           rx(0);
           ry(0);
+          gsap.to(c, { "--gx": "50%", "--gy": "0%", duration: 0.9, ease: "power3" });
         };
         el.addEventListener("pointermove", move);
         el.addEventListener("pointerleave", leave);
@@ -49,20 +50,32 @@ export default function Datasheet({ locale }: { locale: Locale }) {
   );
 
   return (
-    <div ref={root} className="datasheet mx-auto w-full max-w-[500px] md:mx-0">
+    <div ref={root} className="datasheet mx-auto w-full max-w-[500px] lg:mx-0 2xl:max-w-[560px] short:max-w-[360px]">
       <div
         ref={card}
+        role="group"
+        aria-labelledby="datasheet-title"
         className="datasheet-card relative overflow-hidden rounded-[6px] border border-line bg-graphite/70 shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)]"
       >
         <div className="bg-grid absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" />
         <div className="datasheet-glare pointer-events-none absolute inset-0" />
 
         <div className="relative flex items-center justify-between border-b border-line px-5 py-4">
-          <span className="label-mono text-paper">{t(ds.title, locale)}</span>
-          <span className="label-mono text-copper">{ds.part}</span>
+          <span id="datasheet-title" className="label-mono text-paper">
+            {t(ds.title, locale)}
+          </span>
+          <span className="label-mono text-copper" aria-hidden="true">
+            {ds.part}
+          </span>
         </div>
 
         <div className="relative flex aspect-[5/4] items-center justify-center border-b border-line">
+          {/* the chip drawing sits behind the portrait: it shows while the photo loads (or if it can't) */}
+          {person.photo && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Chip />
+            </div>
+          )}
           {person.photo ? (
             <Image
               src={person.photo.src}
@@ -78,10 +91,10 @@ export default function Datasheet({ locale }: { locale: Locale }) {
 
         <dl className="relative divide-y divide-line">
           {ds.rows.map((row) => (
-            <div key={t(row.label, locale)} className="grid grid-cols-[7rem_1fr] items-center gap-4 px-5 py-3.5">
+            <div key={t(row.label, locale)} className="grid grid-cols-[5.5rem_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[7rem_1fr] sm:px-5">
               <dt className="label-mono text-mute">{t(row.label, locale)}</dt>
               <dd className="flex items-center gap-2 text-sm text-paper">
-                {t(row.value, locale)}
+                <span>{t(row.value, locale)}</span>
                 {row.label.en === "Status" && <span className="status-dot ml-1" aria-hidden="true" />}
               </dd>
             </div>
@@ -89,7 +102,7 @@ export default function Datasheet({ locale }: { locale: Locale }) {
         </dl>
 
         <div className="relative flex items-end justify-between gap-6 border-t border-line px-5 py-4">
-          <p className="max-w-[26ch] font-mono text-[0.68rem] uppercase leading-relaxed tracking-[0.12em] text-mute">
+          <p className="max-w-[34ch] text-balance font-mono text-[0.68rem] uppercase leading-relaxed tracking-[0.12em] text-mute">
             {t(ds.footer, locale)}
           </p>
           <Barcode />
