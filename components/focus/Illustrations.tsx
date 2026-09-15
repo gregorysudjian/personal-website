@@ -154,7 +154,7 @@ export function CodeWindow() {
         <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-line" />
           <span className="h-2.5 w-2.5 rounded-full bg-line" />
-          <span className="h-2.5 w-2.5 rounded-full bg-copper/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-line" />
           <span className="label-mono ml-3 text-[0.62rem] text-mute">agent.py</span>
         </div>
         {/* the code shrinks with its window (the longest line is ~37 characters); in a narrow window the

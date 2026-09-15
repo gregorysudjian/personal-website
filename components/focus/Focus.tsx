@@ -132,7 +132,7 @@ export default function Focus({ locale }: { locale: Locale }) {
                 </div>
                 <div className="focus-body flex flex-col justify-between gap-10 p-8 md:p-12">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm text-copper" aria-hidden="true">
+                    <span className="label-mono text-copper" aria-hidden="true">
                       0{i + 1}
                     </span>
                     <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" aria-hidden="true" />
@@ -148,9 +148,12 @@ export default function Focus({ locale }: { locale: Locale }) {
                     {t(item.keywords, locale)
                       .split(" · ")
                       .map((k, j, all) => (
-                        <span key={k} className="whitespace-nowrap">
-                          {k}
-                          {j < all.length - 1 ? " · " : ""}
+                        <span key={k}>
+                          <span className="whitespace-nowrap">
+                            {k}
+                            {j < all.length - 1 ? " ·" : ""}
+                          </span>
+                          {j < all.length - 1 ? " " : ""}
                         </span>
                       ))}
                   </p>
