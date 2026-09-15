@@ -24,6 +24,11 @@ export default function Boot() {
       window.scrollTo(0, 0);
       lockScroll();
       const overlay = root.current!;
+      // On a slow first load the mark has already faded in with CSS (see globals.css); carry on from there.
+      const mark = overlay.querySelector<HTMLElement>(".boot-mark")!;
+      const shown = Number(getComputedStyle(mark).opacity);
+      overlay.classList.add("is-live");
+      gsap.set(mark, { autoAlpha: shown, y: shown > 0 ? 0 : 8 });
       // Nothing behind the overlay can be focused while it plays.
       const page = [document.querySelector<HTMLElement>("header"), document.getElementById("main"), document.querySelector<HTMLElement>("body > footer")];
       page.forEach((el) => el?.setAttribute("inert", ""));
@@ -50,7 +55,7 @@ export default function Boot() {
       window.addEventListener("keydown", skip, { once: true });
       overlay.addEventListener("click", skip, { once: true });
 
-      tl.fromTo(".boot-mark", { y: 8 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.1)
+      tl.to(mark, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.1)
         .to(".boot-bar", { scaleX: 1, duration: 1.1, ease: "power3.inOut" }, 0.2)
         .to(".boot-mark", { autoAlpha: 0, y: -8, duration: 0.35, ease: "power2.in" }, "+=0.1")
         .addLabel("split")
