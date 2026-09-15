@@ -9,9 +9,9 @@ import SectionHeader from "../SectionHeader";
 import { CodeWindow, MathPlot, NeuralNet } from "./Illustrations";
 
 const ART = { software: CodeWindow, ai: NeuralNet, math: MathPlot } as const;
-// Keep in sync with the focus rules in globals.css. Smaller windows get the stacked list.
+// Keep in sync with the focus rules in globals.css. Smaller windows (and portrait tablets, where the
+// panels would be too narrow for their drawings) get the stacked list.
 const HORIZONTAL = [
-  "(min-width: 768px) and (min-height: 900px)",
   "(min-width: 1000px) and (min-height: 700px)",
   "(min-width: 1200px) and (min-height: 580px)",
 ]

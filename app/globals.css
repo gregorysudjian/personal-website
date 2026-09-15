@@ -515,9 +515,8 @@ header.is-scrolled .header-solid {
 /* ------------------------------------------------------------------ focus */
 
 /* Keep in sync with HORIZONTAL in components/focus/Focus.tsx.
-   Windows too small for the panels (phones held sideways, small narrow windows) get the stacked list. */
-@media (min-width: 768px) and (min-height: 900px) and (prefers-reduced-motion: no-preference),
-  (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
+   Windows too small for the panels (phones held sideways, portrait tablets, small windows) get the stacked list. */
+@media (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
   (min-width: 1200px) and (min-height: 580px) and (prefers-reduced-motion: no-preference) {
   html.js .focus-frame {
     position: sticky;
