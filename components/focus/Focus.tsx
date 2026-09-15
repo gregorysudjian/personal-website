@@ -63,7 +63,8 @@ export default function Focus({ locale }: { locale: Locale }) {
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               gsap.set(bar.current, { scaleX: self.progress });
-              const i = Math.min(n, Math.floor(self.progress * n * 0.999) + 1);
+              // The track travels n-1 panel widths: show the panel that's most in view.
+              const i = Math.round(self.progress * (n - 1)) + 1;
               if (count.current) count.current.textContent = String(i).padStart(2, "0");
             },
           },
@@ -82,7 +83,8 @@ export default function Focus({ locale }: { locale: Locale }) {
           );
         });
 
-        ScrollTrigger.refresh();
+        // (no ScrollTrigger.refresh() here: matchMedia already refreshes when this layout switches on,
+        // and a nested refresh sent the page back to the top when a resize crossed the threshold)
         return () => {
           ScrollTrigger.removeEventListener("refreshInit", size);
           section.style.height = "";
@@ -120,16 +122,19 @@ export default function Focus({ locale }: { locale: Locale }) {
                 data-reveal
                 className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2"
               >
-                <div className="relative aspect-square overflow-hidden border-b border-line md:aspect-auto md:border-b-0 md:border-r">
+                {/* square on phones, but never taller than most of a sideways phone's screen */}
+                <div className="relative aspect-square overflow-hidden border-b border-line max-md:max-h-[60svh] max-md:w-full md:aspect-auto md:border-b-0 md:border-r">
                   <div className="bg-grid absolute inset-0 opacity-30" />
-                  <div className="focus-art absolute inset-0 flex items-center justify-center p-6 md:p-10">
+                  <div className="focus-art absolute inset-0 flex items-center justify-center p-4 md:p-10">
                     <Art />
                   </div>
                 </div>
                 <div className="focus-body flex flex-col justify-between gap-10 p-8 md:p-12">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm text-copper">0{i + 1}</span>
-                    <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" />
+                    <span className="font-mono text-sm text-copper" aria-hidden="true">
+                      0{i + 1}
+                    </span>
+                    <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.045em] text-paper">
@@ -137,7 +142,17 @@ export default function Focus({ locale }: { locale: Locale }) {
                     </h3>
                     <p className="mt-6 max-w-[38ch] text-lg leading-relaxed text-paper/70">{t(item.text, locale)}</p>
                   </div>
-                  <p className="label-mono text-mute">{t(item.keywords, locale)}</p>
+                  {/* lines only break between keywords */}
+                  <p className="label-mono leading-[1.7] text-mute">
+                    {t(item.keywords, locale)
+                      .split(" · ")
+                      .map((k, j, all) => (
+                        <span key={k} className="whitespace-nowrap">
+                          {k}
+                          {j < all.length - 1 ? " · " : ""}
+                        </span>
+                      ))}
+                  </p>
                 </div>
               </article>
             );
