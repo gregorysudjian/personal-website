@@ -32,27 +32,41 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
   const view = useRef<HTMLDivElement>(null);
   const shots = useRef<(HTMLImageElement | null)[]>([]);
   const [active, setActive] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [auto, setAuto] = useState(false); // autoplay at all (never with reduced motion)
+  const [playing, setPlaying] = useState(false); // on screen
+  const [held, setHeld] = useState(false); // pointer over it or keyboard focus inside: hold the current slide
   const [distance, setDistance] = useState(0);
+  const remaining = useRef(0);
   const current = slides[active];
   const glide = Math.round((distance / (current.speed ?? SCROLL_SPEED)) * 1000);
   const duration = current.scroll
     ? Math.max(current.duration ?? SCROLL_MS, glide + 2 * SCROLL_PAUSE)
     : (current.duration ?? STEP_MS);
+  const advancing = playing && !held;
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
+    setAuto(true);
     const io = new IntersectionObserver(([entry]) => setPlaying(entry.isIntersecting), { threshold: 0.35 });
     io.observe(root.current!);
     return () => io.disconnect();
   }, []);
 
+  // A new slide gets its full time; a hold or scrolling away pauses the countdown instead of restarting it.
   useEffect(() => {
-    if (!playing) return;
-    const id = setTimeout(() => setActive((i) => (i + 1) % slides.length), duration);
-    return () => clearTimeout(id);
-  }, [playing, active, duration, slides.length]);
+    remaining.current = duration;
+  }, [active, duration]);
+
+  useEffect(() => {
+    if (!advancing) return;
+    const started = performance.now();
+    const id = setTimeout(() => setActive((i) => (i + 1) % slides.length), remaining.current);
+    return () => {
+      clearTimeout(id);
+      remaining.current = Math.max(0, remaining.current - (performance.now() - started));
+    };
+  }, [advancing, active, duration, slides.length]);
 
   // How far the active scroll slide has to travel to reach the bottom of its page.
   // Re-measured when the image loads (or swaps between the phone and laptop version) and on resize.
@@ -70,7 +84,14 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
   }, [active, current.scroll]);
 
   return (
-    <div ref={root} className="absolute inset-0 flex flex-col">
+    <div
+      ref={root}
+      className="absolute inset-0 flex flex-col"
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHeld(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setHeld(false)}
+      onFocus={() => setHeld(true)}
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setHeld(false)}
+    >
       {/* the screens */}
       <div ref={view} className="relative flex-1 overflow-hidden bg-white">
         {slides.map((slide, i) => {
@@ -116,20 +137,24 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
               type="button"
               onClick={() => setActive(i)}
               aria-pressed={i === active}
-              className="group pb-1.5 pt-3 text-left"
+              className="group relative pb-1.5 pt-3 text-left before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-['']"
             >
               <span className="relative block h-[2px] overflow-hidden bg-paper/15">
                 <span
                   key={i === active ? `on-${active}` : "off"}
                   className={`absolute inset-0 origin-left bg-copper ${
-                    i === active ? (playing ? "slide-progress" : "") : i < active ? "" : "scale-x-0"
+                    i === active ? (auto ? "slide-progress" : "") : i < active ? "" : "scale-x-0"
                   }`}
-                  style={i === active ? { animationDuration: `${duration}ms` } : undefined}
+                  style={
+                    i === active
+                      ? { animationDuration: `${duration}ms`, animationPlayState: advancing ? "running" : "paused" }
+                      : undefined
+                  }
                 />
               </span>
               <span
                 className={`label-mono mt-2 block text-[0.6rem] transition-colors ${
-                  i === active ? "text-paper" : "text-paper/45 group-hover:text-paper/80"
+                  i === active ? "text-paper" : "text-paper/55 group-hover:text-paper/80"
                 }`}
               >
                 0{i + 1} · {t(slide.label, locale)}
@@ -138,7 +163,8 @@ export default function Slides({ slides, locale }: { slides: Slide[]; locale: Lo
           ))}
         </div>
         {/* two lines reserved so the screen above doesn't jump between short and long captions */}
-        <p className="mt-1 line-clamp-2 min-h-[2lh] text-[12.5px] leading-snug text-paper/75" aria-live="polite">
+        {/* announced only when the visitor changes the slide, not on every automatic step */}
+        <p className="mt-1 line-clamp-2 min-h-[2lh] text-[12.5px] leading-snug text-paper/75" aria-live={advancing ? "off" : "polite"}>
           {t(current.caption, locale)}
         </p>
       </div>

@@ -102,11 +102,12 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             ref={frame}
             className="overflow-hidden rounded-[8px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
           >
+            {/* the window dots give way on phones so the name and badge both fit */}
             <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-line" />
-              <span className="h-2.5 w-2.5 rounded-full bg-line" />
-              <span className="h-2.5 w-2.5 rounded-full bg-line" />
-              <span className="label-mono ml-3 truncate text-[0.62rem] text-mute">{project.slug}</span>
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="label-mono truncate text-[0.62rem] text-mute sm:ml-3">{project.slug}</span>
               {(project.preview || media?.type === "slides") && (
                 <span className="label-mono ml-auto shrink-0 text-[0.58rem] text-copper/80">
                   {t(project.preview ? L.demo : L.slidesBadge, locale)}
