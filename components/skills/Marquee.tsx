@@ -22,8 +22,9 @@ export default function Marquee({ words }: { words: string[] }) {
         let direction = 1;
         let target = 1;
         let speed = 1;
+        let held = false; // pointer over the band: ease to a stop so it can be read
         const tick = () => {
-          target += (direction - target) * 0.04; // boost decays back to cruising speed
+          target += ((held ? 0 : direction) - target) * 0.04; // boost decays back to cruising speed
           speed += (target - speed) * 0.12;
           loop.timeScale(speed);
         };
@@ -35,12 +36,23 @@ export default function Marquee({ words }: { words: string[] }) {
           end: "bottom top",
           onUpdate: (self) => {
             direction = self.direction;
-            target = direction * (1 + Math.min(6, Math.abs(self.getVelocity()) / 250));
+            if (!held) target = direction * (1 + Math.min(6, Math.abs(self.getVelocity()) / 250));
           },
           onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
         });
         if (!st.isActive) loop.pause();
-        return () => gsap.ticker.remove(tick);
+
+        const el = root.current!;
+        const hold = (e: PointerEvent) => {
+          if (e.pointerType === "mouse") held = e.type === "pointerenter";
+        };
+        el.addEventListener("pointerenter", hold);
+        el.addEventListener("pointerleave", hold);
+        return () => {
+          gsap.ticker.remove(tick);
+          el.removeEventListener("pointerenter", hold);
+          el.removeEventListener("pointerleave", hold);
+        };
       });
     },
     { scope: root },
