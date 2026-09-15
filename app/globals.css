@@ -160,6 +160,17 @@ html.js:not(.booted) .boot:not(.is-live) .boot-mark {
   animation: boot-wait 0.8s ease-out 0.6s both;
 }
 
+/* Plain-content mode (no JS, or the app never arrived): controls that need JS would do nothing, so they
+   step aside and what they would have opened is simply shown. */
+html:not(.js) .specs-panel {
+  height: auto !important;
+}
+html:not(.js) .specs-toggle,
+html:not(.js) .slide-steps,
+html:not(.js) [aria-controls="mobile-menu"] {
+  display: none;
+}
+
 /* The boot overlay only plays once per visit, never without JS or with reduced motion. */
 html:not(.js) .boot,
 html.booted .boot {
@@ -474,9 +485,11 @@ header.is-scrolled .header-solid {
     transform: translateY(0);
   }
 }
-/* Touch: a short press state instead of a hover that never goes away. */
+/* Touch: a short press state instead of a hover that never goes away (every control, not just pills). */
 @media (hover: none) {
-  .btn:active {
+  .btn:active,
+  a:active,
+  button:active {
     opacity: 0.75;
   }
 }

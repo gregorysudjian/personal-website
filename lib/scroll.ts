@@ -79,14 +79,35 @@ export function jumpTo(a: Anchor) {
   const el = blocks()[a.i];
   if (!el) return;
   const top = el.getBoundingClientRect().top + window.scrollY + a.f * el.offsetHeight;
+  // Flagged like any scroll the site starts, so the header doesn't read it as "scrolling down" and hide.
+  autoScrolling = true;
+  setTimeout(() => (autoScrolling = false), 400);
   if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
   else window.scrollTo(0, top);
 }
 
-/** Remembers the reader's place for the page at `path` (this one on reload, the other language on a switch). */
+/** Remembers the reader's place per page, so Back after a language switch still lands in the right section. */
 export function saveAnchor(path: string, carry = false) {
   try {
-    sessionStorage.setItem(ANCHOR_KEY, JSON.stringify({ path, carry, ...readAnchor() }));
+    const all = JSON.parse(sessionStorage.getItem(ANCHOR_KEY) || "{}");
+    all[path] = { carry, ...readAnchor() };
+    sessionStorage.setItem(ANCHOR_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+export function readSaved(path: string) {
+  try {
+    return JSON.parse(sessionStorage.getItem(ANCHOR_KEY) || "{}")[path] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearCarry(path: string) {
+  try {
+    const all = JSON.parse(sessionStorage.getItem(ANCHOR_KEY) || "{}");
+    if (all[path]) delete all[path].carry;
+    sessionStorage.setItem(ANCHOR_KEY, JSON.stringify(all));
   } catch {}
 }
 

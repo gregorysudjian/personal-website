@@ -15,6 +15,8 @@ import { gsap, SplitText, useGSAP, FULL_MOTION } from "@/lib/gsap";
  */
 export default function Reveals() {
   useGSAP(() => {
+    // The head script's failsafe has turned the page into plain content: leave it alone.
+    if (!document.documentElement.classList.contains("js")) return;
     const mm = gsap.matchMedia();
     mm.add(FULL_MOTION, () => {
       const splits: SplitText[] = [];

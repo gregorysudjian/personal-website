@@ -34,6 +34,7 @@ export default function Focus({ locale }: { locale: Locale }) {
 
   useGSAP(
     () => {
+      if (!document.documentElement.classList.contains("js")) return; // plain-content mode
       const mm = gsap.matchMedia();
       mm.add(HORIZONTAL, () => {
         const section = root.current!;

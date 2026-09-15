@@ -9,33 +9,39 @@ declare global {
     __gsReady?: boolean;
   }
 }
-import { ANCHOR_KEY, jumpTo, readAnchor, saveAnchor, setLenis, type Anchor } from "@/lib/scroll";
+import { clearCarry, jumpTo, readAnchor, readSaved, saveAnchor, setLenis, type Anchor } from "@/lib/scroll";
 
 /** Smooth, weighted scrolling on desktop, kept in sync with GSAP's clock.
  *  Touch devices keep native scrolling (it already feels right, and never lags). */
 export default function SmoothScroll() {
   useEffect(() => {
     window.__gsReady = true; // the head script's no-JS failsafe stands down
-    // If that failsafe already fired (very slow load), switch the animated page back on.
-    document.documentElement.classList.add("js");
+    // If that failsafe already fired (the app arrived very late), the page is already readable as plain
+    // content: leave it that way rather than hiding everything again under the reader.
+    if (!document.documentElement.classList.contains("js")) return;
 
     // After a reload, Back/Forward or a language switch, return to the same place
     // (the browser's own restore is off, see layout). That beats a leftover #hash in the address.
     const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    let restore: Anchor | null = null;
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(ANCHOR_KEY) || "null");
-      if (saved?.path === location.pathname && (saved.carry || nav?.type === "reload" || nav?.type === "back_forward"))
-        restore = saved;
-      if (saved?.carry) sessionStorage.removeItem(ANCHOR_KEY);
-    } catch {}
+    const saved = readSaved(location.pathname);
+    const restore: Anchor | null =
+      saved && (saved.carry || nav?.type === "reload" || nav?.type === "back_forward") ? saved : null;
+    if (saved?.carry) clearCarry(location.pathname);
+
+    // If the visitor has already started reading by the time a slow page is ready, leave them alone.
+    let moved = false;
+    const startedAt = window.scrollY;
+    const noticeMove = () => (moved = true);
+    addEventListener("wheel", noticeMove, { passive: true, once: true });
+    addEventListener("touchstart", noticeMove, { passive: true, once: true });
+    addEventListener("keydown", noticeMove, { once: true });
 
     // Web fonts change text heights; re-measure every scroll animation once they're in.
     // A link to a section (#projects) lands on it once the page has its final height.
     document.fonts.ready.then(() => {
       ScrollTrigger.refresh();
       const target = location.hash.length > 1 ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
-      if (restore) jumpTo(restore);
+      if (restore && !moved && window.scrollY === startedAt) jumpTo(restore);
       else if (target) window.scrollTo(0, target.getBoundingClientRect().top + window.scrollY);
     });
 
@@ -43,14 +49,16 @@ export default function SmoothScroll() {
     let anchor = readAnchor();
     let resizing = false;
     let settle = 0;
-    let size = [window.innerWidth, window.innerHeight];
+    // Compared with the size the anchor was taken at, so slowly dragging an edge still counts as one resize.
+    let anchorSize = [window.innerWidth, window.innerHeight];
     const onScroll = () => {
-      if (!resizing) anchor = readAnchor();
+      if (resizing) return;
+      anchor = readAnchor();
+      anchorSize = [window.innerWidth, window.innerHeight];
     };
     const onResize = () => {
-      const [w, h] = size;
-      size = [window.innerWidth, window.innerHeight];
-      if (w === size[0] && Math.abs(h - size[1]) < 150) return;
+      const [w, h] = anchorSize;
+      if (w === window.innerWidth && Math.abs(h - window.innerHeight) < 150) return;
       resizing = true;
       clearTimeout(settle);
       settle = window.setTimeout(() => (resizing = false), 1500);
@@ -59,14 +67,9 @@ export default function SmoothScroll() {
       if (resizing && anchor) jumpTo(anchor);
       resizing = false;
       anchor = readAnchor();
+      anchorSize = [window.innerWidth, window.innerHeight];
     };
-    const onHide = () => {
-      // a language switch already saved the place for the other page
-      try {
-        if (JSON.parse(sessionStorage.getItem(ANCHOR_KEY) || "null")?.carry) return;
-      } catch {}
-      saveAnchor(location.pathname);
-    };
+    const onHide = () => saveAnchor(location.pathname);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     window.addEventListener("pagehide", onHide);
@@ -93,6 +96,9 @@ export default function SmoothScroll() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pagehide", onHide);
+      removeEventListener("wheel", noticeMove);
+      removeEventListener("touchstart", noticeMove);
+      removeEventListener("keydown", noticeMove);
       ScrollTrigger.removeEventListener("refresh", onRefresh);
     };
 

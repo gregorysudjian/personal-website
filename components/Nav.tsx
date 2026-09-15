@@ -186,7 +186,10 @@ export default function Nav({ locale }: { locale: Locale }) {
             <a
               href={`/${other}`}
               hrefLang={other}
-              onClick={() => saveAnchor(`/${other}`, true)}
+              onClick={(e) => {
+                // a new-tab click (⌘/Ctrl/shift/middle) leaves this page where it is
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) saveAnchor(`/${other}`, true);
+              }}
               className="tap-area label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
             >
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
