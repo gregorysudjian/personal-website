@@ -7,16 +7,26 @@ import Datasheet from "./Datasheet";
 export default function About({ locale }: { locale: Locale }) {
   const [first, ...rest] = about.paragraphs;
   return (
-    <section id="about" aria-labelledby="about-title" className="relative gutter pb-32 pt-32 md:pb-48 md:pt-48">
+    <section id="about" aria-labelledby="about-title" className="relative gutter pb-32 pt-32 md:pb-48 md:pt-48 short:py-20!">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
 
-      {/* The text comes first for screen readers; the datasheet still shows first (above on phones, left on laptops).
+      {/* Reading order and phones: heading, datasheet, then the text (a nav link to About lands on its heading).
+          From lg the heading and text share the right column and the datasheet sits to the left of both.
           Two columns only from lg: at tablet width both would be too narrow. */}
-      <div className="grid gap-20 lg:grid-cols-12 lg:gap-10">
+      <div className="grid gap-y-12 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-0">
         <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1">
           <SectionHeader id="about-title" label={t(about.label, locale)} heading={t(about.heading, locale)} />
+        </div>
 
-          <p data-reveal className="mt-12 max-w-[62ch] text-pretty text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5]">
+        {/* pinned beside the text only on screens tall enough to show the whole card */}
+        <div className="lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+          <div data-reveal className="lg:tall:sticky lg:tall:top-28">
+            <Datasheet locale={locale} />
+          </div>
+        </div>
+
+        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-2">
+          <p data-reveal className="max-w-[62ch] text-pretty text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5] lg:mt-12">
             {t(first, locale)}
           </p>
           {rest.map((p, i) => (
@@ -41,13 +51,6 @@ export default function About({ locale }: { locale: Locale }) {
               </div>
             ))}
           </dl>
-        </div>
-
-        {/* pinned beside the text only on screens tall enough to show the whole card */}
-        <div className="order-first lg:order-none lg:col-span-5 lg:col-start-1 lg:row-start-1">
-          <div data-reveal className="lg:tall:sticky lg:tall:top-28">
-            <Datasheet locale={locale} />
-          </div>
         </div>
       </div>
     </section>

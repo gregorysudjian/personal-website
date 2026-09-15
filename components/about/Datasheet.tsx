@@ -50,7 +50,7 @@ export default function Datasheet({ locale }: { locale: Locale }) {
   );
 
   return (
-    <div ref={root} className="datasheet mx-auto w-full max-w-[500px] lg:mx-0 2xl:max-w-[560px] short:max-w-[360px]">
+    <div ref={root} className="datasheet w-full max-w-[500px] 2xl:max-w-[560px] short:max-w-[360px]">
       <div
         ref={card}
         role="group"
