@@ -25,6 +25,7 @@ export default function Statement({ locale }: { locale: Locale }) {
           onSplit: (self) => {
             // Dim every word up front, then light them in reading order as the section scrolls.
             gsap.set(self.words, { opacity: 0.2 });
+            text.current!.classList.add("is-split");
             return gsap.to(self.words, {
               opacity: 1,
               ease: "none",
@@ -53,7 +54,7 @@ export default function Statement({ locale }: { locale: Locale }) {
         {/* sized by height too, so the sentence fits a phone held sideways */}
         <p
           ref={text}
-          className="max-w-[22ch] text-[clamp(2rem,min(5.4vw,8.5svh),5.6rem)] font-medium leading-[1.04] tracking-[-0.035em] text-paper md:max-w-[24ch] short:text-[clamp(1.35rem,min(5.4vw,7.2svh),2rem)]!"
+          className="statement-text max-w-[22ch] text-pretty text-[clamp(2rem,min(5.4vw,8.5svh),5.6rem)] font-medium leading-[1.04] tracking-[-0.035em] text-paper md:max-w-[24ch] short:text-[clamp(1.35rem,min(5.4vw,7.2svh),2rem)]!"
         >
           <Rich text={t(statement, locale)} />
         </p>
