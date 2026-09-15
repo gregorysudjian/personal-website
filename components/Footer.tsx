@@ -5,10 +5,16 @@ import { t, type Locale } from "@/lib/i18n";
 import { footer, person } from "@/content/site";
 import { scrollToTarget } from "@/lib/scroll";
 
+/* Scroll up and take keyboard focus along, so the next Tab starts from the top, not the footer. */
+function backToTop() {
+  scrollToTarget(0);
+  document.getElementById("main")?.focus({ preventScroll: true });
+}
+
 export default function Footer({ locale }: { locale: Locale }) {
   return (
     <footer className="relative overflow-hidden border-t border-line">
-      <div className="gutter grid gap-5 py-10 md:grid-cols-4 md:items-center">
+      <div className="gutter grid gap-5 py-10 md:grid-cols-2 md:items-center md:gap-x-10 lg:grid-cols-4">
         <p className="label-mono text-mute">
           © {new Date().getFullYear()} {person.name}
         </p>
@@ -19,9 +25,9 @@ export default function Footer({ locale }: { locale: Locale }) {
             <LocalTime />
           </span>
         </p>
-        <div className="md:text-right">
-          <button type="button" onClick={() => scrollToTarget(0)} className="tap-area link-underline label-mono text-paper">
-            {t(footer.backToTop, locale)} ↑
+        <div className="lg:text-right">
+          <button type="button" onClick={backToTop} className="tap-area link-underline label-mono text-paper">
+            {t(footer.backToTop, locale)} <span aria-hidden="true">↑</span>
           </button>
         </div>
       </div>
@@ -39,11 +45,12 @@ export default function Footer({ locale }: { locale: Locale }) {
 function LocalTime() {
   const [time, setTime] = useState("--:--:--");
   useEffect(() => {
-    // en-GB gives a plain 24h "14:05:09" in both languages.
+    // en-GB gives a plain 24h "14:05:09" in both languages. With reduced motion the seconds don't tick.
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fmt = new Intl.DateTimeFormat("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
+      second: still ? undefined : "2-digit",
       hour12: false,
       timeZone: person.timezone,
     });
