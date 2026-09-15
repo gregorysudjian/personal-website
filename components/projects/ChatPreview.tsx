@@ -86,8 +86,16 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
 
   return (
     <div ref={root} className="@container absolute inset-0 flex text-[13px]">
+      {/* Screen readers get the whole conversation at once; the animated version below is visual only. */}
+      <ol className="sr-only">
+        {chat.messages.map((m, i) => (
+          <li key={i}>
+            {t(chat.speakers[m.from], locale)}: {t(m.text, locale)}
+          </li>
+        ))}
+      </ol>
       {/* chat column */}
-      <div className="flex min-w-0 flex-1 flex-col border-line @min-[520px]:border-r">
+      <div className="flex min-w-0 flex-1 flex-col border-line @min-[520px]:border-r" aria-hidden="true">
         <div className="flex items-center gap-3 border-b border-line px-4 py-3">
           <span className="grid h-8 w-8 place-items-center rounded-full border border-line bg-graphite text-paper">
             <Mark className="h-4 w-4" />
@@ -110,7 +118,6 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
                   : "self-end rounded-br-sm bg-graphite text-paper/90"
               }`}
             >
-              <span className="sr-only">{t(chat.speakers[m.from], locale)}: </span>
               {t(m.text, locale)}
             </div>
           ))}
@@ -123,7 +130,7 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
       </div>
 
       {/* agent log */}
-      <div className="hidden w-[38%] flex-col @min-[520px]:flex">
+      <div className="hidden w-[38%] flex-col @min-[520px]:flex" aria-hidden="true">
         <div className="label-mono border-b border-line px-4 py-[1.13rem] text-[0.6rem] text-mute">agent.log</div>
         <div className="flex flex-1 flex-col gap-3 p-4 font-mono text-[11px] leading-relaxed">
           {LOG.map((lines, i) => (

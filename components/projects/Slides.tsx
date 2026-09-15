@@ -135,8 +135,9 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
           return (
             <div
               key={i}
-              className={`slide absolute inset-0 ${manual ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} ${on ? "is-active" : ""} ${loaded[i] ? "bg-white" : ""}`}
+              className={`slide absolute inset-0 ${manual && on ? "overflow-y-auto overscroll-contain focus-visible:outline-offset-[-3px]" : "overflow-hidden"} ${on ? "is-active" : ""} ${loaded[i] ? "bg-white" : ""}`}
               aria-hidden={!on}
+              inert={!on}
               {...(manual && on ? { tabIndex: 0, role: "region", "aria-label": t(slide.alt, locale) } : {})}
             >
               {slide.scroll ? (

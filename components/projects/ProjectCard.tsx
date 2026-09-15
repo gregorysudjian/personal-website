@@ -19,6 +19,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   const specs = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const specsId = useId();
+  const titleId = useId();
   const flip = index % 2 === 1;
   const hasSpecs = Boolean(project.problem || project.solution || project.how);
   const media = project.media;
@@ -93,71 +94,9 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
   };
 
   return (
-    <article ref={root} className="project grid items-start gap-10 xl:grid-cols-12 xl:gap-12">
-      {/* preview window (stays in view while the details scroll past); stacked full width above the text
-          below 1280px so tablets get a big, readable preview, but never taller than ~3/4 of the screen */}
-      <div
-        className={`md:max-xl:max-w-[calc(75svh*16/11)] xl:sticky xl:top-28 xl:col-span-7 ${flip ? "xl:order-2 xl:col-start-6" : ""}`}
-      >
-        <div data-reveal="clip" data-cursor={cursorLabel}>
-          <div
-            ref={frame}
-            className="overflow-hidden rounded-[6px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
-          >
-            {/* the window dots give way on phones so the name and badge both fit */}
-            <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
-              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
-              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
-              <span className="label-mono truncate text-[0.62rem] text-mute max-sm:text-[0.66rem] max-sm:tracking-[0.08em] sm:ml-3">{project.slug}</span>
-              {(project.preview || media?.type === "slides") && (
-                <span className="label-mono ml-auto shrink-0 text-[0.62rem] text-copper max-sm:text-[0.66rem] max-sm:tracking-[0.08em]">
-                  {t(project.preview ? L.demo : L.slidesBadge, locale)}
-                </span>
-              )}
-            </div>
-            {/* taller on phones, where a wide frame would leave the screens too small to read; on a phone
-                held sideways it's capped to the screen height so the tabs and caption stay in view */}
-            <div className="relative aspect-[3/4] overflow-hidden bg-ink [contain:layout_paint] md:aspect-[16/11] short:aspect-auto! short:h-[85svh]">
-              {project.preview === "chat" && <ChatPreview locale={locale} />}
-              {media?.type === "slides" && <Slides slides={media.slides} name={t(project.title, locale)} locale={locale} />}
-              {media?.type === "image" && (
-                <Shot
-                  src={t(media.src, locale)}
-                  mobile={media.mobile && t(media.mobile, locale)}
-                  alt={t(media.alt, locale)}
-                  className="absolute inset-0 h-full w-full object-cover object-top"
-                />
-              )}
-              {media?.type === "scroll" && (
-                // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
-                <img
-                  src={t(media.src, locale)}
-                  alt={t(media.alt, locale)}
-                  loading="lazy"
-                  decoding="async"
-                  className="scroll-shot absolute inset-x-0 top-0 w-full will-change-transform"
-                />
-              )}
-              {media?.type === "video" && (
-                <video
-                  src={t(media.src, locale)}
-                  aria-label={t(media.alt, locale)}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="none"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <article ref={root} aria-labelledby={titleId} className="project grid items-start gap-10 xl:grid-cols-12 xl:gap-12">
       {/* details */}
-      <div className={`max-w-2xl xl:col-span-5 xl:max-w-none ${flip ? "xl:order-1 xl:col-start-1" : ""}`}>
+      <div className={`max-w-2xl xl:col-span-5 xl:row-start-1 xl:max-w-none ${flip ? "xl:col-start-1" : "xl:col-start-8"}`}>
         <div data-reveal="stagger">
           <div className="flex flex-wrap items-center gap-3">
             <span
@@ -172,7 +111,7 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
           </div>
 
           <p className="label-mono mt-7 text-copper/90">{t(project.kicker, locale)}</p>
-          <h3 className="mt-3 text-[clamp(2rem,3.4vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.035em] text-paper">
+          <h3 id={titleId} className="mt-3 text-[clamp(2rem,3.4vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.035em] text-paper">
             {t(project.title, locale)}
           </h3>
           <p className="mt-5 text-pretty text-lg leading-relaxed text-paper/70">{t(project.summary, locale)}</p>
@@ -191,12 +130,14 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
             <dt className="label-mono pt-1 text-mute">{t(L.role, locale)}</dt>
             <dd className="text-paper">{t(project.role, locale)}</dd>
             <dt className="label-mono pt-1.5 text-mute max-sm:mt-3">{t(L.stack, locale)}</dt>
-            <dd className="flex flex-wrap gap-2">
-              {project.stack.map((s) => (
-                <span key={t(s, locale)} className="rounded-full border border-line px-3 py-1 font-mono text-xs text-paper/80">
-                  {t(s, locale)}
-                </span>
-              ))}
+            <dd>
+              <ul className="flex flex-wrap gap-2">
+                {project.stack.map((s) => (
+                  <li key={t(s, locale)} className="rounded-full border border-line px-3 py-1 font-mono text-xs text-paper/80">
+                    {t(s, locale)}
+                  </li>
+                ))}
+              </ul>
             </dd>
           </dl>
 
@@ -259,6 +200,71 @@ export default function ProjectCard({ project, index, locale }: { project: Proje
           )}
         </div>
       </div>
+      {/* preview window (stays in view while the details scroll past); stacked full width above the text
+          below 1280px so tablets get a big, readable preview, but never taller than ~3/4 of the screen.
+          It comes after the details in the markup (name first for screen readers) and is placed first by CSS. */}
+      <div
+        className={`order-first md:max-xl:max-w-[calc(75svh*16/11)] xl:sticky xl:top-28 xl:order-none xl:col-span-7 xl:row-start-1 ${flip ? "xl:col-start-6" : "xl:col-start-1"}`}
+      >
+        <div data-reveal="clip" data-cursor={cursorLabel}>
+          <div
+            ref={frame}
+            className="overflow-hidden rounded-[6px] border border-line bg-graphite shadow-[0_50px_120px_-50px_rgb(0_0_0/0.9)] will-change-transform"
+          >
+            {/* the window dots give way on phones so the name and badge both fit */}
+            <div className="flex items-center gap-2 border-b border-line px-4 py-3">
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="hidden h-2.5 w-2.5 rounded-full bg-line sm:block" />
+              <span className="label-mono truncate text-[0.62rem] text-mute max-sm:text-[0.66rem] max-sm:tracking-[0.08em] sm:ml-3" aria-hidden="true">
+                {project.slug}
+              </span>
+              {(project.preview || media?.type === "slides") && (
+                <span className="label-mono ml-auto shrink-0 text-[0.62rem] text-copper max-sm:text-[0.66rem] max-sm:tracking-[0.08em]">
+                  {t(project.preview ? L.demo : L.slidesBadge, locale)}
+                </span>
+              )}
+            </div>
+            {/* taller on phones, where a wide frame would leave the screens too small to read; on a phone
+                held sideways it's capped to the screen height so the tabs and caption stay in view */}
+            <div className="relative aspect-[3/4] overflow-hidden bg-ink [contain:layout_paint] md:aspect-[16/11] short:aspect-auto! short:h-[85svh]">
+              {project.preview === "chat" && <ChatPreview locale={locale} />}
+              {media?.type === "slides" && <Slides slides={media.slides} name={t(project.title, locale)} locale={locale} />}
+              {media?.type === "image" && (
+                <Shot
+                  src={t(media.src, locale)}
+                  mobile={media.mobile && t(media.mobile, locale)}
+                  alt={t(media.alt, locale)}
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                />
+              )}
+              {media?.type === "scroll" && (
+                // eslint-disable-next-line @next/next/no-img-element -- tall screenshot needs its natural height
+                <img
+                  src={t(media.src, locale)}
+                  alt={t(media.alt, locale)}
+                  loading="lazy"
+                  decoding="async"
+                  className="scroll-shot absolute inset-x-0 top-0 w-full will-change-transform"
+                />
+              )}
+              {media?.type === "video" && (
+                <video
+                  src={t(media.src, locale)}
+                  aria-label={t(media.alt, locale)}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
     </article>
   );
 }
