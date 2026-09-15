@@ -29,6 +29,8 @@ export default function Hero({ locale }: { locale: Locale }) {
       // Split the name once; the intro raises the letters, the scroll parts them.
       const splits = reduce ? [] : lines.map((line) => SplitText.create(line, { type: "chars" }));
       const allChars = splits.flatMap((s) => s.chars);
+      // Each line masks its letters only while they rise; without the intro nothing is clipped.
+      if (allChars.length) gsap.set(lines, { overflow: "hidden" });
       if (allChars.length) gsap.set(allChars, { yPercent: 118 });
 
       /* ---------- intro (after the boot sequence) ---------- */
@@ -93,7 +95,8 @@ export default function Hero({ locale }: { locale: Locale }) {
           s.to(lines[li], { yPercent: li === 0 ? -55 : 55, ease: "power2.in", duration: 0.75 }, 0);
         });
 
-        s.to(q(".hero-hud-scroll, .hero-eyebrow"), { autoAlpha: 0, y: -28, duration: 0.15 }, 0)
+        // Opacity only, so the CTAs stay in the tab order (focusing one brings the hero back, below).
+        s.to(q(".hero-hud-scroll, .hero-eyebrow"), { opacity: 0, y: -28, duration: 0.15 }, 0)
           .to(q(".hero-name-scroll"), { scale: small ? 1.35 : 1.55, ease: "power2.in", duration: 0.75 }, 0)
           .to(q(".hero-name-scroll"), { autoAlpha: 0, duration: 0.32 }, 0.4)
           .to(q(".hero-circuit-scroll"), { scale: small ? 1.45 : 1.7, duration: 1 }, 0)
@@ -129,6 +132,12 @@ export default function Hero({ locale }: { locale: Locale }) {
         return () => window.removeEventListener("pointermove", onMove);
       });
 
+      /* ---------- a keyboard user tabbing back into the hero gets it back in full ---------- */
+      const onFocus = () => {
+        if (window.scrollY > 0 && root.current!.querySelector(":focus-visible")) scrollToTarget(0);
+      };
+      root.current!.addEventListener("focusin", onFocus);
+
       /* ---------- pause the circuit pulses once the hero is off screen ---------- */
       const io = new IntersectionObserver(([entry]) => {
         circuit.current?.toggleAttribute("data-paused", !entry.isIntersecting);
@@ -137,6 +146,7 @@ export default function Hero({ locale }: { locale: Locale }) {
 
       return () => {
         cancelled = true;
+        root.current?.removeEventListener("focusin", onFocus);
         io.disconnect();
         mm.revert();
         splits.forEach((s) => s.revert());
@@ -151,8 +161,10 @@ export default function Hero({ locale }: { locale: Locale }) {
   };
 
   return (
-    <section ref={root} id="top" className="relative h-[170vh] md:h-[190vh]">
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden">
+    // With reduced motion nothing animates the gate, so the frame simply scrolls away (no frozen screen,
+    // and the lit trace below never slides over the name).
+    <section ref={root} id="top" className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh]">
+      <div className="sticky top-0 flex h-svh flex-col overflow-hidden motion-reduce:relative">
         {/* Layer 0 — horizon glow */}
         <div className="hero-glow-scroll pointer-events-none absolute inset-x-0 top-[58%] flex -translate-y-1/2 justify-center">
           <div className="hero-glow-mouse">
@@ -198,12 +210,12 @@ export default function Hero({ locale }: { locale: Locale }) {
             <h1
               data-intro
               aria-label={person.name}
-              className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,16.4vw,17.5rem)] short:text-[clamp(3.4rem,min(16.4vw,26svh),17.5rem)]!"
+              className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_15.5rem)*1.25)),17.5rem)] short:text-[clamp(3.4rem,min(16.4vw,26svh),17.5rem)]!"
             >
-              <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em]">
+              <span aria-hidden="true" className="hero-name-line block pb-[0.03em]">
                 {person.firstName}
               </span>
-              <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em] text-right">
+              <span aria-hidden="true" className="hero-name-line block pb-[0.03em] text-right">
                 {person.lastName}
               </span>
             </h1>
@@ -223,6 +235,7 @@ export default function Hero({ locale }: { locale: Locale }) {
                 </a>
                 <a href={person.cv} download className="btn btn-sm">
                   {t(hero.ctaCv, locale)}
+                  <span className="sr-only"> (PDF)</span>
                 </a>
               </div>
             </div>
@@ -230,7 +243,7 @@ export default function Hero({ locale }: { locale: Locale }) {
               <span className="label-mono text-mute">{t(hero.scrollHint, locale)}</span>
               <span className="hint-wire" />
             </div>
-            <p data-intro className="hero-hud label-mono flex items-center gap-3 text-paper/80 md:justify-end md:pb-3 short:justify-end! short:pb-3!">
+            <p data-intro className="hero-hud label-mono flex items-center gap-3 whitespace-nowrap text-paper/80 md:justify-end md:pb-3 short:justify-end! short:pb-3!">
               <span className="status-dot" aria-hidden="true" />
               {t(hero.status, locale)}
             </p>
