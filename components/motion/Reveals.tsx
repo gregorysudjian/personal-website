@@ -74,7 +74,20 @@ export default function Reveals() {
         );
       });
 
-      return () => splits.forEach((s) => s.revert());
+      // Keyboard focus landing inside content that hasn't finished revealing shows it at once,
+      // so the focus ring is never on something invisible.
+      const onFocus = (e: FocusEvent) => {
+        const host = (e.target as Element | null)?.closest?.<HTMLElement>("[data-reveal]");
+        if (!host) return;
+        const targets = host.dataset.reveal === "stagger" ? [host, ...Array.from(host.children)] : [host];
+        gsap.to(targets, { opacity: 1, y: 0, clipPath: "none", duration: 0.25, overwrite: "auto" });
+      };
+      document.addEventListener("focusin", onFocus);
+
+      return () => {
+        document.removeEventListener("focusin", onFocus);
+        splits.forEach((s) => s.revert());
+      };
     });
   });
 
