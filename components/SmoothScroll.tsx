@@ -82,11 +82,17 @@ export default function SmoothScroll() {
     const onFocusIn = (e: FocusEvent) => {
       const el = e.target as HTMLElement | null;
       if (!el?.getBoundingClientRect || !el.matches(":focus-visible")) return;
+      // The browser may have just scrolled the control into view itself; tell Lenis where the page is
+      // now, or its next frame would pull it back to where it thought it was.
+      const here = getLenis();
+      if (here && Math.abs(here.animatedScroll - window.scrollY) > 2) {
+        here.scrollTo(window.scrollY, { immediate: true, force: true });
+      }
       const r = el.getBoundingClientRect();
       if (r.bottom > 80 && r.top < window.innerHeight - 20) return;
       // Through Lenis, so it replaces any smooth scroll still running (a plain scrollIntoView would be
       // overridden a frame later); otherwise the browser's own.
-      const lenis = getLenis();
+      const lenis = here;
       if (lenis) lenis.scrollTo(el, { offset: -(window.innerHeight / 2 - r.height / 2), duration: 0.35, force: true });
       else el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
     };
