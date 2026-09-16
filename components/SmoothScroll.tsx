@@ -9,7 +9,7 @@ declare global {
     __gsReady?: boolean;
   }
 }
-import { clearCarry, jumpTo, readAnchor, readSaved, saveAnchor, setLenis, type Anchor } from "@/lib/scroll";
+import { clearCarry, jumpTo, readAnchor, readSaved, saveAnchor, scrollToTarget, setLenis, type Anchor } from "@/lib/scroll";
 
 /** Smooth, weighted scrolling on desktop, kept in sync with GSAP's clock.
  *  Touch devices keep native scrolling (it already feels right, and never lags). */
@@ -70,6 +70,24 @@ export default function SmoothScroll() {
       anchorSize = [window.innerWidth, window.innerHeight];
     };
     const onHide = () => saveAnchor(location.pathname);
+    // Back/Forward between the sections the visitor jumped to.
+    const onPop = () => {
+      const id = location.hash.slice(1);
+      scrollToTarget(id ? `#${decodeURIComponent(id)}` : 0);
+    };
+    window.addEventListener("popstate", onPop);
+
+    // Keyboard focus that lands outside the viewport (Shift+Tab up a long page) is taken there smoothly,
+    // so the ring is never on something off screen.
+    const onFocusIn = (e: FocusEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (!el?.getBoundingClientRect || !el.matches(":focus-visible")) return;
+      const r = el.getBoundingClientRect();
+      if (r.bottom > 80 && r.top < window.innerHeight - 20) return;
+      el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+    };
+    document.addEventListener("focusin", onFocusIn);
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     window.addEventListener("pagehide", onHide);
@@ -96,6 +114,8 @@ export default function SmoothScroll() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pagehide", onHide);
+      window.removeEventListener("popstate", onPop);
+      document.removeEventListener("focusin", onFocusIn);
       removeEventListener("wheel", noticeMove);
       removeEventListener("touchstart", noticeMove);
       removeEventListener("keydown", noticeMove);

@@ -7,7 +7,7 @@ import { scrollToTarget } from "@/lib/scroll";
 
 /* Scroll up and take keyboard focus along, so the next Tab starts from the top, not the footer. */
 function backToTop() {
-  scrollToTarget(0);
+  scrollToTarget("#top");
   document.getElementById("main")?.focus({ preventScroll: true });
 }
 

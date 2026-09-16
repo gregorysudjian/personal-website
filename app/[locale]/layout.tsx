@@ -67,7 +67,7 @@ export const viewport: Viewport = {
    height, so the browser's own restore lands in the wrong place), and skips the boot sequence on repeat
    visits, when the visitor prefers reduced motion, or when the link points at a section (#projects…).
    If the app's JS still hasn't started after 8s, it drops the "js" flag so the page shows as plain content. */
-const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{history.scrollRestoration='manual'}catch(e){}try{if(sessionStorage.getItem('gs-booted')||location.hash||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('booted')}catch(e){d.classList.add('booted')}setTimeout(function(){if(!window.__gsReady){d.classList.remove('js');d.classList.add('booted')}},8000)})();`;
+const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{history.scrollRestoration='manual'}catch(e){}try{if(sessionStorage.getItem('gs-booted')||location.hash||matchMedia('(prefers-reduced-motion: reduce)').matches){d.classList.add('booted');sessionStorage.setItem('gs-booted','1')}}catch(e){d.classList.add('booted')}setTimeout(function(){if(!window.__gsReady){d.classList.remove('js');d.classList.add('booted')}},8000)})();`;
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;

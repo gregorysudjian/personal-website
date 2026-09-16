@@ -32,7 +32,7 @@ export default function ScrollProgress() {
     <div
       ref={root}
       aria-hidden="true"
-      className="invisible fixed right-4 top-1/2 z-40 hidden h-28 w-px -translate-y-1/2 bg-line opacity-0 lg:block"
+      className="invisible fixed right-[calc(var(--gutter)/2)] top-1/2 z-40 h-28 w-px -translate-y-1/2 bg-line opacity-0"
     >
       <div ref={fill} className="absolute inset-0 origin-top scale-y-0 bg-copper" />
     </div>

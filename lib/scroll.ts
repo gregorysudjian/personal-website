@@ -34,11 +34,16 @@ export function isAutoScrolling() {
   return autoScrolling;
 }
 
-export function scrollToTarget(target: string | number | HTMLElement) {
+export function scrollToTarget(target: string | number | HTMLElement, push = false) {
   const el = typeof target === "number" ? null : typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
-  // Section links keep the address shareable (#projects) without adding history entries.
+  // Section links keep the address shareable (#projects); from the nav they also add a history entry,
+  // so Back walks back through the sections the visitor jumped to.
   if (typeof target === "string" && target.startsWith("#")) {
-    history.replaceState(null, "", target === "#top" ? location.pathname : target);
+    const url = target === "#top" ? location.pathname : target;
+    if (push && url !== location.pathname + location.hash) history.pushState(null, "", url);
+    else history.replaceState(null, "", url);
+  } else if (target === 0) {
+    history.replaceState(null, "", location.pathname);
   }
   if (lenis) {
     autoScrolling = true;
