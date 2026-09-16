@@ -33,7 +33,7 @@ export const heroRoute: Route = (w, h) => {
   const vh = window.innerHeight;
   const cx = Math.round(w / 2);
   const r = railX(w);
-  const y0 = w < 768 ? vh + 24 : vh - 30;
+  const y0 = w < 768 || h < 520 ? vh + 24 : vh - 30; // below the first screen where the hero has no room to spare
   const yA = y0 + 36;
   const span = cx - r;
   const diag = Math.min(span, Math.max(0, h - yA - 48));

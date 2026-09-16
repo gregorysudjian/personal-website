@@ -40,14 +40,17 @@ export default function Focus({ locale }: { locale: Locale }) {
         const section = root.current!;
         const panels = gsap.utils.toArray<HTMLElement>(".focus-panel", section);
         const distance = () => Math.max(0, track.current!.scrollWidth - frame.current!.clientWidth);
-        const size = () => {
-          // Normal sizes unless a panel's text would reach its bottom edge; then the compact sizes (see globals.css).
-          section.classList.remove("focus-compact");
-          const tooTight = panels.some((p) => {
+        const tight = () =>
+          panels.some((p) => {
             const last = p.querySelector(".focus-body")?.lastElementChild;
             return last ? p.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom < 16 : false;
           });
-          section.classList.toggle("focus-compact", tooTight);
+        const size = () => {
+          // Normal sizes unless a panel's text would reach its bottom edge; then the compact sizes (see globals.css).
+          section.classList.remove("focus-compact", "focus-tight");
+          section.classList.toggle("focus-compact", tight());
+          // Compact still not enough (text-only zoom, a large default font): let the panel text scroll.
+          section.classList.toggle("focus-tight", tight());
           section.style.height = `${distance() + window.innerHeight}px`;
         };
         size();

@@ -66,9 +66,12 @@ export default function Hero({ locale }: { locale: Locale }) {
 
       /* ---------- scroll + cursor ---------- */
       const mm = gsap.matchMedia();
-      mm.add({ full: FULL_MOTION, fine: FINE_POINTER, small: "(max-width: 767px)" }, (ctx) => {
-        const { full, fine, small } = ctx.conditions as Record<string, boolean>;
-        if (!full) return;
+      mm.add(
+        { full: FULL_MOTION, fine: FINE_POINTER, small: "(max-width: 767px)", tiny: "(max-height: 360px)" },
+        (ctx) => {
+        const { full, fine, small, tiny } = ctx.conditions as Record<string, boolean>;
+        // With almost no height (a heavily zoomed page) the hero is plain content: no gate, no pin.
+        if (!full || tiny) return;
 
         const s = gsap.timeline({
           defaults: { ease: "none" },
@@ -133,7 +136,8 @@ export default function Hero({ locale }: { locale: Locale }) {
         };
         window.addEventListener("pointermove", onMove, { passive: true });
         return () => window.removeEventListener("pointermove", onMove);
-      });
+        },
+      );
 
       /* ---------- a keyboard user tabbing back into the hero gets it back in full ---------- */
       const onFocus = () => {
@@ -166,8 +170,13 @@ export default function Hero({ locale }: { locale: Locale }) {
   return (
     // With reduced motion nothing animates the gate, so the frame simply scrolls away (no frozen screen,
     // and the lit trace below never slides over the name).
-    <section ref={root} id="top" aria-labelledby="hero-title" className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh] md:motion-reduce:h-[125svh]">
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden motion-reduce:relative">
+    <section
+      ref={root}
+      id="top"
+      aria-labelledby="hero-title"
+      className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh] md:motion-reduce:h-[125svh] tiny:h-auto!"
+    >
+      <div className="sticky top-0 flex h-svh flex-col overflow-hidden motion-reduce:relative tiny:relative! tiny:h-auto! tiny:min-h-svh">
         {/* Layer 0 — horizon glow */}
         <div className="hero-glow-scroll pointer-events-none absolute inset-x-0 top-[58%] flex -translate-y-1/2 justify-center">
           <div className="hero-glow-mouse">

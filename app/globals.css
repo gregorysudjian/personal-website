@@ -4,6 +4,8 @@
 @custom-variant roomy (@media (min-width: 48rem) and (min-height: 501px));
 /* Very short screens, e.g. a phone held sideways: the hero drops to a compact bottom row. */
 @custom-variant short (@media (max-height: 500px));
+/* Barely any height at all (a laptop zoomed to 200-400%): the hero stops pinning and simply flows. */
+@custom-variant tiny (@media (max-height: 360px));
 /* Screens tall enough to pin the About datasheet beside the text without cutting it off. */
 @custom-variant tall (@media (min-height: 840px));
 
@@ -569,6 +571,13 @@ header.is-scrolled .header-solid {
   }
   html.js .focus-meter {
     display: flex;
+  }
+
+  /* Still too tight after the compact sizes (text-only zoom, a large default font): the panel's text
+     scrolls rather than being cut off. Set from Focus.tsx after a second measure. */
+  html.js .focus-tight .focus-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   /* Only when the text wouldn't fit (short laptop windows): sizes follow the screen height so the
