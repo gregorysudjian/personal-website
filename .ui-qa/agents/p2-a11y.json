@@ -1,0 +1,159 @@
+[
+  {
+    "section": "projects",
+    "viewport": "all (measured 1440x900), prefers-reduced-motion: reduce",
+    "severity": "P1",
+    "description": "With reduced motion, Tab lands on an invisible slide that screen readers are told to ignore. The Lead Finder '03 · Demo' slide is a scroll slide, so without motion it gets `overflow-y-auto` (manual = slide.scroll && !auto) even while it's inactive, at opacity 0 with aria-hidden=\"true\". Once its screenshot has loaded (scrollHeight 3424 vs clientHeight 424), Chromium makes the scroller keyboard-focusable. The live tab order after one pass down the page (images loaded), then from the top: … 'Download CV (PDF)' → DIV.slide (opacity 0, aria-hidden, name '') at 57,238 753x424 → '01 · Leads'. It's reached again on Shift+Tab. Nothing on screen marks the focus (the screenshot shows the Leads slide, no ring), and a screen reader says nothing. The same happens to Clarté's '01 · Website' slide once the visitor switches to '02 · Dashboard'. WCAG 2.4.7, 2.4.3, 4.1.2 (a focusable element inside aria-hidden). This is the same thing the pass-2 audit logged as `div \"\"` at y=238 in '1440 en reduced keyboard'. It isn't a parallel-load artifact.",
+    "evidence": [
+      "shots/projects/p2/agent-a11y/reduced-1440-focus-on-hidden-slide.png",
+      "shots/audit-p2-1440-motion_reduced.json",
+      "shots/global/p2/agent-a11y/data/p2c-slidescroller.mjs",
+      "shots/global/p2/agent-a11y/data/rev-r.txt"
+    ],
+    "file_line": "components/projects/Slides.tsx:132-138",
+    "suggested_fix": "Give only the active manual slide a scroller: `${manual && on ? \"overflow-y-auto overscroll-contain\" : \"overflow-hidden\"}`. Also mark inactive slides `inert` (inert={!on}) instead of (or as well as) aria-hidden, so nothing inside a hidden slide can ever take focus.",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all (measured 1440x900), prefers-reduced-motion: reduce",
+    "severity": "P2",
+    "description": "The one scroll region on the page has no visible focus indicator. With reduced motion, the active Clarté 'Website' slide becomes `tabIndex=0 role=region aria-label=\"The Clarté Math homepage\"`. It fills its view (absolute inset-0), and the view is `overflow-hidden`, so the global 2px copper outline at offset 4px is clipped on all four sides. Measured cut: 6/6/6/6px by div.relative.flex-1.overflow-hidden.bg-graphite. Every other control on the page shows the copper ring. This is the only focus stop without one (2.4.7). Also, the region's name repeats the alt of the only image inside it, so it's announced twice ('The Clarté Math homepage, region' then 'The Clarté Math homepage, image').",
+    "evidence": [
+      "shots/global/p2/agent-a11y/kb-en-reduced-1440x900-booted/15.png",
+      "shots/global/p2/agent-a11y/data/kb-en-reduced-1440x900-booted.json",
+      "shots/global/p2/agent-a11y/data/aria-en-reduced-1440.txt"
+    ],
+    "file_line": "components/projects/Slides.tsx:127, 136-138",
+    "suggested_fix": "Draw the ring inside the region: add `focus-visible:outline-offset-[-3px]` (or an inset box-shadow ring in copper) to the manual slide. Name the region from the visible caption (aria-labelledby on the caption <p>'s id) or give it a short purpose label, and leave the alt on the image, so the name isn't read twice.",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all (measured 1440x900), full motion",
+    "severity": "P2",
+    "description": "In full motion, the WhatsApp chat demo is hidden from screen readers most of the time, which breaks the site's own rule. Reveals.tsx says content 'must stay focusable and readable by screen readers', so reveals are opacity-only, and that rule is why UI-011/UI-012 were fixed. ChatPreview instead hides every bubble with display:none and the agent-log steps with autoAlpha (visibility:hidden) the moment it mounts. It re-hides them at every loop and fades them to visibility:hidden between rounds. Measured ariaSnapshot of the card: before it scrolls into view it reads 'Demo business · Assistant / AI agent agent.log In progress 2026', with no conversation and no log. At 1.5s in view it has one message, at 4s two, and only at 9s all four. Reduced motion exposes the full conversation and six log lines. So what a screen-reader user hears depends on timing and motion preference, and before playback the labels 'agent.log' and 'Demo business · Assistant' introduce nothing. 1.3.1 / consistency with the reveal pattern.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/chat-aria.txt",
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt",
+      "shots/global/p2/agent-a11y/data/aria-en-reduced-1440.txt",
+      "shots/projects/p2/agent-a11y/chat-motion-1440-t1500.png",
+      "shots/projects/p2/agent-a11y/chat-motion-1440-t9000.png"
+    ],
+    "file_line": "components/projects/ChatPreview.tsx:31-37, 44, 55-59, 104-139",
+    "suggested_fix": "Render the conversation once as a static sr-only transcript (the speaker labels already exist), for example an <ol class=\"sr-only\"> of 'Customer: …' / 'Assistant: …', and put aria-hidden=\"true\" on the animated chat column and the agent.log column, so what's announced never depends on the animation. Alternatively animate opacity only and never set display:none/visibility on bubbles.",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The Stack pills aren't a list, unlike every other group of chips. Skills puts the same kind of item (tech names) in <ul>/<li> labelled by the group heading. In each project card, the Stack <dd> is a flex row of bare <span>s, so screen readers get one run-on string where item boundaries are lost: ariaSnapshot 'definition: Next.js TypeScript Supabase Claude API DuckDB Vitest' ('Claude API DuckDB' can't be told apart from 'Claude' + 'API DuckDB'). Assistive tech doesn't announce a count either ('list, 6 items'). 1.3.1. The Focus keyword lines ('Python · Java · C · Bash') are the same kind of item set, though their visible separators make them readable.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt",
+      "shots/global/p2/agent-a11y/data/aria-fr-motion-1440.txt"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:194-200 (also components/focus/Focus.tsx:146-155)",
+    "suggested_fix": "<dd><ul className=\"flex flex-wrap gap-2\">{project.stack.map(s => <li key=… className=\"rounded-full border …\">…</li>)}</ul></dd>. The look is unchanged. Optionally, make the Focus keyword <p> a <ul> as well, with the ' · ' separators in aria-hidden spans.",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all (worst at >=1280 on flipped cards)",
+    "severity": "P2",
+    "description": "Reading order in project cards breaks the 'name first' rule the other sections now follow. Experience (UI-014) and About (UI-136) were changed so the heading or text comes first in the DOM and CSS keeps the visual order. ProjectCard still has the preview column first, and inside the details the status pill, year and kicker come before the <h3>. ariaSnapshot of card 1: 'lead-finder Real app screens' → image → 'Lead Finder' slide-tab group → caption → 'In progress 2026' → 'AI lead agent' → heading 'Lead Finder'. Someone jumping by heading (H) to 'Lead Finder' lands after the slide controls and the status, which are now read as part of the previous card. At >=1280 (xl), flipped cards (index 1 WhatsApp AI Agent, index 3 This website) show the details on the left and the preview on the right, but the DOM still reads the preview (the whole chat demo) first, so the reading order is the opposite of the visual order (1.3.2).",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt",
+      "shots/global/p2/agent-a11y/data/aria-en-reduced-1440.txt",
+      "shots/projects/p2/1440"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:96-177",
+    "suggested_fix": "Put the details column first in the DOM and give the preview `order-first xl:order-none` (with `xl:order-2` on flipped cards) so the visual layout doesn't change. Inside the details, put the <h3> first and move the status/year row and kicker above it visually (flex-col with `order-first` on the meta row), the same pattern Experience uses for its dates.",
+    "confidence": "medium",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Window-chrome text is hidden in one illustration and read aloud in another. The Focus CodeWindow's title bar ('agent.py') is inside an aria-hidden illustration. The project frames' title bars aren't, so every card opens with the file-name slug: 'lead-finder Real app screens', 'whatsapp-ai-agent Illustrative demo', 'clarte-math …', 'personal-website'. That's machine-style text that repeats the <h3>, read before it. In the chat frame, the 'agent.log' header is exposed while (in motion) the log lines under it are hidden, so it labels nothing.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:108-118; components/projects/ChatPreview.tsx:127; components/focus/Illustrations.tsx:152-158",
+    "suggested_fix": "Put aria-hidden=\"true\" on the slug <span> (it only repeats the title) and on the 'agent.log' header when the log is hidden. Keep the 'Real app screens' / 'Illustrative demo' badge, because it carries meaning, or move it to an sr-only note after the <h3>.",
+    "confidence": "medium",
+    "lens": "a11y"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Project cards and Focus panels are <article> elements with no accessible name. Elsewhere, groups are named: the Datasheet is role=group labelled 'Datasheet', each slide-tab group is labelled with the project name, and each Experience/Skills list is labelled by its heading. Screen readers that list or jump by article (JAWS, VoiceOver rotor) just announce 'article' seven times with no title.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:96, 175; components/focus/Focus.tsx:120, 140",
+    "suggested_fix": "Give each <h3> an id (useId) and set aria-labelledby on its <article>.",
+    "confidence": "medium",
+    "lens": "a11y"
+  },
+  {
+    "section": "global",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Region landmarks are named by three different rules. The hero <section id=\"top\"> has no name, so it isn't a region, while every other section is. The Statement region is named by its small eyebrow label ('In one sentence'). About, Focus, Projects, Experience, Skills and Contact are named by their h2 headline. The landmarks list reads 'In one sentence', 'Hi, I'm Gregory.', 'Three things I keep coming back to.', 'Things I've built.', 'What I've done so far.', 'The toolkit.', 'Let's build something.', so none of the names matches the nav labels a visitor has just heard (About, Projects, Experience, Contact). FR shows the same mismatch ('Parcours' in the nav vs region 'Ce que j'ai fait jusqu'ici.').",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt",
+      "shots/global/p2/agent-a11y/data/aria-fr-motion-1440.txt"
+    ],
+    "file_line": "components/hero/Hero.tsx:169; components/Statement.tsx:49-56; components/SectionHeader.tsx:19-23; components/about/About.tsx:10; components/focus/Focus.tsx:99; components/projects/Projects.tsx:9; components/Experience.tsx:11; components/skills/Skills.tsx:10; components/contact/Contact.tsx:16-18",
+    "suggested_fix": "Pick one rule. For example, give the SectionHeader / Contact eyebrow <p> an id and label every section with it (aria-labelledby=\"about-label\"), so the names match the nav ('About', 'Projects'…) and the Statement's current approach. The h2 stays the heading. Label the hero from the h1 (aria-labelledby pointing at an id on the h1).",
+    "confidence": "medium",
+    "lens": "a11y"
+  },
+  {
+    "section": "nav",
+    "viewport": "<768 vs >=768",
+    "severity": "P3",
+    "description": "The same site navigation has a different landmark name depending on width. At >=768 it's navigation 'Main navigation' / 'Navigation principale' (hard-coded in the component). The phone drawer is navigation 'Menu' (ui.menu, 'Menu' in both languages). Someone moving between devices or zoom levels hears two names for one landmark.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt",
+      "shots/global/p2/agent-a11y/data/aria-en-motion-390.txt"
+    ],
+    "file_line": "components/Nav.tsx:165, 224",
+    "suggested_fix": "Use one localized label for both (add ui.mainNav to content/site.ts and use it on both <nav> elements).",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "about",
+    "viewport": ">=768 with a mouse, prefers-reduced-motion: reduce",
+    "severity": "P3",
+    "description": "Hover motion is only partly switched off for reduced motion. Datasheet tilt, project-card tilt, Magnetic buttons and the custom cursor all check prefers-reduced-motion. The About fact rows still slide their value 4px right (group-hover:translate-x-1, 500ms transition) and grow the dash from 12 to 24px on hover, with reduced motion on. 2.3.3 (AAA) / consistency.",
+    "evidence": [
+      "shots/about/p2/1440"
+    ],
+    "file_line": "components/about/About.tsx:35, 38",
+    "suggested_fix": "Prefix both with motion-safe: (motion-safe:group-hover:translate-x-1, motion-safe:group-hover:w-6), or keep only the colour change.",
+    "confidence": "high",
+    "lens": "a11y"
+  },
+  {
+    "section": "about",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Arrow glyphs aren't handled consistently. Every arrow in the UI chrome (↓ View projects, ↓ Download CV, ↗ external links, ↑ Back to top, → 404 buttons, ✓ Copied) is aria-hidden. But the content arrows are exposed and read as 'right arrow' / 'flèche droite': Datasheet Origin 'Lebanon → Montreal' / 'Liban → Montréal', the Clarté highlight 'request → client', and the 'How it's built' pipelines ('Catalog → lead → homepage research → …', 'Meta webhook → signature check → …'). Here the arrow means 'to' or 'then', and the glyph name gets in the way.",
+    "evidence": [
+      "shots/global/p2/agent-a11y/data/aria-en-motion-1440.txt"
+    ],
+    "file_line": "content/site.ts:130, 315-316, 393-394, 414-415 (rendered by components/about/Datasheet.tsx:97, components/projects/ProjectCard.tsx:184, 226)",
+    "suggested_fix": "Render '→' through a small helper (like Rich) that outputs <span aria-hidden=\"true\">→</span><span class=\"sr-only\">to</span> ('vers' / 'puis' in FR). The visible copy doesn't change.",
+    "confidence": "medium",
+    "lens": "a11y"
+  }
+]

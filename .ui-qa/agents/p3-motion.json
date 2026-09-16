@@ -1,0 +1,75 @@
+[
+  {
+    "section": "hero",
+    "viewport": "1440, 1920 (desktop only; 390 is clean)",
+    "severity": "P1",
+    "description": "The hero gate — the page's signature motion and the first thing anyone sees — runs well under 30 fps on desktop, and the cost is rasterization, not JS. Method: scroll #top from 0 to its full height at a steady 260 px/s with a rAF loop, recording every frame gap, then repeat with one layer disabled at a time (same run, same machine). 1440, CPU 4x: median frame 35.1 ms (28 fps), p90 38.9 ms, 64% of frames over 33 ms (repeat run: 35.8 ms, 72%). 1440 with NO CPU throttle it is barely better — median 34.2 ms (29 fps), 62% long frames — so this is not a slow-CPU artifact. 1920, CPU 4x: median 54.8 ms (18 fps), p90 60.9, 70% long frames. Attribution, 1440 unthrottled, median frame / % frames >33 ms: base 34.2 / 62% → hide .grain 30.1 / 15% → kill the .hero-circuit-mask two-gradient mask 28.1 / 1% → hide .hero-floor 24.3 / 2% → hide the whole .hero-circuit-scroll layer 20.5 / 1%. The dominant cost is that .hero-circuit-mask (two mask-image layers composited with mask-composite: intersect) sits INSIDE the element the scroll timeline scales from 1 to 1.7, so a viewport-sized masked SVG is re-rasterized on every frame of the gate; .hero-floor (a perspective-transformed bg-grid under a linear-gradient mask, scaled 1 → 1.25) is second; .grain (a fixed 1760x1220 noise layer stepping 5x per 0.9 s) is third. Adding will-change:transform,opacity to all four scroll layers does NOT help (median 35.4 ms, 68% long) — confirming the work is raster, not compositing. Every other section on the page is clean at the same throttle (median 16.6-16.8 ms, 0 long frames), so the hero is the page's only janky scroll.",
+    "evidence": [
+      "shots/hero/p3/agent-motion/hero-gate-4x-cpu-1440.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:105-110 (scale on .hero-circuit-scroll / .hero-floor-scroll / .hero-glow-scroll); app/globals.css:224-230 (.hero-circuit-mask, mask-composite: intersect); app/globals.css:195-204 (.grain); components/hero/Hero.tsx:194-200 (mask nested inside the scaled wrapper)",
+    "suggested_fix": "Move .hero-circuit-mask off the scaled node and onto the outer, unscaled .hero-circuit-scroll wrapper (the vignette is a viewport effect and should stay put while the circuit zooms through it), so the scale becomes a pure composited transform over an already-rasterized texture. Same for .hero-floor: put the mask-image on .hero-floor-scroll rather than inside it. Then hide .grain for the duration of the gate (it is decorative and already switched off on touch). If any one of those is too invasive, killing the double mask alone takes long frames from 62% to 1% in these measurements.",
+    "confidence": "high on the relative attribution (repeated three times, monotonic and consistent across 1440/1920 and throttled/unthrottled); medium on the absolute fps, since headless Chromium rasterizes on the CPU and a real GPU will do better",
+    "lens": "motion"
+  },
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The slideshow's push-in is on a 5 s clock that matches no slide's length, so it never lands, and at the handover it visibly reverses. .slide animates transform with `transform 5s linear` from scale(1.04) to scale(1). Measured by sampling the computed matrix of every .slide each frame for 16 s at 1440: a still slide is shown for 4183 ms, so at handover its scale is still 1.0065 — it has covered 84% of its 0.04 travel and is cut off mid-creep, never resting at its designed size. The scroll slide is shown for 9014 ms: its scale reaches exactly 1.000 at the 5 s mark and then the frame is completely motionless for the last 4.0 s while the capture glides underneath. Worse at the handover: the outgoing slide is at 1.0065 (or 1.000) and immediately starts growing BACK toward 1.04 at the same linear rate, so for the 800 ms the crossfade is still visible (opacity 0.42 at +100 ms, 0.07 at +300 ms) the leaving frame is zooming the opposite way from the arriving one. `linear` is also the only linear easing in an element-state transition anywhere on the page — every other one uses --ease-out-expo.",
+    "evidence": [
+      "shots/projects/p3/agent-motion/slides-pushin-1440.png",
+      "shots/projects/p3/agent-motion/slide-crossfade-200ms-1440.png"
+    ],
+    "file_line": "app/globals.css:619-629 (.slide, transform 5s linear) with components/projects/Slides.tsx:19-23 (STEP_MS 4200, SCROLL_MS 8000, MAX_GLIDE 12) and :49-51 (the computed `duration`)",
+    "suggested_fix": "Drive the push-in from the slide's own clock instead of a fixed 5 s: set `transitionDuration: `${duration}ms`` inline on the active .slide alongside the existing animationDuration on the progress bar, so the zoom lands exactly when the slide hands over whether it is a 4.2 s still or a 9 s scroll slide. Reset the outgoing slide's transform without a transition (transition-duration: 0 on :not(.is-active)) so it cannot reverse under the crossfade, and use var(--ease-out-expo) or a gentle ease-out rather than linear.",
+    "confidence": "high",
+    "lens": "motion"
+  },
+  {
+    "section": "global",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "One event, four different speeds. When the copper spark reaches an anchor, everything that is supposed to 'power on' from that single moment runs on a different clock: .trace-pad 0.5 s, .section-index box-shadow 0.9 s, .xp-org / .xp-dates colour 0.9 s, .chip-corner 1 s, .chip-box border 1.2 s and box-shadow 1.4 s, .xp-row::before underline 1.4 s, .contact .accent text-shadow 1.4 s. Measured at 1440 by stepping the scroll at a steady 600 px/s through #experience and timing, per element, from the class flip to the visual end state: the pad's glow is at full 14 px blur 166 ms after the flip (mean of 7 pads, range 165-168 ms), while the same row's copper underline needs 883 ms to reach scaleX 1 (mean of 6 rows, range 881-884) — a 5.3x spread for two things triggered by the same spark passing the same point. So each Experience row snaps a pad on, then drifts its dates copper, then sweeps an underline, as three separate events rather than one.",
+    "evidence": [
+      "shots/experience/p3/agent-motion/power-on-three-speeds-1440.png"
+    ],
+    "file_line": "app/globals.css:264-267 (.trace-pad 0.5s), :511 (.section-index 0.9s), :672 (.xp-row::before 1.4s), :679-684 (.xp-org/.xp-dates 0.9s), :752-754 (.chip-box 1.2/1.4s), :762 (.chip-corner 1s), :777 (.contact .accent 1.4s)",
+    "suggested_fix": "Give the power-on family one duration token (e.g. --dur-power: 0.9s) and use it for every property that answers the spark, keeping a deliberate offset only where one is meant to trail the other (the underline sweep can stay longer if it is also given a small transition-delay so it reads as a consequence of the pad rather than a parallel animation).",
+    "confidence": "high",
+    "lens": "motion"
+  },
+  {
+    "section": "global",
+    "viewport": "1440 (measured); all",
+    "severity": "P3",
+    "description": "Scroll reveals are on a fixed 1.2-1.4 s clock with only 12% of a viewport of runway, so at a brisk scroll they finish long after the element has arrived — and on `stagger` groups the last child lands after the group has left the top of the screen. Method: constant-velocity rAF scroll of the whole page at 1440, sampling each frame, recording where each [data-reveal] element sat when its tween started and where it sat when it settled. At 900 px/s (a normal flick-and-read): every plain reveal starts with its top at 84-86% of the viewport and settles ~700 ms later with its top at 8-13% — it crosses about 75% of the screen while still fading in. `stagger` groups are worse because the trigger is the container: they start at 61-71% and settle with the container top at -2 to -4% of the viewport, i.e. the last chips in Skills and the last rows in the About datasheet finish arriving after they have scrolled off the top edge. At 400 px/s the same reveals settle with their top at ~51%, which is the intended feel — so the effect is entirely scroll-speed dependent and there is no compensation.",
+    "evidence": [],
+    "file_line": "components/motion/Reveals.tsx:26 (start 'top 88%', once), :39 (lines duration 1.4), :52 (stagger duration 1.2, stagger 0.08), :62 (default duration 1.3)",
+    "suggested_fix": "Either shorten the reveals to ~0.8-0.9 s (still on-brand with the expo.out family and the 1.2 s gsap default) or lower the trigger to 'top 95%' so the element has a full 20-25% of viewport of runway before it is needed; for `stagger`, set the ScrollTrigger on the container but start it from the container's own top with a small negative offset so the tail children are not staggered off-screen.",
+    "confidence": "high on the measurements; medium that the current timing is wrong rather than a deliberate choice",
+    "lens": "motion"
+  },
+  {
+    "section": "global",
+    "viewport": "390, 375, 844l (touch) and any reduced-motion session",
+    "severity": "P3",
+    "description": "The grain layer keeps a permanently promoted compositor layer where its animation is switched off. .grain declares `will-change: transform` unconditionally, but the `grain` keyframes are cancelled under both `prefers-reduced-motion: reduce` and `(hover: none)`. Measured at 390: getComputedStyle(.grain).animationName === 'none' while willChange === 'transform', so a 710x1164 fixed layer (inset:-160px, i.e. viewport plus 320 px each way) is held promoted for an animation that will never run — on the devices least able to spare the GPU memory. At 1440 the same layer is 1760x1220 = 2.15 Mpx; a full inventory of the page at the top of the scroll finds 18 promoted elements totalling 6.51 Mpx, of which .grain is the second largest after the 783x3424 scroll capture already filed as UI-197.",
+    "evidence": [],
+    "file_line": "app/globals.css:195-204 (.grain, will-change: transform) with :215-219 (@media reduced-motion, (hover: none) { .grain { animation: none } })",
+    "suggested_fix": "Move `will-change: transform` out of the base .grain rule and into a `@media (prefers-reduced-motion: no-preference) and (hover: hover)` block so it is declared only where the animation actually runs — or drop it entirely, since the keyframes already use translate3d and will promote the layer on their own while playing.",
+    "confidence": "high",
+    "lens": "motion"
+  },
+  {
+    "section": "nav",
+    "viewport": "390, 375",
+    "severity": "P3",
+    "description": "Opening the mobile menu puts the focus ring on an item that is still moving, and closing has no counterpart to the staged open. Measured at 390 by sampling the panel's opacity and each .menu-item's translateY every frame: on open the panel reaches opacity 1 at 310 ms, but the four items are at y = 42, 48, 48, 48 px at t=11 ms and the last one does not settle until ~610 ms — and Nav.tsx focuses the first link synchronously in the same tick, so the copper 2px focus ring is drawn on a link that then travels ~42 px under it. On close the panel simply dissolves: opacity 0 at 183 ms, display:none at 299 ms, with the items left at y=0 the whole time. So opening is a 610 ms staged reveal and closing is a 300 ms flat fade with nothing staged — a 2x asymmetry with no shared gesture.",
+    "evidence": [],
+    "file_line": "components/Nav.tsx:102-106 (open: yPercent 100 → 0, duration 0.9, stagger 0.06, expo.out), :107 (focus() fired immediately), :130-136 (close: autoAlpha 0, duration 0.3, no item motion)",
+    "suggested_fix": "Bring the open stagger down to roughly the panel fade (0.5-0.6 s total) so the first link has settled by the time focus lands on it — or move the .focus() into the tween's onStart of the first item's completion. For the close, run the items back out with the same stagger reversed over ~0.3 s so the two directions read as one gesture.",
+    "confidence": "high on the measurements; medium on the severity, since a fast close is a common deliberate choice",
+    "lens": "motion"
+  }
+]

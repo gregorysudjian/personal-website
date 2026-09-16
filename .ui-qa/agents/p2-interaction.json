@@ -1,0 +1,218 @@
+[
+  {
+    "section": "global",
+    "viewport": "1280x900→1280x560, 1440x900→780, 1100x760→640, 900x960→840 (desktop, mouse)",
+    "severity": "P2",
+    "description": "Dragging the window's bottom edge (a height-only resize, which arrives as many small resize events) throws the reader out of the section they were reading. The guard in SmoothScroll compares each resize event with the previous one and returns early whenever the width is unchanged and the height moved less than 150px, so a slow vertical drag never sets `resizing` and the refresh handler never restores the anchor. Every section above the reader is sized in vh (hero 170/190vh, statement 220vh, Focus height = slide distance + innerHeight), so the content moves but the scroll offset does not. Measured, all at Experience row 3 / Contact / Clarté / Skills: 1280x900→560 in 20px steps: the reader ends in Contact with the row they were reading 2037px above the viewport top (single-jump 900→560, Δ340 ≥150, keeps it exactly: row top 80px, so only the stepped drag fails). 1440x900→780 in 15px steps at the Contact heading: heading ends at -346. 1100x760→640 at the Clarté card: card heading at -1157, 'This website' now on screen. 900x960→840 at the Skills heading: -331. Crossing the Focus height thresholds (580/700) vertically is the worst case because Focus also switches between horizontal and stacked. Width drags and rotations are fine (measured 1440→1150 in 30px steps, 1024x768↔768x1024, 1100x650→1300x650: all kept within 30px). Expected: the same place-keeping as for width changes; the 150px tolerance is only meant to ignore phone toolbar resizes.",
+    "evidence": [
+      "shots/global/p2/agent-interaction/1280x560-resize-h_drag_1280x900_560_20px_steps_xp_row3.png",
+      "shots/global/p2/agent-interaction/1280x560-resize-h_jump_1280x900_560_xp_row3.png",
+      "shots/global/p2/agent-interaction/1100x640-resize-h_drag_1100x760_640_20px_projects_card3.png",
+      "shots/global/p2/agent-interaction/1440x780-resize-h_drag_1440x900_780_15px_steps_contact.png",
+      "shots/global/p2/agent-interaction/900x840-resize-h_drag_900x960_840_20px_skills.png"
+    ],
+    "file_line": "components/SmoothScroll.tsx:50-57 (onResize, `if (w === size[0] && Math.abs(h - size[1]) < 150) return;`)",
+    "suggested_fix": "Compare against the size recorded when the anchor was last taken, not against the previous resize event (keep `anchorSize` alongside `anchor` and update it in onRefresh), so a drag of many small steps still adds up past the threshold. Better: only apply the 150px tolerance on touch devices (`matchMedia('(hover: none)')`), where it exists for the address bar; on a pointer device treat every height change as a resize.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 (mouse) — Clarté 01 · WEBSITE",
+    "severity": "P2",
+    "description": "REGRESSION of UI-156. Scrolling away from a gliding scroll slide and back still desyncs the glide from the countdown, because the glide style is only applied while `gliding = on && playing && auto`: leaving the viewport removes the `animation` declaration altogether (measured: translateY -761px → 0, style.animation ''), and coming back re-adds it, so the CSS animation restarts from the top after its 700ms delay while `remaining.current` keeps the countdown where it was. Steps: 1440x900, let Clarté slide 01 play 5s (bar 0.35, image at -761 of 2923), scroll 1500px down, wait 1.5s, scroll back. Observed: the image restarts at 0 while the bar resumes at 0.38 and the slide advances 8.4s later with the screenshot only at -2082 of 2923, so the bottom 840px of the page (the request form the caption promises) is never shown. Expected: the glide resumes where it paused (it already pauses correctly for hover and focus), or slide and countdown restart together.",
+    "evidence": ["shots/projects/p2/agent-interaction/1440x900-glide-after-scroll-away.png"],
+    "file_line": "components/projects/Slides.tsx:132 (`const gliding = on && playing && auto;`) with Slides.tsx:153-161 (style applied only when gliding)",
+    "suggested_fix": "Keep the animation declaration on the active slide whenever it is active (drop `playing` from `gliding`) and let `animationPlayState` alone do the pausing — it already reads `i === leaving || advancing || stopped`, and `advancing` is false while the card is off screen. Or drive the glide with a WAAPI animation you pause()/play() next to the timer so both share one clock.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 (mouse), any",
+    "severity": "P2",
+    "description": "A scroll slide whose capture fails to load freezes the whole slideshow for good. The new `ready` gate (added in d2bf76c for UI-157) makes the countdown wait for `loaded[active]`, but a failed image never fires onLoad, so `advancing` stays false forever: the progress bar sits paused, aria-live stays 'polite' and the card never advances. Steps: block /projects/clarte-laptop-*.webp (or just go offline before Projects is reached) and scroll to Clarté. Observed: slide 01 shows its fallback panel and nothing moves for the whole 26s watch (bar animation-play-state 'paused', active tab unchanged). Lead Finder behaves the same way: with all /projects/*.webp blocked it steps 01 → 02 → 03 and then stops dead on 03 · DEMO (the scroll slide). The visitor can still tap a step, but the card looks broken. Expected: a failed capture is treated as 'nothing more to wait for' and autoplay continues (ideally skipping the failed step).",
+    "evidence": [
+      "shots/projects/p2/agent-interaction/1440x900-img-blocked-clarte-frozen.png",
+      "shots/projects/p2/agent-interaction/1440x900-img-blocked-card1.png",
+      "shots/projects/p2/agent-interaction/1440x900-img-blocked-card3.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:53-54 (`const ready = !current.scroll || loaded[active];`) with components/projects/Shot.tsx:29,66 (failure state never reports back)",
+    "suggested_fix": "Give Shot an `onFail` callback (or reuse `onLoad` with a flag) and mark the slide 'settled' on error too: `const ready = !current.scroll || loaded[active] || failed[active]`. While you are there, skip failed indices when advancing, as UI-159's fix note suggested.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440x900 and 390x844",
+    "severity": "P2",
+    "description": "Back (and Forward) after a language switch drops the visitor at the top of the page. The reader's place lives in a single sessionStorage slot keyed by the page it was saved for, so the second page overwrites it. Steps: /en, scroll to the Clarté card (y=9818), click EN/FR (lands correctly on /fr at the same card), read on to Skills (y=13751), press Back. Observed: /en opens at y=0 with the hero on screen (navigation type back_forward, stored anchor {path:'/fr'} so no restore happens); pressing Forward then opens /fr at y=0 too, so both pages of the visit are lost. Same at 390x844. (Note: a production build may serve these from bfcache, but bfcache is never guaranteed — iOS evictions, memory pressure — and the site's own restore logic is what should cover it; the same single-slot limitation also means going /en → /fr → /en by the switch loses the /en place.) Expected: Back returns to the Clarté card it left.",
+    "evidence": [
+      "shots/nav/p2/agent-interaction/1440x900-back-after-lang-switch.png",
+      "shots/nav/p2/agent-interaction/1440x900-forward-after-back.png"
+    ],
+    "file_line": "lib/scroll.ts:65-91 (single ANCHOR_KEY slot) and components/SmoothScroll.tsx:26-31 (`saved?.path === location.pathname`)",
+    "suggested_fix": "Store a small map keyed by pathname, e.g. sessionStorage['gs-scroll'] = {'/en': {i,f}, '/fr': {i,f}} (plus the separate `carry` entry for the switch), and on a reload/back_forward restore the entry for location.pathname. Keep the carry entry one-shot as it is now.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440x900, JS chunks delayed past the 8s failsafe",
+    "severity": "P2",
+    "description": "When the app's JS arrives after the 8s failsafe has already switched the page to plain content, the page re-hides and re-lays out under the reader instead of leaving them where they are. Steps: delay /_next/static/chunks/*.js, wait for the failsafe (~8.5s), read down to the Experience heading (y=10748), then let the JS through. Observed at ~11.0s: `html.js` comes back, the header drops to opacity 0 for ~1.1s before fading in again, and the sections above grow (Focus becomes the pinned horizontal track) so the same scrollY now shows the 'This website' project card — the reader is thrown a whole section back mid-sentence, with no scroll of their own. Expected: either stay in plain mode for the rest of this page view, or capture the reader's place before re-enabling and restore it after the first ScrollTrigger.refresh().",
+    "evidence": [
+      "shots/global/p2/agent-interaction/1440x900-latejs-before.png",
+      "shots/global/p2/agent-interaction/1440x900-latejs-after-arrival.png"
+    ],
+    "file_line": "components/SmoothScroll.tsx:18-20 (re-adds `js` after the failsafe) with app/[locale]/layout.tsx:70 (8s failsafe)",
+    "suggested_fix": "In SmoothScroll, before `document.documentElement.classList.add('js')`, check whether the failsafe already fired (the class is missing while `document.readyState === 'complete'`); if so either leave the page plain, or take readAnchor() first and jumpTo() it inside the fonts.ready / ScrollTrigger.refresh() step, and skip the header's intro fade so the header never disappears from under the reader.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440x900, Slow 3G (1.6Mbps/560ms) + 4x CPU",
+    "severity": "P2",
+    "description": "On a slow reload the place-restore fires ~10s in and overrides scrolling the reader has already done. Steps: read at Experience (y=12373), reload with Slow-3G + 4x CPU throttling. Observed: the page paints at the top and stays there; at 4.2s the reader scrolls down 1200px themselves (statement/About area, perfectly usable); at 10.2s window.__gsReady flips and the saved anchor is applied, yanking them from y=1200 to y=12373. Nothing cancels the restore once the visitor has taken over, and there is no sign during those 10 seconds that a jump is coming. Expected: the restore is abandoned as soon as the visitor scrolls, or it happens before the page is interactive.",
+    "evidence": [
+      "shots/global/p2/agent-interaction/1440x900-slow-reload-user-t2.png",
+      "shots/global/p2/agent-interaction/1440x900-slow-reload-user-t3.png"
+    ],
+    "file_line": "components/SmoothScroll.tsx:35-40 (document.fonts.ready.then(... jumpTo(restore)))",
+    "suggested_fix": "Record the scroll position at mount and listen for wheel/touchstart/keydown; if the visitor has scrolled (or pressed a scrolling key) before fonts.ready resolves, drop `restore`. A cheap alternative: only restore if `window.scrollY < 4` when the promise resolves.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440x900 and 390x844",
+    "severity": "P2",
+    "description": "After a language switch (and after any reload) mid-page, the header lands hidden, so the control the visitor just used is gone. The restore jump reads as a downward scroll, and the hide-on-scroll-down rule fires with no `isAutoScrolling()` guard around it. Steps: 1440x900 (and 390x844), scroll to the Clarté card, scroll up 200px so the header is on screen, click EN/FR. Observed on /fr: the place is kept (Clarté still on screen) but the header is off screen (bounding bottom -8 at 1440, -6 at 390) although opacity is 1; the visitor gets no confirmation of the language they chose and has to scroll up to reach the switch again. Same after a plain reload (header bottom -8). This contradicts the rule the nav already follows for its own link scrolls ('stays in view while a nav link's own scroll runs', UI-217).",
+    "evidence": [
+      "shots/nav/p2/agent-interaction/1440x900-after-lang-switch-header.png",
+      "shots/nav/p2/agent-interaction/390x844-after-lang-switch-header.png"
+    ],
+    "file_line": "components/Nav.tsx:52-59 (ScrollTrigger onUpdate → show(self.direction !== 1)) with lib/scroll.ts:78-84 (jumpTo)",
+    "suggested_fix": "Make jumpTo() flag the restore the way scrollToTarget does (set `autoScrolling` for a frame or two), so the header's onUpdate ignores it; or in Nav, ignore direction changes for the first ~600ms after load.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "390x844 touch, 768x1024 touch (all touch devices)",
+    "severity": "P2",
+    "description": "On touch, only the pill buttons answer a press. An audit of every CSS rule the page ships finds exactly one `:active` rule — `.btn:active {opacity:.75}` inside `@media (hover: none)` — while Tailwind's preflight sets `-webkit-tap-highlight-color: rgba(0,0,0,0)` on the whole document (measured on the live page). So Copy, 'How it's built', the slide step tabs, the EN/FR switch, Menu/Close, the mobile menu links, the email address, 'Back to top' and the logo give no feedback at all between the tap and whatever happens next (the slide tabs' and the Copy pill's reactions are the slowest, since they wait for state to change). The hover states these controls do have are correctly gated to `(hover: hover)`, which leaves touch with nothing. Expected: one press treatment shared by every control type, as the pill buttons already have.",
+    "evidence": ["shots/nav/p2/agent-interaction/390x844-menu-open-midpage.png"],
+    "file_line": "app/globals.css:477-481 (the only :active rule) — the controls at components/contact/Contact.tsx:135-145, components/projects/ProjectCard.tsx:145-152, components/projects/Slides.tsx:186-195, components/Nav.tsx:186-213, components/Footer.tsx:29-31 have none",
+    "suggested_fix": "Add a shared press state next to the existing `.btn:active` block, e.g. `@media (hover: none) { .tap-area:active, button:active, #contact a[href^='mailto']:active { opacity: .7 } }` — or a `.pressable` utility used by every control, so press feedback doesn't depend on which control type you happen to tap.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 (all viewports), /_next/static/chunks/*.js blocked",
+    "severity": "P2",
+    "description": "In the JS-failed fallback (the 8s failsafe correctly turns the page into plain content) three controls stay on screen but are dead, and one of them hides real content for good. Steps: block /_next/static/chunks/*.js, wait 9s, then use the page. Observed: 'How it's built' looks like a normal disclosure (copper +, aria-expanded=false) but clicking it does nothing — the panel keeps height 0, `inert` and aria-hidden, so the Problem/Solution/How-it-works text of all four projects is unreachable; the Copy pill clicks with no change ('COPY', no 'Copied ✓', nothing copied); the slide step tabs stay aria-pressed=false and the slideshow is frozen on step 01 forever. Expected for a plain-content fallback: the disclosure panels are open (or at least not inert), and controls that cannot work are not shown. (Not re-reporting the JS-off mobile menu, UI-218 wontfix.)",
+    "evidence": [
+      "shots/projects/p2/agent-interaction/1440x900-jsfail-accordion-dead.png",
+      "shots/global/p2/agent-interaction/1440x900-jsfail-first-9s.png",
+      "shots/global/p2/agent-interaction/1440x900-jsfail-first-3s.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:145-165 (toggle + `h-0 overflow-hidden` inert panel), components/contact/Contact.tsx:135-145 (Copy), components/projects/Slides.tsx:186-195 (step tabs)",
+    "suggested_fix": "Style the fallback the way the site already styles the no-JS case: `html:not(.js) [id^=':r'] { height: auto !important }` won't do — instead render the panel open by default and let the script close it on mount (progressive enhancement), and hide the Copy pill and the step tabs under `html:not(.js)` (the email link and the first slide still work without them).",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "nav",
+    "viewport": "1440x900 (desktop, any)",
+    "severity": "P3",
+    "description": "Cmd/Ctrl-clicking the EN/FR switch (open the other language in a new tab) leaves a stale 'carry' anchor behind in the current tab, and the next reload of that tab lands at the top. The click handler saves `{path:'/fr', carry:true}` on every click, including modifier clicks that never navigate this tab; from then on `onHide` sees `carry` and refuses to save this page's own place. Steps: /en at Experience row 3 (y=12277), Cmd-click EN/FR (a new tab opens), then reload the /en tab. Observed: sessionStorage still holds {\"path\":\"/fr\",\"carry\":true,...} and the reload lands at y=0 instead of y=12277. Expected: a modifier click doesn't touch the current page's saved place.",
+    "evidence": ["shots/nav/p2/agent-interaction/1440x900-reload-after-modclick-switch.png"],
+    "file_line": "components/Nav.tsx:189 (`onClick={() => saveAnchor(`/${other}`, true)}`) with components/SmoothScroll.tsx:63-68 (onHide bails out on carry)",
+    "suggested_fix": "Skip the save when the click is not a plain left click: `onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return; saveAnchor(`/${other}`, true); }}`. Storing per-path anchors (see the Back/Forward finding) would also make the stale entry harmless.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "about",
+    "viewport": "1440x900 (all viewports)",
+    "severity": "P3",
+    "description": "Incomplete fix of UI-166: the portrait's failure state still shows the browser's broken-image icon. With /_next/image* blocked (or offline before About is reached) the chip drawing appears behind as intended, but the <Image> element stays in the DOM with naturalWidth 0, so Chrome paints its grey broken-image glyph in the top-left corner of the photo area, on top of the card's grid (measured: complete=true, naturalWidth=0, the img still occupies the whole 397px-tall photo area). Expected: the chip drawing alone, as the pass-1 fix intended ('hide it onError').",
+    "evidence": ["shots/about/p2/agent-interaction/1440x900-img-blocked-datasheet.png"],
+    "file_line": "components/about/Datasheet.tsx:79-89 (<Image> with no onError)",
+    "suggested_fix": "Add local state to Datasheet: `onError={() => setBroken(true)}` on the Image and don't render it when broken (the <Chip/> behind is already the designed fallback). Fading it in `onLoad` would also remove the pop-in.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 (all viewports)",
+    "severity": "P3",
+    "description": "A project capture that failed once never recovers when the connection comes back. Steps: load /en, go offline, scroll through Projects so the lazy captures fail (6 fallback panels appear — the designed 'preview unavailable' panels, which look right), then go back online and scroll through the cards again. Observed: still 6 fallback panels after 3s per card with navigator.onLine true; the only way to see the screenshots is a reload. On a phone that drops out of coverage for a moment while scrolling the page, the previews are gone for the rest of the visit. Expected: retry the image once when the page comes back online (or when the card is scrolled into view again).",
+    "evidence": [
+      "shots/projects/p2/agent-interaction/1440x900-offline-card1.png",
+      "shots/projects/p2/agent-interaction/1440x900-back-online-card1-still-failed.png"
+    ],
+    "file_line": "components/projects/Shot.tsx:29-47 (failed state is permanent)",
+    "suggested_fix": "In Shot, listen for window 'online' (and/or an IntersectionObserver re-entry) while `failed` is true and reset it with a cache-busting suffix: `setFailed(false); setBust(Date.now())` → `src={failed ? `${src}?r=${bust}` : src}`.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900, 400kbps/400ms throttling",
+    "severity": "P3",
+    "description": "Incomplete fix of UI-158: the countdown now waits for scroll slides only, so the still slides still step through captures that have not arrived. Steps: throttle to 400kbps, scroll to Lead Finder. Observed: step 01 · LEADS is shown for its full 4.2s without ever painting (img.complete false the whole time) and advances at 5.0s with its progress bar full; step 02 · DESIGNS then shows an empty graphite frame for 2.5s before its capture lands at 7.6s; only step 03 (the scroll slide) waits for its image. On the first pass a visitor sees two captioned-but-empty frames and never sees slide 01. Expected: the same 'wait for the capture' rule for every slide type.",
+    "evidence": ["shots/projects/p2/agent-interaction/1440x900-slow-slide-unloaded-2.png"],
+    "file_line": "components/projects/Slides.tsx:53 (`const ready = !current.scroll || loaded[active];`)",
+    "suggested_fix": "Make it `const ready = loaded[active] || failed[active]` for every slide (with a short cap, e.g. start the countdown anyway after ~6s so a very slow image can't stop the show), and give the first slide of each card fetchPriority='high'.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1024x768 (and every width below 1280)",
+    "severity": "P3",
+    "description": "Keyboard focus now runs backwards through each project card. Since the markup was reordered (95b6558) the details come before the preview, while CSS puts the preview first (order-first below xl, col-start-1 at xl). Tabbing from the Projects heading at 1024x768 gives: 'How it's built' (card 1, y=7893) → 'View website' (y=7893) → 01 · Leads (the page scrolls back UP to y=7126) → 02 · Designs → 03 · Demo → 'How it's built' (card 2, y=9444, a 2300px jump down) → … so every card makes the page bounce down-then-up-then-down. At xl the preview sits to the left of the details, so focus goes right column first, then left. Mouse and screen-reader users each get a sensible order; keyboard users get neither.",
+    "evidence": ["shots/projects/p2/agent-interaction/1440x900-reload-with-accordions-open.png"],
+    "file_line": "components/projects/ProjectCard.tsx:97-100 (details block) and ProjectCard.tsx:203-210 (preview block, `order-first … xl:col-start-1`)",
+    "suggested_fix": "Keep the DOM order the reading order and give the preview a heading-linked position instead of visual reordering: put the preview back before the details and label the card by its <h3> (aria-labelledby already exists), or move only the small parts that need to come first (kicker + title) above the preview so DOM, visual and focus order agree.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "global",
+    "viewport": "1440x900 (desktop, fine pointer)",
+    "severity": "P3",
+    "description": "Hover feedback is a different length and a different kind on almost every control type, and keyboard focus only reproduces the hover state on one of them. Measured from the shipped CSS/classes: pill buttons 0.5s expo colour + 0.6s fill wipe; nav links 300ms colour; the EN/FR switch and the Copy pill and the 'How it's built' label and the slide step tabs all use Tailwind's bare `transition-colors` (150ms, ease-in-out); the email and 'Back to top' underline 0.6s expo; skills chips 0.4s expo; About fact rows 500ms; Focus panels 500ms; the footer mark 0.8s. The logo/home link in the header has no hover response at all, although the four links beside it do. On focus, `.btn:focus-visible` mirrors its hover exactly (fill + inverted text) while the Copy pill, the accordion, the step tabs, 'Back to top' and the nav links get only the 2px copper outline, so a keyboard user never sees the copper-text/underline cue a mouse user gets.",
+    "evidence": ["shots/nav/p2/agent-interaction/1440x900-after-lang-switch-header.png"],
+    "file_line": "app/globals.css:403-407 (.link-underline), :437-481 (.btn), :700-733 (.chip), :776-779 (.footer-mark); components/Nav.tsx:155-163 (logo, no hover), :172 (duration-300), :190 (bare transition-colors); components/contact/Contact.tsx:139; components/projects/ProjectCard.tsx:153; components/projects/Slides.tsx:214-215",
+    "suggested_fix": "Pick one hover duration/easing token (e.g. 0.4s var(--ease-out-expo)) and apply it to every interactive element, give the logo the same colour/underline response as its neighbours, and pair every `:hover` rule with `:focus-visible` (`.copy:hover, .copy:focus-visible { … }`) as `.btn` already does.",
+    "confidence": "high",
+    "lens": "interaction"
+  },
+  {
+    "section": "skills",
+    "viewport": "390x844 touch, 1440x900 keyboard",
+    "severity": "P3",
+    "description": "Pause-to-read is a mouse-only privilege, and which loops accept it differs per section. The marquee band eases to a stop only for `pointerType === 'mouse'`, the WhatsApp chat demo holds only for mouse hover, and the project slideshows hold for mouse hover *and* keyboard focus. So on a phone nothing can be held (the only touch control anywhere is tapping a slide step, which stops that slideshow for good), and with a keyboard only the slideshows respond — the marquee (a 30s loop that also speeds up to 7x with scroll velocity) and the chat demo keep going. This is the same 2.2.2 gap UI-017/UI-144 were fixed for, just on the other input types. Expected: one hold/pause rule for every self-running thing, reachable by touch and keyboard.",
+    "evidence": ["shots/projects/p2/agent-interaction/1440x900-glide-after-scroll-away.png"],
+    "file_line": "components/skills/Marquee.tsx:54-58 (mouse only), components/projects/ChatPreview.tsx:71-77 (mouse only), components/projects/Slides.tsx:123-126 (mouse + focus)",
+    "suggested_fix": "Accept any pointer type for the hold (a touch-and-hold on the band/demo already fires pointerdown/pointerup) and add focus-within holding to the marquee and the chat demo as Slides has; or give each self-running element one small pause/play control, which also covers keyboard and touch in the same way.",
+    "confidence": "medium",
+    "lens": "interaction"
+  },
+  {
+    "section": "about",
+    "viewport": "1440x900 (fine pointer)",
+    "severity": "P3",
+    "description": "The About fact rows still use the 'this row is a link' hover that was deliberately removed from the Experience rows (UI-132, fixed in f0e2b0f): hovering a row widens the copper dash from 12px to 24px and slides the value 4px to the right over 500ms, but the row is a plain <dt>/<dd> pair with no action and no cursor change. Two lists of the same kind of label/value content in the same page now behave differently on hover — Experience is inert, About invites a click that never comes.",
+    "evidence": ["shots/about/p2/agent-interaction/1440x900-img-blocked-datasheet.png"],
+    "file_line": "components/about/About.tsx:45,48 (`group-hover:bg-copper motion-safe:group-hover:w-6`, `motion-safe:group-hover:translate-x-1`)",
+    "suggested_fix": "Drop the translate on the value and keep at most the dash colour change (no movement), so the About facts read as static as the Experience rows do.",
+    "confidence": "high",
+    "lens": "interaction"
+  }
+]

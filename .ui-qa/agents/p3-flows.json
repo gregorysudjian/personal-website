@@ -1,0 +1,99 @@
+[
+  {
+    "section": "projects",
+    "viewport": "all",
+    "severity": "P1",
+    "description": "Flow 1 (recruiter, laptop), step 'clicks View website' on the first project card: the flagship CTA is a dead end. Expected: the Lead Finder app, the thing the whole card is selling ('Real app screens', 'View website ↗'). Observed: https://ai-lead-agent-lac.vercel.app 307-redirects to /login?next=%2F, a password-only sign-in that says 'This tool holds lead records and draft outreach. It is for the operator only.' There is no guest mode, no demo account and no way back except the browser's Back — and the link opened in a new tab, so Back there goes nowhere. The recruiter's single most likely click on the portfolio's first and largest project returns nothing. Note the site already has the vocabulary for this case (`privateRepo` puts a padlock + 'Private repository' next to a card); the live app has no equivalent, so a walled app is advertised exactly like an open one (the Clarté card's identical 'View website' does open). Checked 2026-09-16: curl first hop 307 -> /login, clarte-math.vercel.app 200.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f1-05-leadfinder-login.png",
+      "shots/global/p3/agent-flows/f1-02-how-its-built.png"
+    ],
+    "file_line": "content/site.ts:357 (links: [{ label: viewSite, href: \"https://ai-lead-agent-lac.vercel.app\" }])",
+    "suggested_fix": "Either give the deployed app a read-only demo entry point (a 'demo' password shown on the card, or a /demo route with seeded data) so 'View website' delivers what it promises, or drop the link and mark the card the way private code is already marked — e.g. a 'Private app' pill next to the frame, with the slides carrying the whole story. A third option: keep the link but relabel it ('View the sign-in ↗' is honest but weak) — the first two are better.",
+    "confidence": 0.95,
+    "lens": "flows"
+  },
+  {
+    "section": "global",
+    "viewport": "all",
+    "severity": "P1",
+    "description": "Flows 4 and 5 (French visitor / returning visitor): the first-visit intro replays in the middle of a reading session. The head script marks the session 'booted' when `location.hash` is present (app/[locale]/layout.tsx:70), but only Boot's own onComplete writes sessionStorage `gs-booted` — and Boot bails out early when the class is already there (components/Boot.tsx:18-21). So anyone who arrives on a shared section link never gets the flag set. Repro A: open /en#projects fresh (measured: lands at Projects, sessionStorage gs-booted = null), read a while, scroll up and click FR. Expected: the French page at Projects. Observed: the full boot splash covers the screen for 2.7s with the page scroll-locked (is-locked true from t=319ms to t=3050ms), and only then does it open onto Projects in French. Repro B: open /en#projects fresh, click the logo (which clears the hash to /en), then reload — the same 2.7s splash, again with scroll locked. The visitor has been on the site for minutes and is shown the 'first visit' animation, twice over, each time losing control of the page.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f8-01-intro-replay-after-lang-switch.png",
+      "shots/global/p3/agent-flows/f12-01-replay-after-logo-then-reload.png"
+    ],
+    "file_line": "app/[locale]/layout.tsx:70 (bootScript sets 'booted' from location.hash but never gs-booted); components/Boot.tsx:18-21",
+    "suggested_fix": "Write the session flag wherever the intro is declared over, not only when the timeline finishes: in the head script, `try{sessionStorage.setItem('gs-booted','1')}catch(e){}` on the same branch that adds the `booted` class, and in Boot's early return. Then a deep-link arrival counts as the visit it is.",
+    "confidence": 0.95,
+    "lens": "flows"
+  },
+  {
+    "section": "nav",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "Flow 5 (returning visitor), step 'Back/Forward between sections': the address bar walks the page but Back does not. Clicking About, Projects, Experience, Contact in the header takes the address through /en#about -> /en#projects -> /en#experience -> /en#contact (verified, each landing on its section), yet history.length is still 2 — scrollToTarget uses history.replaceState, so none of the four clicks leaves a history entry. Expected after four section clicks: Back steps back through the sections, or at worst does nothing. Observed: one Back press leaves the site entirely (about:blank in the test; the referring page, e.g. LinkedIn, in real life). Forward then returns to /en#contact at y=14518, which proves the address really was the navigation state the whole time. The same applies to the phone menu links. Combined with flow 1 (where 'View website' opens a new tab, so Back there is a no-op too), a visitor has no working Back anywhere in the journey: every press is a one-way exit.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f5-01-after-back-from-contact.png"
+    ],
+    "file_line": "lib/scroll.ts:40-42 (history.replaceState in scrollToTarget)",
+    "suggested_fix": "Use pushState for the four header/menu section links (keep replaceState for the logo's #top and for anything the page does on its own), and add a popstate listener that scrolls to the hash without re-pushing. The reader's place is already restored on back_forward navigations, so the section anchors are the only missing piece.",
+    "confidence": 0.9,
+    "lens": "flows"
+  },
+  {
+    "section": "footer",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "Flows 3 and 5, step 'Back to top': the address is left pointing at the section the visitor just left. The footer button calls scrollToTarget(0) with a number, and the `history.replaceState` branch in lib/scroll.ts only runs for string targets starting with '#', so the hash is never cleared. Measured: click Contact in the nav (address /en#contact, y=14518), click 'Back to top' (y=0) — the address still reads http://localhost:3000/en#contact while the reader is looking at the hero. The header logo does the same journey via scrollToTarget('#top') and correctly clears it to /en, so the two controls for 'go to the top' leave two different addresses. It matters at the next step: reloading from there lands at the top (the saved-place restore wins) while the address still says #contact, and anyone who copies or bookmarks that URL shares a link to Contact for a page they were viewing from the top.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f9-01-backtotop-stale-hash.png",
+      "shots/global/p3/agent-flows/f7-04-back-to-top.png"
+    ],
+    "file_line": "components/Footer.tsx:10 (scrollToTarget(0)); lib/scroll.ts:40",
+    "suggested_fix": "Make the footer button call scrollToTarget('#top') like the logo does, or clear the hash in scrollToTarget when the target is the numeric 0 — either way the two 'back to top' controls should end on the same address.",
+    "confidence": 0.9,
+    "lens": "flows"
+  },
+  {
+    "section": "global",
+    "viewport": "375,390,768,844",
+    "severity": "P2",
+    "description": "All six flows, the whole scroll-through: below lg the page gives no sense of where you are or how much is left, on a document that is 22.6 screens long (measured 19067px at 390x844; 15958px / 17.7 screens at 1440x900). Three things that would normally answer 'where am I' are all absent or switched off: (1) no header or menu link is ever marked current — all four keep aria-current=null and the same text-mute class at every scroll position (measured across a full 30-step scroll); (2) the address never changes while scrolling — the URL stayed exactly '/en' through About, Focus, Projects and Experience, so the only way to get a section address is to click a nav link; (3) the one progress cue, the copper meter, is `hidden lg:block` and aria-hidden (components/motion/ScrollProgress.tsx:35), so phones, tablets, every landscape phone and screen-reader users get nothing. The result on a phone is 20+ screens of scrolling with no landmark other than the section headings themselves, and no way to tell whether the end is near.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f2-02-after-menu-jump.png",
+      "shots/global/p3/agent-flows/f2-03-slides-tapped.png"
+    ],
+    "file_line": "components/motion/ScrollProgress.tsx:35 (hidden lg:block, aria-hidden); components/Nav.tsx:170 (no aria-current)",
+    "suggested_fix": "Pick one cue and make it work everywhere: either let the progress meter render below lg (a 2px copper line under the header reads well on a phone), or mark the section the reader is in — a ScrollTrigger per section setting aria-current=\"true\" plus a copper underline on the matching header link, which also lights up the phone menu when it is opened mid-page. Updating the address with replaceState as sections pass would fix the 'copy the link to this section' case at the same time.",
+    "confidence": 0.85,
+    "lens": "flows"
+  },
+  {
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "Flow 3 (keyboard-only), the Shift+Tab return trip: the focus ring goes missing for about half a second every time focus moves up a long distance, while the same move downward is instant. Measured from the Lead Finder slide steps (settled at y=8396) pressing Shift+Tab once to the hero's 'Download CV': the browser's own scroll-into-view is overridden by Lenis's lerp, so scrollY eases 7681 -> 3323 -> 1077 -> 231 -> 19 -> 0 and the focused button sits at top=-6083, then -1725, before it first appears on screen at ~600ms and settles at ~1.5s. Expected: the control that just took focus is on screen when it takes it. Observed: 500ms with the focused control off screen and no ring anywhere, then a 1.5s glide. Tabbing forward over the same distance (hero -> Projects, ~8000px) lands in one frame with the button already at top=575, so the two directions behave differently for no reason the visitor can see. In the full Shift+Tab run back up the page this happened twice in a row (indices 17 and 18 of 27).",
+    "evidence": [
+      "shots/global/p3/agent-flows/f3-03-shifttab-midflight.png",
+      "shots/global/p3/agent-flows/f3-02-shift-tab-end.png"
+    ],
+    "file_line": "lib/scroll.ts (no focus handling for browser-driven scroll); components/SmoothScroll.tsx:107-113 (Lenis lerp 0.085)",
+    "suggested_fix": "Catch focusin at the document level and, when the newly focused element is outside the viewport, hand the move to Lenis with `scrollTo(el, { immediate: true })` (or `lenis.stop()` for the frame, set scrollY, `lenis.start()`), so keyboard focus moves the page the same way in both directions.",
+    "confidence": 0.8,
+    "lens": "flows"
+  },
+  {
+    "section": "projects",
+    "viewport": "844x390",
+    "severity": "P3",
+    "description": "Flow 2 (phone), step 'rotating to landscape mid-way': turning the phone sideways makes the project screenshots smaller and less readable, not bigger, and leaves almost half the screen empty. In portrait 390x844 the frame serves lf-*-m.webp (780px natural) into a 340x341 window — scale 0.45. Rotating to 844x390 crosses the `(max-width: 767px) and (orientation: portrait)` art-direction switch (components/projects/Shot.tsx:63), so the frame now serves the 2048px laptop capture into a 423x238 window — scale 0.207, i.e. a 1024px-wide app layout drawn 423px wide, with its 11-12px UI text landing near 2.5px. The window is also height-capped by the 390px viewport, so it occupies only 467 of 844px: measured 377px of empty ink to its right at two scroll positions in the Projects run. Same root cause as UI-173 (open), but this is its worst measured scale and it is reached by an ordinary gesture rather than a rare window size.",
+    "evidence": [
+      "shots/global/p3/agent-flows/f2-04-landscape.png",
+      "shots/global/p3/agent-flows/f11-01-landscape-frame.png"
+    ],
+    "file_line": "components/projects/Shot.tsx:63",
+    "suggested_fix": "Decide the capture by how wide the frame actually is, not by the viewport: swap to the -m captures whenever the rendered window is under ~500px (a container query, or a media query that also catches short landscape, e.g. `(max-width: 767px), (max-height: 500px)`). Letting the window use the full landscape width would help both this and the empty right-hand band.",
+    "confidence": 0.85,
+    "lens": "flows"
+  }
+]

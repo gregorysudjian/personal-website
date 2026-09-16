@@ -1,0 +1,182 @@
+[
+  {
+    "section": "about",
+    "viewport": "375x667, 390x844, 430x932, 667x375, 740x360, 844x390, 768x1024 (EN+FR); fine only at 1024x768 (lg)",
+    "severity": "P2",
+    "description": "REGRESSION of UI-204 (the portrait/landscape part was never fixed). The About nav target is the only one whose heading is off screen when you arrive. Tapping About (mobile menu or tablet nav) scrolls the section top to y=0, and on phones and tablets that shows only the datasheet card. The label/h2 land at y=821/820 at 375x667 (vh 667), 833/832 at 390x844 (vh 844), 848 at 667x375, 912 at 844x390 (2.3 screens down) and 1024 at 768x1024 (vh 1024). By comparison, Projects and Experience land with the label at y=128 (phones) or 192 (md), and Contact at 185/273, so their headings are always in view. In the scroll-through, the About label sits 781px below the section top at 375, 984px at 768x1024 and 872px at 844x390. It's the same card-first order that UI-204 described.",
+    "evidence": [
+      "shots/nav/p2/agent-mobile/en-375x667-land-about.png",
+      "shots/nav/p2/agent-mobile/en-390x844-land-about.png",
+      "shots/nav/p2/agent-mobile/en-844x390-land-about.png",
+      "shots/nav/p2/agent-mobile/en-768x1024-land-about.png",
+      "shots/nav/p2/agent-mobile/en-375x667-land-projects.png",
+      "shots/global/p2/agent-mobile/p2b-navland.json"
+    ],
+    "file_line": "components/about/About.tsx:47 (order-first on the datasheet column below lg); components/about/About.tsx:15",
+    "suggested_fix": "Below lg, show the SectionHeader before the datasheet: drop order-first and put the card after the lead paragraph, or render a mobile-only header above it. Alternatively, make the About nav link target #about-title (scroll-margin-top ≈ header height + 24px) so the heading is what you land on, the same as the other three links.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "global",
+    "viewport": "844x390, 932x430 (landscape ≥768 wide); 667x375, 740x360 to a lesser degree; EN+FR",
+    "severity": "P2",
+    "description": "In landscape the vertical rhythm is inconsistent between sections. Only the bottom three sections have the short: (max-height:500px) overrides: Experience, Skills and Contact use short:py-20! (80px). About, Focus and Projects keep their full padding (About.tsx:10 pt-32/pb-32 md:48, Focus.tsx:102 py-28, Projects.tsx:9 md:pt-48 md:pb-32, and the card gap md:gap-44). Measured at 844x390 (content edge to content edge): About→Focus 304px, Focus→Projects 304px, Projects→Experience 208px, Experience→marquee 160px, chips→Contact box 160px, box→footer 80px. So the first two breaks are 78% of a 390px screen (the header takes 56px of it), which is a full screen of empty rail, while the lower breaks are 20-40%. Project cards sit 176px apart at 844x390 but 128px at 740x360. Nav landings don't match either: at 844x390 Projects lands with its label at y=192 and heading at 231-284, while Experience lands at label y=80 and Contact at y=129. At 667x375 the top breaks are still 240/240 against 160/80 below.",
+    "evidence": [
+      "shots/nav/p2/agent-mobile/en-844x390-land-projects.png",
+      "shots/nav/p2/agent-mobile/en-844x390-land-experience.png",
+      "shots/projects/p2/844l/en-motion-00.png",
+      "shots/about/p2/844l/en-motion-00.png",
+      "shots/global/p2/agent-mobile/p2b-rhythm.json"
+    ],
+    "file_line": "components/about/About.tsx:10; components/focus/Focus.tsx:102; components/projects/Projects.tsx:9 and :17; compare components/Experience.tsx:11, components/skills/Skills.tsx:10, components/contact/Contact.tsx:19",
+    "suggested_fix": "Apply the same short override to the upper sections: short:py-20! on About and Projects, short:py-16! on .focus-frame when it's stacked, and short:gap-24 on the Projects card list. Then every landscape section break comes out at about 160px and every nav landing at label y≈80.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "768x1024 FR (touch tablet); 375x667 FR, 390x844 FR",
+    "severity": "P2",
+    "description": "REGRESSION of UI-088 (status 'verified'). The French hero CTAs still stack into two pills of different widths. At 768x1024 FR, 'VOIR LES PROJETS' (179px) is at top 884 and 'TÉLÉCHARGER LE CV' (170px) at top 940, the same numbers as the original report (885/941). The md bottom grid is still md:grid-cols-[1fr_auto_1fr], which leaves about 300px for the text column. At 375/390 FR they stack the same way (tops 496/552 and 673/729) at 179 vs 170px, so the stack reads as an accidental wrap. EN and landscape keep both CTAs on one row (667x375, 740x360, 844x390 tops equal).",
+    "evidence": [
+      "shots/hero/p2/agent-mobile/fr-768x1024-atf.png",
+      "shots/hero/p2/375/fr-motion-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:233 (md:grid-cols-[1fr_auto_1fr]); components/hero/Hero.tsx:240 (flex flex-wrap gap-3)",
+    "suggested_fix": "Apply UI-088's fix: md:grid-cols-[minmax(0,1.6fr)_auto_1fr] so both FR pills fit at 768. On phones, make the stack deliberate with grid grid-cols-1 sm:flex and justify-center/text-center at full width, or use 2 equal columns with smaller padding.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "667x375, 740x360, 844x390 (landscape phones), 768x1024 (tablet); EN+FR",
+    "severity": "P3",
+    "description": "The phone floor for the frame's micro labels only follows width (max-sm, <640px), so the same phone gets smaller labels when you turn it sideways. Portrait 375/390: slide tab labels, slug, 'Real app screens' badge, status pill and chat badge are all 10.56px (0.66rem, 0.08em tracking). Landscape 667x375/740x360/844x390: tab labels are 9.6px ('01 · Leads'), and the slug, badge and 'In progress' pill are 9.92px, uppercase, 0.14em tracking. The physical text size drops about 10% on the same device, and it's the smallest text on the page in that orientation (every other section is at 11.52px or more). The 768x1024 touch tablet gets the same 9.6/9.92px.",
+    "evidence": [
+      "shots/projects/p2/agent-mobile/en-740x360-card1.png",
+      "shots/projects/p2/agent-mobile/en-844x390-card1.png",
+      "shots/global/p2/agent-mobile/p2b-scan.json"
+    ],
+    "file_line": "components/projects/Slides.tsx:214; components/projects/ProjectCard.tsx:103, :219, :223; components/projects/ChatPreview.tsx:106",
+    "suggested_fix": "Key the floor to device class rather than width, e.g. a custom variant @custom-variant compact (@media (max-width: 767px), (max-height: 500px), (pointer: coarse)), and use compact:text-[0.66rem] compact:tracking-[0.08em] instead of max-sm: in these five places.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "360-430 portrait (243x31), 667x375/740x360 (244x31), 844x390 (279x35), 768x1024 (254x32); EN+FR",
+    "severity": "P3",
+    "description": "The email address, Contact's main action, has the smallest touch target of any control on the page: its hit area is 243x31px at 375 and 390, measured with elementFromPoint sampling. Every other small-text control has been brought to 44px or more with .tap-area or min-height: the header EN/FR is 71x48, Menu 59x68, the Copy pill beside it 109x63, Back to top 127x50, and hero/project btn-sm 44. On a phone the address sits in a wrap row between the 'EMAIL' label and the Copy pill, whose tap area extends 16px up and down, so a slightly low tap copies instead of opening the mail app.",
+    "evidence": [
+      "shots/contact/p2/375/en-motion-01.png",
+      "shots/global/p2/agent-mobile/p2b-scan.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:54",
+    "suggested_fix": "Add tap-area (or py-2 -my-2) to the mailto link so its hit area reaches ~44px tall, the same treatment as the neighbouring Copy button. Check that the two expanded areas don't overlap when the row wraps (gap-y-5 = 20px; use tap-area inset -12px on both).",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "nav",
+    "viewport": "667x375, 740x360 (landscape phones, mobile menu); EN+FR",
+    "severity": "P3",
+    "description": "In landscape the mobile menu items are under the 44px minimum and smaller than in portrait. With short:text-3xl each link is 40px tall (hit area 615x40 at 667x375), against 52px in portrait. The li's pb-3 and the ul's gap-2 add a 21px dead band between hit areas that doesn't open anything. At 740x360 the drawer is also 4px taller than the screen (scrollHeight 364 vs clientHeight 360), so it rubber-bands by 4px on every swipe.",
+    "evidence": [
+      "shots/nav/p2/agent-mobile/fr-740x360-menu.png",
+      "shots/nav/p2/agent-mobile/en-667x375-menu.png",
+      "shots/global/p2/agent-mobile/p2b-menu.json"
+    ],
+    "file_line": "components/Nav.tsx:231 (link), :234 (short:text-3xl), :223 (pb-16 pt-24 short:pb-8)",
+    "suggested_fix": "Give the menu link py-1.5 (or min-h-11) and move the li's pb-3 onto the link, so the full row is tappable (≥44px) in both orientations. Trim short:pb-8 to short:pb-6 so 740x360 fits without scrolling.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "667x375, 740x360, 844x390 (all common landscape phones); EN+FR",
+    "severity": "P3",
+    "description": "UI-063 is only partly fixed. The tagline now stays at heights of 420-500px, but it's still display:none at 419px and below ([@media(max-height:419px)]:hidden). That covers every common landscape phone: 667x375, 740x360, 844x390 (UI-063's own repro viewport) and 896x414. There the hero loses its only descriptive sentence, while no other section drops content in landscape. The measurements show room for it: at 667x375 the name ends at y=262 and the CTAs start at 299, and at 844x390 the CTA/status row has a free left block above it.",
+    "evidence": [
+      "shots/hero/p2/agent-mobile/fr-667x375-atf.png",
+      "shots/hero/p2/844l/fr-motion-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:237 ([@media(max-height:419px)]:hidden)",
+    "suggested_fix": "Below 420px tall, keep the tagline as a single line-clamped row (short:line-clamp-1 short:text-sm) beside or above the CTAs instead of hiding it, or move it into the grid's empty middle column (the scroll hint is hidden there in short mode).",
+    "confidence": "medium",
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "320-430 portrait, 740x360 vs 844x390 landscape; EN+FR",
+    "severity": "P3",
+    "description": "The Contact heading has its own phone scale, so its size relative to every other section heading flips with screen width. All SectionHeader h2s are 41.6px at every phone width (clamp(2.6rem,6vw,…)). The Contact h2 is 36.8px at 320 (smaller than the others), 43.1 at 375, 44.9 at 390, and 48px at 430 and at 667x375/740x360. Rotating to 844x390 crosses the width-only md breakpoint: the heading jumps to 69.2px and the box padding goes from px-6 to px-16. The heading then wraps to 2 lines (FR 'Construisons quelque / chose.') and the box is 552-620px tall on a 390px screen, compared with 519px at 740x360.",
+    "evidence": [
+      "shots/contact/p2/agent-mobile/fr-844x390-box.png",
+      "shots/contact/p2/agent-mobile/fr-740x360-box.png",
+      "shots/global/p2/agent-mobile/p2b-rhythm.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:41; components/contact/Contact.tsx:26 (md:px-16 md:py-20); compare components/SectionHeader.tsx:26",
+    "suggested_fix": "Tie the phone clamp to the section scale (e.g. clamp(2.3rem,6vw+0.4rem,3rem) so it never falls below the 41.6px h2 at 375+), and add short:text-[clamp(2.6rem,7svh+2rem,3.4rem)]! short:px-10! so landscape phones ≥768 wide keep the phone-sized finale.",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "667x375, 740x360 (landscape phones <768 wide); EN+FR",
+    "severity": "P3",
+    "description": "The art direction for captures follows width only (<source media=\"(max-width: 767px)\">). Landscape phones under 768px wide get the portrait phone captures (-m files, e.g. Lead Finder with its 'Menu' button) inside a wide landscape frame (680x306 at 740x360, short:h-[85svh]). The tall portrait capture is shown object-contain as a narrow centred strip with white on both sides. At 844x390 the same phone held the same way gets the laptop captures. So the same slide looks different on two landscape phones, and neither choice fits the frame's shape.",
+    "evidence": [
+      "shots/projects/p2/agent-mobile/en-740x360-card1.png",
+      "shots/projects/p2/agent-mobile/en-844x390-card1.png"
+    ],
+    "file_line": "components/projects/Shot.tsx:51",
+    "suggested_fix": "Choose by frame shape rather than width: media=\"(max-width: 767px) and (orientation: portrait)\" for the -m captures, so every landscape phone gets the laptop capture in its wide frame.",
+    "confidence": "medium",
+    "lens": "mobile"
+  },
+  {
+    "section": "about",
+    "viewport": "768x1024, 844x390, 667x375, 740x360 (below lg)",
+    "severity": "P3",
+    "description": "The About datasheet is the only lead media block that's centred and narrower than the column on tablets and in landscape. Focus panels, project frames and the contact box all start at the left gutter (x=31 at 768, 34 at 844) and line up with their headings. The datasheet is mx-auto, max-w-[500px]: at 768x1024 it spans x 134-634 with the heading below at x=31; at 844x390 (short:max-w-[360px]) x 242-602; at 667x375 x 154-514. The copper rail's pad and the left-aligned heading then sit 100-210px left of the card above them.",
+    "evidence": [
+      "shots/about/p2/844l/en-motion-00.png",
+      "shots/about/p2/844l/en-motion-02.png",
+      "shots/nav/p2/agent-mobile/en-768x1024-land-about.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:53 (mx-auto … lg:mx-0)",
+    "suggested_fix": "Left-align it like the other sections' media (drop mx-auto below lg; mx-0 everywhere). Or, in short/landscape, place it beside the heading (a short:grid-cols-[360px_1fr] layout), which also fixes the About landing finding.",
+    "confidence": "medium",
+    "lens": "mobile"
+  },
+  {
+    "section": "skills",
+    "viewport": "768x1024, 844x390, 1024x768 FR (md to lg); EN+FR",
+    "severity": "P3",
+    "description": "After UI-108's md:grid-cols-2, the three chip groups fill a 2x2 grid with one empty cell at 768-1023 and at 844x390. Languages and Foundations share row 1, and AI / IA sits alone on row 2 (x 31-364 at 768) with a 373px empty half beside it. That's the only place on the page where a group grid leaves a hole: Experience groups stack, and the Focus/Projects items are full width.",
+    "evidence": [
+      "shots/skills/p2/agent-mobile/fr-768x1024-groups.png",
+      "shots/skills/p2/agent-mobile/en-844x390-groups.png"
+    ],
+    "file_line": "components/skills/Skills.tsx:16 (md:grid-cols-2 lg:grid-cols-3)",
+    "suggested_fix": "Between md and lg, use one column with the group title on the left and chips on the right (md:grid-cols-1, each group grid-cols-[10rem_1fr]), or let the third group span both columns (md:[&>*:last-child]:col-span-2 lg:[&>*:last-child]:col-span-1).",
+    "confidence": "high",
+    "lens": "mobile"
+  },
+  {
+    "section": "global",
+    "viewport": "320-430 portrait (values shown); md doubles most of them; EN+FR",
+    "severity": "P3",
+    "description": "The gap between section header and content differs in each section, so the rhythm changes as you scroll on a phone. Measured from the SectionHeader's bottom to the first content: About 48px (mt-12), Focus 56px (mt-14; 48 at md), Skills 64px (mt-16; 80 at md), Projects 80px and Experience 80px (mt-20; 112 at md). The label-to-heading gap was just unified at 24px everywhere, but this next step still uses five different values for the same pattern (heading, then a list of cards or rows).",
+    "evidence": [
+      "shots/global/p2/agent-mobile/p2b-rhythm.json",
+      "shots/focus/p2/375/en-motion-00.png",
+      "shots/experience/p2/375/en-motion-00.png"
+    ],
+    "file_line": "components/about/About.tsx:19; components/focus/Focus.tsx:116; components/skills/Skills.tsx:16; components/projects/Projects.tsx:17; components/Experience.tsx:15",
+    "suggested_fix": "Use one token for header-to-content (e.g. mt-16 md:mt-24) in all five places. Keep About's lead paragraph at mt-12 only if it's meant to read as part of the header.",
+    "confidence": "medium",
+    "lens": "mobile"
+  }
+]
