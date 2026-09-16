@@ -1,0 +1,389 @@
+[
+ {
+  "section": "experience",
+  "viewport": "768, 1024, 844l (en+fr)",
+  "severity": "P2",
+  "description": "The 12-column, 3-column row layout starts at md (768px), where the org column is only 214px wide (293px at 1024). At text-3xl (30px), org titles wrap to 2 lines in 4 of 6 rows at 768 (Independent Tutoring, Saint Joseph University, McGill University, Collège Mariste Champville; FR: Tutorat indépendant, Université Saint-Joseph, Université McGill...). The role/place line also wraps in 4 of 6 rows. Meanwhile the dates column (179px) holds about 110px of text. The middle column looks crushed and every row reads ragged.",
+  "evidence": [
+   "shots/experience/p1/768/fr-reduced-00.png",
+   "shots/experience/p1/768/en-reduced-00.png",
+   "shots/experience/p1/agent-visual/fr-768-row1-dpr2.png"
+  ],
+  "file_line": "components/Experience.tsx:36-45",
+  "suggested_fix": "Switch the 3-column grid to lg (lg:grid-cols-12). At md, use a 2-column layout (dates+org+role stacked in col 1, text in col 2), or shrink the dates column to 2/12 and make the org column 5/12.",
+  "confidence": 0.85,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "768 fr (also 844l fr at narrower gutters)",
+  "severity": "P2",
+  "description": "In FR, the dates 'JUIL. — SEPT. 2026' wrap to 2 lines in the 179px dates column. label-mono has line-height:1, so the two mono lines sit at an 11.5px pitch with no leading, and the lines touch. It reads as a collision rather than a 2-line label.",
+  "evidence": [
+   "shots/experience/p1/768/fr-reduced-00.png",
+   "shots/experience/p1/agent-visual/fr-768-row1-dpr2.png"
+  ],
+  "file_line": "components/Experience.tsx:38; app/globals.css:73",
+  "suggested_fix": "Add whitespace-nowrap to .xp-dates (the column has room once the grid is fixed), or give multi-line mono labels leading-[1.5].",
+  "confidence": 0.9,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "768, 844l, 1024 (fr worst, en too)",
+  "severity": "P2",
+  "description": "The role / place line breaks right after the separator, leaving a dangling slash at the line end ('Tuteur en mathématiques /' then 'Montréal'; 'Concours d'entrepreneuriat /' then 'Beyrouth'; EN 'Entrepreneurship Competition' wraps the same way at 768). This happens in 4 of 6 FR rows at 768.",
+  "evidence": [
+   "shots/experience/p1/agent-visual/fr-768-row1-dpr2.png",
+   "shots/experience/p1/844l/fr-motion-01.png",
+   "shots/experience/p1/768/fr-reduced-00.png"
+  ],
+  "file_line": "components/Experience.tsx:41-43",
+  "suggested_fix": "Wrap the slash and place in a whitespace-nowrap span (`<span className=\"whitespace-nowrap\"><span className=\"text-line\">/</span> {place}</span>`) so the pair moves to the next line together.",
+  "confidence": 0.9,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "all (375-1920, en+fr)",
+  "severity": "P2",
+  "description": "The rail pads don't line up with what they power. (a) The section-label pad centre is 6.2px below the copper dash it should connect to (1440: dash y=10979.2, pad centre 10985.4; same 6.2px on every viewport and in Skills). (b) Each row pad sits 12px below the row separator but 32px (375) to 40px (768-1920) above the dates line, so it lines up with neither the copper sweep line nor the text.",
+  "evidence": [
+   "shots/experience/p1/1440/en-reduced-00.png",
+   "shots/experience/p1/375/fr-reduced-00.png",
+   "shots/experience/p1/375/fr-reduced-01.png"
+  ],
+  "file_line": "components/CircuitTrace.tsx:46,57",
+  "suggested_fix": "Don't use a fixed `y + 12`. For section labels, use the label's vertical centre (offsetTop + offsetHeight/2). For .xp-row, use the row's top edge (y) so the pad sits on the separator that .xp-row::before sweeps, or the .xp-dates centre. A data-pad-offset attribute could pick the mode.",
+  "confidence": 0.85,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "1920 (and 1440)",
+  "severity": "P2",
+  "description": "The page has no max content width. At 1920 the description column (col-span-5) is 735px of 16px text, about 100 characters per line (first line: 'Tutored algebra, geometry and calculus, adapting each session to the student's level. Built practice' = 100 chars), well past the ~75ch comfortable measure. The dates column is 430px wide for about 120px of text, which leaves a 340px dead gap before the org titles at x=516.",
+  "evidence": [
+   "shots/experience/p1/1920/en-reduced-00.png",
+   "shots/experience/p1/agent-visual/fr-1920-row1-dpr2.png"
+  ],
+  "file_line": "components/Experience.tsx:36,38,45",
+  "suggested_fix": "Add max-w-[62ch] to the description <p>, and/or change the spans at xl to 2/4/6 (dates narrower). Or cap the section content with a max-w-[1600px] wrapper.",
+  "confidence": 0.8,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "1440/1920 (hover:hover)",
+  "severity": "P3",
+  "description": "On row hover, only the org <h3> shifts right by 10px (.xp-row:hover .xp-org translateX(10px)). The role/place line under it stays put, so the middle column's left edge goes ragged by 10px while hovered and the title comes loose from its subtitle.",
+  "evidence": [
+   "shots/experience/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "app/globals.css:598-602",
+  "suggested_fix": "Apply the translate to the whole org column (the div wrapping h3 + p) instead of the h3 alone.",
+  "confidence": 0.6,
+  "lens": "visual"
+ },
+ {
+  "section": "experience",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "When powered, every row draws a copper line on its top edge, but the last row of each group keeps its plain grey border-b. Both lists (Work, Education) end on a grey rule under a stack of copper ones, so the powered state looks unfinished at the bottom.",
+  "evidence": [
+   "shots/experience/p1/1440/en-reduced-01.png"
+  ],
+  "file_line": "app/globals.css:569-582; components/Experience.tsx:30,36",
+  "suggested_fix": "Also light the last row's bottom border (e.g. `.xp-row.is-powered:last-child { border-bottom-color: var(--color-copper) }` with a matching transition), or drop the bottom border on the last row.",
+  "confidence": 0.45,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "375-1920 (all)",
+  "severity": "P2",
+  "description": "Too much dead space around the marquee. From the last Experience row to the marquee band there is 368px of empty ink at 768 and up (Experience pb-48 192px + Skills pt-44 176px), about 41% of a 900px viewport. At 375 it is 256px, 38% of a 667px screen. The same 368px sits between the last skill chip and the contact chip box, filled only by the board's top traces on wide screens and mostly empty at 375/768. The marquee band already works as a divider, so the extra padding just stacks up.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/en-375-fullpage-xp-to-skills.png",
+   "shots/skills/p1/agent-visual/en-1440-fullpage-xp-skills-contact-half.png",
+   "shots/skills/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "components/skills/Skills.tsx:10; components/Experience.tsx:11; components/contact/Contact.tsx:15",
+  "suggested_fix": "Reduce Skills' top padding (e.g. pt-16 md:pt-24) since the bordered marquee does the separating. Optionally trim Experience's bottom padding to md:pb-32 so the gap above the band is about 200-230px.",
+  "confidence": 0.75,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "375, 768, 844l, 1440, 1920 (motion+reduced)",
+  "severity": "P2",
+  "description": "The copper rail (1.5px core + 7px halo) is drawn on top of the marquee words. CircuitTrace's absolute wrapper paints over the static marquee div, so a copper stripe cuts through the solid 'S' of SOFTWARE/LOGICIEL at x=28 (1440) and x=12 (375). In motion the glowing spark also slides over the letters. Everywhere else the rail stays in the gutter and never crosses text.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/en-1440-marquee-rail-dpr4.png",
+   "shots/skills/p1/agent-visual/en-375-marquee-rail-dpr4.png",
+   "shots/skills/p1/844l/fr-motion-00.png"
+  ],
+  "file_line": "components/skills/Skills.tsx:11-12; components/skills/Marquee.tsx:58",
+  "suggested_fix": "Give the marquee band `relative z-[2] bg-ink` so the rail passes under it (add pads where the rail meets the band's top and bottom borders), or have the rail route hop the band.",
+  "confidence": 0.7,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The outlined marquee words keep the solid words' tracking (-0.04em). With a 2px stroke, the outlines of neighbouring glyphs touch and merge (P-Y, Y-T, T-H, H-O in PYTHON; A-I in AI), so the outlined words read as one fused contour instead of letters. The solid words look fine.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/en-1440-marquee-outline-zoom.png",
+   "shots/skills/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "components/skills/Marquee.tsx:52,61; app/globals.css:608-612",
+  "suggested_fix": "Add `letter-spacing: -0.01em` (or 0) to .marquee-outline so outlined glyphs keep a hairline gap.",
+  "confidence": 0.6,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "all (reduced motion)",
+  "severity": "P3",
+  "description": "With reduced motion the band doesn't move, so its crop is permanent. The first word starts at x=0 (glyph flush to the viewport edge, under the rail) while all other content sits on the 24-56px gutter, and the right side cuts mid-word ('C' at 1440, 'AGENT' at 1920).",
+  "evidence": [
+   "shots/skills/p1/1440/en-reduced-00.png",
+   "shots/skills/p1/1920/fr-reduced-00.png"
+  ],
+  "file_line": "components/skills/Marquee.tsx:58-65",
+  "suggested_fix": "Under prefers-reduced-motion, pad the row with the gutter (motion-reduce:pl-[var(--gutter)]) or offset it so the band starts on the content edge.",
+  "confidence": 0.45,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "768 (fr worst), 1024 fr",
+  "severity": "P2",
+  "description": "md:grid-cols-3 applies at 768, giving 209px columns. Foundations stacks one chip per row (3 rows). The FR 'Structures de données' chip fills the whole column, and its right pin marks overflow 5.3px into the column gap. Languages splits 2+2 and AI 1+2+1. The three groups end at different heights and look ragged.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/fr-768-groups-dpr2.png",
+   "shots/skills/p1/768/fr-reduced-00.png"
+  ],
+  "file_line": "components/skills/Skills.tsx:16",
+  "suggested_fix": "Use md:grid-cols-2 lg:grid-cols-3 (or stack the groups until lg). Alternatively put the group title in a left column and the chips on the right at md.",
+  "confidence": 0.8,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "1440, 375",
+  "severity": "P3",
+  "description": "Chip rows leave orphans. At 1440, Foundations wraps 2+1 ('Mathematics' alone) and AI wraps 3+1 ('Gemini' alone) even though the Languages row fits all 4. At 375, Languages wraps 3+1 ('Bash' alone). The 20px gap-x plus 6px pin overhang on each side is what pushes the last chip down.",
+  "evidence": [
+   "shots/skills/p1/1440/en-reduced-00.png",
+   "shots/skills/p1/375/en-reduced-00.png"
+  ],
+  "file_line": "components/skills/Skills.tsx:22; app/globals.css:618",
+  "suggested_fix": "Tighten the chip rhythm (gap-x-4, padding 0.8rem 1rem) so the 1440 groups fit on one line, or accept the wraps but balance them (e.g. 2+2 via a max-width on the ul).",
+  "confidence": 0.4,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "all (375 most visible)",
+  "severity": "P3",
+  "description": "The chip pin marks (::before at left:-6px) overhang each group's left edge. At 1440 the first chip's pins start at x=50 while the group label, border and chips align at x=56. At 375 the pins start at x=18, just 2.5px from the rail halo's edge (15.5px), so the pins and the copper rail nearly touch.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/en-375-chip-left-dpr4.png",
+   "shots/skills/p1/agent-visual/en-1440-chip-left-dpr4.png"
+  ],
+  "file_line": "components/skills/Skills.tsx:22; app/globals.css:631-646",
+  "suggested_fix": "Inset the list by the pin width (`pl-[6px]` on the ul, or ml-1.5 on first-child chips) so the pins sit inside the column and clear the rail.",
+  "confidence": 0.5,
+  "lens": "visual"
+ },
+ {
+  "section": "skills",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Two different tag styles show the same kind of content (tech names). Skills uses .chip (3px radius, graphite fill, 0.8rem mono, pin marks). The Projects 'Stack' rows use rounded-full outline pills (text-xs mono, no fill). Next to each other on the page, the tech tags look like two unrelated systems.",
+  "evidence": [
+   "shots/skills/p1/agent-visual/en-1440-fullpage-xp-skills-contact-half.png",
+   "shots/skills/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "app/globals.css:614-630; components/projects/ProjectCard.tsx:192",
+  "suggested_fix": "Pick one tag language. For example, give Projects stack tags a small variant of .chip (3px radius, no pins, text-xs), or document the pill as the 'meta tag' and the chip as the 'skill' variant.",
+  "confidence": 0.4,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "1024, 1440, 1920 (en+fr)",
+  "severity": "P2",
+  "description": "The email row uses items-center to align an 11.5px mono label, a 33.6px email link and a 29.5px pill, so the baselines don't line up. The label and the Copy text sit 6.1px above the email's baseline at 1440/1920 (label/copy baseline 14348.9 vs email 14355.0) and 3.1px above at 1024. The small caps look like they float above the address.",
+  "evidence": [
+   "shots/contact/p1/agent-visual/en-1440-email-row-dpr2.png",
+   "shots/contact/p1/agent-visual/fr-1920-email-row-dpr2.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:42",
+  "suggested_fix": "Use `items-baseline` on the row. Flex baseline alignment uses the pill's text baseline, so 'EMAIL', the address and 'COPY' share one baseline. Keep gap-y for the wrapped mobile layout.",
+  "confidence": 0.8,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "all",
+  "severity": "P2",
+  "description": "The Copy button is a one-off button style. It is 29.5px tall, label-mono 0.72rem with 0.14em tracking, a line border, and a copper text/border colour on hover. The .btn buttons 40px below are 53.4px tall, 0.74rem with 0.12em tracking, and use a paper fill-sweep hover. The type sizes and trackings nearly match but not quite, and the hover language differs. It looks like it comes from a different kit than the pills around it.",
+  "evidence": [
+   "shots/contact/p1/1440/en-reduced-00.png",
+   "shots/contact/p1/1440/en-motion-btn-hover.png",
+   "shots/contact/p1/agent-visual/en-1440-email-row-dpr2.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:83; app/globals.css:369-415",
+  "suggested_fix": "Add a .btn-xs variant in globals.css (e.g. padding 0.55rem 0.9rem, 0.66rem, same 0.12em tracking and fill-sweep) and use `btn btn-xs` for Copy, so every pill in the box shares one type size, tracking and hover.",
+  "confidence": 0.7,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "all (touch/keyboard most)",
+  "severity": "P3",
+  "description": "The Copied state jumps in width: 'COPY' 60px becomes 'COPIED ✓' about 93px (FR 'COPIER' 77px becomes 'COPIÉ ✓'). When not hovered it keeps the idle mute grey, so on touch and keyboard the only success signal is a small ✓.",
+  "evidence": [
+   "shots/contact/p1/1440/en-motion-btn-hover.png",
+   "shots/contact/p1/1440/fr-motion-copied.png",
+   "shots/contact/p1/375/en-reduced-copied.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:83-85",
+  "suggested_fix": "Give the button a min-width that fits the longer label (inline-grid, both labels stacked in one cell, only one visible) and switch to text-copper border-copper while done.",
+  "confidence": 0.55,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "375, 768, 1440, 1920",
+  "severity": "P2",
+  "description": "The trace's end pad (9px square) is centred on the chip box's left edge (1440: pad x 203.5-212.5, box x 208), but the box is z-[2] above the trace's z-[1]. Only the left half of the pad shows, as a stray copper notch on the border, instead of a solder joint where the signal plugs in.",
+  "evidence": [
+   "shots/contact/p1/agent-visual/en-1440-entry-pad-dpr4.png",
+   "shots/contact/p1/1440/en-reduced-00.png",
+   "shots/contact/p1/768/fr-reduced-00.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:17-21; lib/routes.ts:64-73",
+  "suggested_fix": "Either end the route 5px short of the box (tx = c.x - 5) so the whole pad sits outside the box, or render the pads of the contact trace above the box (z-[3] on .trace-pad in #contact) so the pad sits on the border.",
+  "confidence": 0.8,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "all (visible at DPR2+)",
+  "severity": "P3",
+  "description": "The chip-corner brackets are square 14px L-shapes with no radius, laid over a box border rounded to 6px. At each corner the square bracket and the rounded border show two different geometries, with a sliver of background between them. It is most visible when powered (copper on copper).",
+  "evidence": [
+   "shots/contact/p1/agent-visual/en-1440-corner-tl-dpr4.png",
+   "shots/contact/p1/agent-visual/en-1440-corner-br-dpr4.png"
+  ],
+  "file_line": "app/globals.css:664-671; components/contact/Contact.tsx:21-26",
+  "suggested_fix": "Give each bracket the matching corner radius (rounded-tl-[6px] etc. on the four spans), or square the box (rounded-[3px] to match the skill chips, which also makes the chip metaphor consistent).",
+  "confidence": 0.6,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "1280s, 1440, 1920 (motion+reduced)",
+  "severity": "P2",
+  "description": "Board traces on the top side that run 'toEdge' end at the contact section's top boundary (y=-4) in open page space under the Skills chips (1440: traces at x≈180 and x≈1106 end mid-air, no pad). The bottom traces end on the footer's border-t, which reads as intentional, but the top ones look clipped.",
+  "evidence": [
+   "shots/contact/p1/1440/en-reduced-00.png",
+   "shots/skills/p1/1440/chip-hover.png",
+   "shots/skills/p1/agent-visual/en-1440-fullpage-xp-skills-contact-half.png"
+  ],
+  "file_line": "lib/board.ts:60-63",
+  "suggested_fix": "For side < 0 (top edge), never use toEdge: always end on a pad. Or fade the board's top 120px with a mask-image linear-gradient on the Board root.",
+  "confidence": 0.7,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The two 'Download CV' buttons don't match. The hero uses `btn btn-sm` with no glyph, and Contact uses a full-size `btn btn-primary` with a ↓ glyph. Same action, same file, different glyph treatment.",
+  "evidence": [
+   "shots/contact/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:55-57; components/hero/Hero.tsx:224-226",
+  "suggested_fix": "Add the ↓ glyph to the hero CV button (aria-hidden), or remove it here. The size difference can stay.",
+  "confidence": 0.45,
+  "lens": "visual"
+ },
+ {
+  "section": "contact",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The contact label doesn't use SectionHeader, so it drifts from the other section labels. The label-to-heading gap is 32px (mt-8) vs 24px (mt-6) elsewhere, and its copper dash lacks .section-index, so it never gets the powered glow the other labels get, even though the whole box lights up around it.",
+  "evidence": [
+   "shots/contact/p1/1440/en-reduced-00.png",
+   "shots/experience/p1/1440/en-reduced-00.png"
+  ],
+  "file_line": "components/contact/Contact.tsx:28-33; app/globals.css:419-425",
+  "suggested_fix": "Add `section-index` to the dash, add a `.contact.is-powered .section-index` glow rule, and use mt-6 on the h2 (or scale the gap in proportion to the larger heading on purpose).",
+  "confidence": 0.4,
+  "lens": "visual"
+ },
+ {
+  "section": "footer",
+  "viewport": "768, 844l (en+fr), 1024 fr",
+  "severity": "P2",
+  "description": "md:grid-cols-4 applies at 768, giving 162px cells. '© 2026 GREGORY / SUTJIAN' wraps to 2 lines (EN and FR, also at 844l). In FR 'HEURE / LOCALE' wraps with the clock floating about 85px to its right. label-mono's line-height:1 makes the wrapped lines touch (11.5px pitch). Single-line cells centre against 2-line ones, so the four items sit on 3 different baselines (768: y 17561.7 vs 17567.5).",
+  "evidence": [
+   "shots/footer/p1/agent-visual/fr-768-meta-dpr2.png",
+   "shots/footer/p1/768/fr-reduced-00.png",
+   "shots/footer/p1/844l/fr-motion-00.png"
+  ],
+  "file_line": "components/Footer.tsx:11-26",
+  "suggested_fix": "Use md:grid-cols-2 lg:grid-cols-4 (or `flex flex-wrap justify-between gap-x-10 gap-y-4`) and add whitespace-nowrap to each cell, so nothing wraps inside a meta item.",
+  "confidence": 0.9,
+  "lens": "visual"
+ },
+ {
+  "section": "footer",
+  "viewport": "1024, 1440, 1920",
+  "severity": "P3",
+  "description": "The equal-width 4-column grid with short, left-aligned mono text leaves uneven visual gaps between the meta items (1024 FR: about 52px, 110px, 160px) and lines them up with nothing above (at 1440 the items start at 56/393/730/1067 while the contact box spans 208-1232).",
+  "evidence": [
+   "shots/footer/p1/agent-visual/fr-1024-meta-dpr2.png",
+   "shots/footer/p1/agent-visual/en-1440-meta-dpr2.png"
+  ],
+  "file_line": "components/Footer.tsx:11",
+  "suggested_fix": "Use flex justify-between (equal gaps between items), or align the two middle items to the contact box's edges.",
+  "confidence": 0.45,
+  "lens": "visual"
+ },
+ {
+  "section": "footer",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The giant outlined 'SUTJIAN' is cropped about 16% at the bottom on every width (1440: glyph bottom 15033.8 vs page end 15004.8, 29px of 187px; 1920: 39px of 249px; 375: 7.8px of 48.6px). That cuts the bowls of S, U and J but is too little to read as a deliberate 'sinking' crop, so it looks slightly mis-sized.",
+  "evidence": [
+   "shots/footer/p1/agent-visual/en-1440-mark-bottom.png",
+   "shots/footer/p1/1440/en-reduced-00.png",
+   "shots/footer/p1/375/fr-reduced-00.png"
+  ],
+  "file_line": "app/globals.css:688-689; components/Footer.tsx:28-33",
+  "suggested_fix": "Decide one way. Show the word fully (remove margin-bottom:-2.4vw, keep leading-[0.78] with a small pb), or crop it on purpose to about 35-45% (margin-bottom about -6vw).",
+  "confidence": 0.5,
+  "lens": "visual"
+ },
+ {
+  "section": "footer",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The giant mark covers only about 67% of the viewport width (964/1440, 514/768, 251/375) and is centred. Its edges line up with neither the page gutter (56px) nor the contact box (208px), and at 375 the 'huge' last name is just 65px tall, smaller than the contact heading above it.",
+  "evidence": [
+   "shots/footer/p1/1440/en-reduced-00.png",
+   "shots/footer/p1/375/fr-reduced-00.png",
+   "shots/footer/p1/768/fr-reduced-00.png"
+  ],
+  "file_line": "components/Footer.tsx:30",
+  "suggested_fix": "Size the word to span gutter to gutter (about 24vw for 7 letters at this tracking, or fit it with a measured scale), so it reads as a full-bleed signature.",
+  "confidence": 0.45,
+  "lens": "visual"
+ }
+]

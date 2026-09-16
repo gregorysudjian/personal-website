@@ -57,7 +57,10 @@ export function generateBoard(w: number, h: number, c: Rect, rail: number, entry
       }
       const yb = y0 + side * out1;
       const yd = yb + side * BEND;
-      const toEdge = rand() < 0.35;
+      // Only the bottom side may run off the edge (into the footer); a top trace ending in open page
+      // space under the skills looks cut, so it ends on a pad instead.
+      const r = rand();
+      const toEdge = side > 0 && r < 0.35;
       const remain = room - out1 - BEND;
       const yEnd = toEdge ? (side < 0 ? -4 : h + 4) : yd + side * (16 + rand() * Math.max(0, remain - 30));
       add([[x, y0], [x, yb], [xb, yd], [xb, yEnd]], !toEdge);

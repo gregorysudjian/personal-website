@@ -1,0 +1,207 @@
+[
+  {
+    "section": "nav",
+    "viewport": "landscape phones under 768 wide: 568x320, 667x375 (iPhone SE), 740x360 (Android); also after rotating 390x844 to 667x375 with the menu open",
+    "severity": "P1",
+    "description": "The mobile menu drawer is taller than a landscape phone screen, and its first item slides under the fixed header. The drawer is `fixed inset-0 flex-col justify-end pb-16` with four 48px items (text-5xl) and no overflow handling, so the list grows upward from the bottom. Measured first item ('About'/'À propos') top/bottom: 740x360 at 28/76, 667x375 at 43/91, 568x320 at -12/36. The header strip ends at 64. At 740x360 'À propos' is drawn right through the 'GREGORY SUTJIAN' logo label. Worse, taps on it hit the header: elementFromPoint in the top 30-50% of the item returns the header's logo link, and a real touch tap there closed the menu and scrolled to the TOP (scrollY 0) instead of going to About. At 568x320 the item is entirely under the header: the tap lands on the header's gutter div and nothing happens, so About can't be reached from the menu. The header gradient also dims the item. The nav has overflow-y: visible and scrollHeight equals clientHeight, so the hidden part can't be scrolled to either.",
+    "evidence": [
+      "shots/nav/p1/agent-mobile/fr-740x360-menu-open.png",
+      "shots/nav/p1/agent-mobile/fr-740x360-menu-open-recheck.png",
+      "shots/nav/p1/agent-mobile/fr-667x375-menu-open.png",
+      "shots/nav/p1/agent-mobile/en-568x320-menu-open.png",
+      "shots/nav/p1/agent-mobile/fr-rotate-390x844-to-667x375-menu-open.png"
+    ],
+    "file_line": "components/Nav.tsx:179 (drawer classes: justify-end pb-16, no top padding or overflow), components/Nav.tsx:188 (text-5xl labels)",
+    "suggested_fix": "Give the drawer a top inset that clears the header (pt-20), make it scrollable (overflow-y-auto overscroll-contain), and replace justify-end with mt-auto on the <ul>. An overflowing justify-end column spills past the top edge, where it can't be scrolled to; mt-auto keeps the list at the bottom when it fits. Add a short: variant for max-height 500px: short:text-3xl on the labels, short:gap-0, short:pb-6.",
+    "confidence": 0.95,
+    "lens": "mobile"
+  },
+  {
+    "section": "statement",
+    "viewport": "844x390 FR (landscape phone), also 932x430 FR and 740x360 FR; motion and reduced motion",
+    "severity": "P1",
+    "description": "In landscape the pinned sentence is taller than the h-svh sticky frame, so it gets clipped at both ends for the whole 220vh pin. The font is clamp(2rem,5.4vw,5.6rem), which scales with width only: 45.6px at 844 wide gives 7 lines, 333px of text plus the label. At 844x390 FR the 'EN UNE PHRASE' label sits at top -1 (cut off at the screen edge) and the text bottom is 391 (> 390 viewport), so the descenders of 'pas encore essayé.' are cut. At 932x430 FR: label top 2, text bottom 428 of 430. At 740x360 FR: label 13, bottom 347. The reduced-motion layout clips the same way (label -1 / bottom 391).",
+    "evidence": [
+      "shots/statement/p1/844l/fr-motion-00.png",
+      "shots/statement/p1/844l/fr-motion-01.png",
+      "shots/statement/p1/agent-mobile/fr-reduced-844x390-pinned.png",
+      "shots/statement/p1/agent-mobile/fr-932x430-pinned.png",
+      "shots/statement/p1/agent-mobile/fr-740x360-pinned.png"
+    ],
+    "file_line": "components/Statement.tsx:50 (text-[clamp(2rem,5.4vw,5.6rem)]), components/Statement.tsx:43 (sticky h-svh justify-center), components/Statement.tsx:44 (mb-8 md:mb-12 label gap)",
+    "suggested_fix": "Cap the size by height too: text-[clamp(1.6rem,min(5.4vw,8.5svh),5.6rem)], or add short:text-[min(5.4vw,8svh)]. Drop the label gap on short screens (short:mb-4). Reserve the header height at the top of the frame (pt-16 md:pt-20, or short:pt-14) so the sentence never centres under the header.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "nav",
+    "viewport": "844x390 and 932x430 (landscape phones at least 768 wide, so the desktop nav shows)",
+    "severity": "P2",
+    "description": "The header height is chosen by width only (h-16, md:h-20), so a landscape phone gets the 80px desktop header: 21% of a 390px-tall screen (measured headerBottom 80, vh 390). Scrolling up reveals it, with the new solid backdrop, over the pinned Statement. At 844x390 FR it hides the 'EN UNE PHRASE' label and the whole first line 'Mon moment préféré quand je' (text top 58 < header bottom 80). The same happens at 932x430. Over About and Projects it covers the section heading (header-over-content shot at 844l). Besides the logo, the four nav links and EN/FR, nothing in this 80px strip needs the space.",
+    "evidence": [
+      "shots/statement/p1/agent-mobile/fr-844x390-header-revealed.png",
+      "shots/statement/p1/agent-mobile/fr-932x430-header-revealed-recheck.png",
+      "shots/nav/p1/844l/fr-motion-header-over-content.png",
+      "shots/nav/p1/agent-mobile/en-844x390-header-revealed-over-about.png"
+    ],
+    "file_line": "components/Nav.tsx:127 (h-16 md:h-20)",
+    "suggested_fix": "Add a height-based override so short screens keep a compact bar: short:h-12, or at least short:h-14. The short custom variant (max-height 500px) already exists in globals.css. Pair this with the Statement top padding fix so pinned text centres below the bar.",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "global",
+    "viewport": "all (tested 390x844 touch); first visit in a tab",
+    "severity": "P2",
+    "description": "On a first visit, deep links to a section are thrown away. Boot sets history.scrollRestoration = 'manual' and calls window.scrollTo(0,0) before the intro, and never goes back to location.hash. Opening /en#contact or /fr#projects in a fresh tab (exactly what someone tapping a shared link in LinkedIn or Messages does) ends at scrollY 0 with the hash still in the URL: #projects is 7972px below. With gs-booted already set, the same URL lands correctly (contact top 0). So a shared section link only works for people who have already visited in that tab.",
+    "evidence": [
+      "shots/global/p1/agent-mobile/deeplink-_en_contact.png",
+      "shots/global/p1/agent-mobile/deeplink-_fr_projects.png"
+    ],
+    "file_line": "components/Boot.tsx:23-24 (scrollRestoration manual + scrollTo(0,0)), components/Boot.tsx:28-35 (onComplete never restores the hash)",
+    "suggested_fix": "Skip the boot when location.hash names an element: add the booted class in the head bootScript when location.hash is set, the same way it does for reduced motion. Or in Boot's onComplete, call scrollToTarget(location.hash) when one exists.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "375x667 touch (the same on 390x844), EN/FR, motion",
+    "severity": "P2",
+    "description": "On phones there is about half a screen of blank scroll between the hero and the Statement. Scroll samples at 375x667: the name's opacity reaches 0.015 at scrollY 334 and hero-fade is at 1 by 500. The Statement label only enters the viewport around scrollY 620-700 (label top 684 at 611, 572 at 723), and the first word lights at 889. From about y 334 to 690 (around 360px, 55% of the viewport) the screen is just the dark background and the copper trace; to 889 the sentence is only at 13% opacity. A normal thumb flick lands inside this gap, and the page looks like it stopped loading. The hero is 170vh, so only 70vh drives the gate, and the gate is done by 0.4-0.75 of it.",
+    "evidence": [
+      "shots/hero/p1/agent-mobile/en-375-scrollstep-08.png",
+      "shots/hero/p1/agent-mobile/en-375-scrollstep-10.png",
+      "shots/hero/p1/375/en-motion-01.png",
+      "shots/hero/p1/375/fr-motion-01.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:96-105 (name out by 0.4-0.72, hero-fade at 0.85), components/hero/Hero.tsx:154 (h-[170vh]), components/Statement.tsx:30 (start 'top 45%')",
+    "suggested_fix": "Close the gap on small screens. Either pull the Statement up under the hero's last frame on phones (a negative margin-top of about 40svh on the Statement section, since the hero frame is ink by then), or shorten the hero's fade-out so it overlaps the Statement's entry (h-[150vh] on phones and hero-fade at 0.95). Starting the Statement's lighting at 'top 70%' would also show the text sooner.",
+    "confidence": 0.6,
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "375x667 touch, reduced motion (the same at every size)",
+    "severity": "P2",
+    "description": "With reduced motion the hero keeps its 170vh height and sticky frame even though nothing animates. A reduced-motion user swipes about 467px (70vh) and the name, tagline and CTAs don't move at all (h1 top stays at 235 from scrollY 0 to 440, then scrolls). On a phone that looks like the page is stuck, which is the opposite of what a static reduced-motion version should do.",
+    "evidence": [
+      "shots/hero/p1/agent-mobile/en-reduced-375-scroll330.png",
+      "shots/hero/p1/375/en-reduced-00.png",
+      "shots/hero/p1/375/en-reduced-01.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:154-155 (h-[170vh] md:h-[190vh] + sticky h-svh, unconditional)",
+    "suggested_fix": "Collapse the scroll runway when motion is reduced: motion-reduce:h-svh on the section (or h-auto with the sticky frame made static via motion-reduce:static).",
+    "confidence": 0.75,
+    "lens": "mobile"
+  },
+  {
+    "section": "statement",
+    "viewport": "375x667 touch, reduced motion (the same at every size)",
+    "severity": "P2",
+    "description": "In reduced motion the Statement is still a 220vh section with a sticky h-svh frame, but the words are all lit from the start. The sentence stays frozen on screen for about 780px of swiping (text top stays at 205 from scrollY 1170 to 1950 at 375x667). Together with the frozen hero, a reduced-motion phone user scrolls roughly 1.9 screens at the top of the page where nothing moves.",
+    "evidence": [
+      "shots/statement/p1/375/en-reduced-01.png",
+      "shots/hero/p1/agent-mobile/en-reduced-375-scroll1320.png"
+    ],
+    "file_line": "components/Statement.tsx:41 (h-[220vh]), components/Statement.tsx:43 (sticky h-svh)",
+    "suggested_fix": "motion-reduce:h-auto on the section and motion-reduce:static motion-reduce:h-auto motion-reduce:py-32 on the frame, so the sentence scrolls like normal content.",
+    "confidence": 0.75,
+    "lens": "mobile"
+  },
+  {
+    "section": "statement",
+    "viewport": "375x667 and 390x844 touch, motion",
+    "severity": "P3",
+    "description": "The sentence finishes lighting only 5vh before the pin lets go, so on a phone it never rests fully lit. The tween ends at 'bottom 105%' and the pin ends at 'bottom 100%'. At 375x667 the last word lights at scrollY of about 1901 and the text starts scrolling away at about 1934, just 33px later. The last line ('whatever I haven't tried yet' / 'pas encore essayé') is only fully readable while it is already leaving.",
+    "evidence": [
+      "shots/statement/p1/375/en-motion-01.png",
+      "shots/statement/p1/375/fr-motion-01.png"
+    ],
+    "file_line": "components/Statement.tsx:30 (end: 'bottom 105%')",
+    "suggested_fix": "End the lighting earlier so the fully lit sentence holds for part of the pin, e.g. end: 'bottom 135%' (about 35vh of rest).",
+    "confidence": 0.5,
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "iOS Safari phones (not reproducible in Chromium; reasoned from CSS)",
+    "severity": "P3",
+    "description": "Sticky frames are h-svh inside sections sized in vh (170vh, 220vh). Once Safari's toolbar collapses, which happens on the first scroll and so for the whole gate, the visual viewport grows to lvh. The hero frame then stops about 80-100px above the bottom of the screen. The grid floor and glow end in a hard line at the svh edge (the floor mask is still 30% opaque at the bottom), and the bottom HUD row no longer sits at the bottom. The Statement frame's vertical centre shifts the same way.",
+    "evidence": [
+      "shots/hero/p1/390/en-motion-00.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:155 (sticky top-0 h-svh), components/Statement.tsx:43 (sticky top-0 h-svh)",
+    "suggested_fix": "Use h-lvh (or 100lvh with an svh fallback) for the decorative hero frame so it always covers the screen, and keep svh only for placing the interactive bottom row (bottom inset). Or use h-dvh with ScrollTrigger's ignoreMobileResize already set.",
+    "confidence": 0.35,
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "375, 390, 768 touch, EN/FR",
+    "severity": "P3",
+    "description": "Both hero CTAs ('View projects' / 'Voir les projets', 'Download CV' / 'Télécharger le CV') are 43px tall, just under the 44px minimum. btn-sm padding of 0.8rem plus the 0.66rem mono line comes to 43px. These are the main actions on the first screen.",
+    "evidence": [
+      "shots/audit-p1-375-motion_reduced.json",
+      "shots/hero/p1/375/fr-motion-atf.png"
+    ],
+    "file_line": "app/globals.css:462-465 (.btn-sm padding 0.8rem 1.2rem)",
+    "suggested_fix": "Add min-height: 44px to .btn-sm (or use padding 0.85rem), which changes the look by about 1px.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "hero",
+    "viewport": "568x320 FR (small landscape phone)",
+    "severity": "P3",
+    "description": "In the short landscape layout the name almost touches the CTA row. 'SUTJIAN' ends at y 239 and the CTAs start at 245 (6px apart), and 'OUVERT AUX STAGES' wraps onto two lines beside the buttons. The eyebrow sits only 6px below the 64px header (70-88), inside the header's 32px gradient tail.",
+    "evidence": [
+      "shots/hero/p1/agent-mobile/fr-568x320-atf.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:201 (short: size min(16.4vw,26svh)), components/hero/Hero.tsx:233 (status p, no nowrap)",
+    "suggested_fix": "Lower the short-screen name cap slightly (e.g. 24svh), and add whitespace-nowrap to the status line (it has room once the CTAs wrap), or hide the status below 600px wide on short screens.",
+    "confidence": 0.6,
+    "lens": "mobile"
+  },
+  {
+    "section": "nav",
+    "viewport": "320-430 portrait touch, EN/FR",
+    "severity": "P3",
+    "description": "Opening the menu changes the toggle's label from 'Menu' (34px wide) to 'Fermer' (51px) or 'Close' (43px). The right-aligned row reflows, and the EN/FR switch next to the thumb jumps left: by 17px in FR (from x 257 to 240 at 390) and 8px in EN. A quick second tap aimed at the same spot can land on the language switch and trigger a full page reload.",
+    "evidence": [
+      "shots/nav/p1/390/fr-motion-menu-closed.png",
+      "shots/nav/p1/390/fr-motion-menu-open.png"
+    ],
+    "file_line": "components/Nav.tsx:162-171 (toggle label swaps between ui.menu and ui.close)",
+    "suggested_fix": "Give the toggle a fixed width that fits the longer label (e.g. min-w-[6ch] justify-end), or stack both labels in one grid cell and toggle their visibility, so the row never reflows.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "nav",
+    "viewport": "390x844, 430x932 portrait touch",
+    "severity": "P3",
+    "description": "The only way to close the drawer is the small 'Close' text at the far top-right (x of about 323-366, y 12-52 at 390x844), the hardest spot to reach one-handed on a tall phone. The drawer is full screen and its upper 60% is empty (the items start at y 512 of 844), but tapping that empty area does nothing, and there is no swipe-down to close either.",
+    "evidence": [
+      "shots/nav/p1/390/en-motion-menu-open.png",
+      "shots/nav/p1/agent-mobile/en-390x844-menu-open.png"
+    ],
+    "file_line": "components/Nav.tsx:176-193 (drawer has no click-outside handler)",
+    "suggested_fix": "Close on a tap on the drawer background (onClick on the nav where e.target === e.currentTarget), and/or add a close control within thumb reach next to the list.",
+    "confidence": 0.5,
+    "lens": "mobile"
+  },
+  {
+    "section": "nav",
+    "viewport": "320-740 wide touch (below sm the logo is the mark alone)",
+    "severity": "P3",
+    "description": "Below sm the logo/home link is just the 24px mark. Even with the .tap-area pseudo-element (inset -16px -8px) its hit box is 40x56, under 44px wide.",
+    "evidence": [
+      "shots/audit-p1-375-motion_reduced.json",
+      "shots/nav/p1/375/en-motion-menu-closed.png"
+    ],
+    "file_line": "components/Nav.tsx:128-131",
+    "suggested_fix": "Add padding to the link (p-2 -m-2) or widen the tap area for this link (e.g. inset: -16px -12px).",
+    "confidence": 0.7,
+    "lens": "mobile"
+  }
+]

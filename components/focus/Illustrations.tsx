@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
 import { playWhenVisible } from "@/lib/visible";
 
-/* Three living drawings for the Focus panels. Each loops only while visible. */
+/* Three living drawings for the Focus panels. Each plays a few times while visible, then rests. */
 
 /* ----------------------------------------------------------- math plot */
 
@@ -62,7 +62,7 @@ export function MathPlot() {
       if (window.matchMedia(REDUCED_MOTION).matches) return;
 
       const state = { x: X0 };
-      const tl = gsap.timeline({ repeat: -1, paused: true });
+      const tl = gsap.timeline({ repeat: 2, paused: true });
       tl.set(q(".m-point"), { autoAlpha: 0 })
         .fromTo(q(".m-curve"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: "power2.inOut" })
         .add(() => {
@@ -134,30 +134,35 @@ export function CodeWindow() {
       if (window.matchMedia(REDUCED_MOTION).matches) return;
       const lines = gsap.utils.toArray<HTMLElement>(".code-line", root.current);
       gsap.set(lines, { clipPath: "inset(0 100% 0 0)" });
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.2, paused: true });
+      const tl = gsap.timeline({ repeat: 2, repeatDelay: 1.2, paused: true });
       lines.forEach((line) => {
         const n = line.textContent?.length ?? 10;
         tl.to(line, { clipPath: "inset(0 0% 0 0)", duration: n * 0.035, ease: `steps(${n})` }, "+=0.12");
       });
+      // Between rounds the code clears; the last round leaves it on screen.
       tl.to(lines, { opacity: 0, duration: 0.4, delay: 2.2 }).set(lines, { clipPath: "inset(0 100% 0 0)", opacity: 1 });
+      tl.eventCallback("onComplete", () => gsap.set(lines, { clipPath: "inset(0 0% 0 0)", opacity: 1 }));
       return playWhenVisible(root.current!, tl);
     },
     { scope: root },
   );
 
   return (
-    <div ref={root} className="flex h-full w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-[460px] overflow-hidden rounded-md border border-line bg-ink shadow-[0_30px_80px_-30px_rgb(0_0_0/0.8)]">
+    // A picture of code, not content to read aloud; the panel around it already has its padding.
+    <div ref={root} className="flex h-full w-full items-center justify-center" aria-hidden="true">
+      <div className="@container w-full max-w-[460px] overflow-hidden rounded-md border border-line bg-ink shadow-[0_30px_80px_-30px_rgb(0_0_0/0.8)]">
         <div className="flex items-center gap-2 border-b border-line px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-line" />
           <span className="h-2.5 w-2.5 rounded-full bg-line" />
-          <span className="h-2.5 w-2.5 rounded-full bg-copper/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-line" />
           <span className="label-mono ml-3 text-[0.62rem] text-mute">agent.py</span>
         </div>
-        <pre className="overflow-hidden px-4 py-5 font-mono text-[0.72rem] leading-[1.9] md:text-[0.8rem]">
+        {/* the code shrinks with its window (the longest line is ~37 characters); in a narrow window the
+            line numbers step aside so it stays readable */}
+        <pre className="overflow-hidden px-4 py-5 font-mono text-[clamp(0.45rem,calc((100cqi-4.25rem)/23),0.8rem)] leading-[1.9] @max-[20rem]:text-[clamp(0.45rem,calc((100cqi-2.25rem)/23),0.8rem)]">
           {CODE.map((line, i) => (
             <div key={i} className="flex">
-              <span className="mr-4 w-4 shrink-0 select-none text-right text-line">{i + 1}</span>
+              <span className="mr-4 w-4 shrink-0 select-none text-right text-line @max-[20rem]:hidden">{i + 1}</span>
               <span className="code-line whitespace-pre">
                 {line.map(([text, kind], j) => (
                   <span key={j} className={TOK_CLASS[kind]}>
@@ -193,7 +198,7 @@ export function NeuralNet() {
   useGSAP(
     () => {
       if (window.matchMedia(REDUCED_MOTION).matches) return;
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.6, paused: true });
+      const tl = gsap.timeline({ repeat: 2, repeatDelay: 0.6, paused: true });
       LAYERS.forEach((_, l) => {
         tl.to(`.node-${l}`, { fill: "#e8823a", stroke: "#ffb27a", duration: 0.25, stagger: 0.06 }, l * 1.1);
         tl.to(`.node-${l}`, { fill: "#0b0c0e", stroke: "#3a3e46", duration: 0.8, stagger: 0.06 }, l * 1.1 + 0.6);

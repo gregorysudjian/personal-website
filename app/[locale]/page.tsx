@@ -17,7 +17,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   return (
     <>
-      <main id="main">
+      <main id="main" tabIndex={-1}>
         <Hero locale={locale} />
         <Statement locale={locale} />
         <About locale={locale} />

@@ -29,6 +29,9 @@ export default function Hero({ locale }: { locale: Locale }) {
       // Split the name once; the intro raises the letters, the scroll parts them.
       const splits = reduce ? [] : lines.map((line) => SplitText.create(line, { type: "chars" }));
       const allChars = splits.flatMap((s) => s.chars);
+      // Each line masks its letters only while they rise, and only top and bottom (scrolling mid-intro
+      // spreads the letters sideways, which must not be cut); without the intro nothing is clipped.
+      if (allChars.length) gsap.set(lines, { clipPath: "inset(0 -100vw 0 -100vw)" });
       if (allChars.length) gsap.set(allChars, { yPercent: 118 });
 
       /* ---------- intro (after the boot sequence) ---------- */
@@ -39,7 +42,7 @@ export default function Hero({ locale }: { locale: Locale }) {
         const tl = gsap.timeline({
           defaults: { ease: "expo.out" },
           // Letters can now fly past their line's edges when the gate opens.
-          onComplete: () => gsap.set(lines, { overflow: "visible" }),
+          onComplete: () => gsap.set(lines, { clearProps: "clipPath" }),
         });
 
         tl.from(q(".hero-glow"), { autoAlpha: 0, scale: 0.5, duration: 2.6 }, 0)
@@ -63,9 +66,12 @@ export default function Hero({ locale }: { locale: Locale }) {
 
       /* ---------- scroll + cursor ---------- */
       const mm = gsap.matchMedia();
-      mm.add({ full: FULL_MOTION, fine: FINE_POINTER, small: "(max-width: 767px)" }, (ctx) => {
-        const { full, fine, small } = ctx.conditions as Record<string, boolean>;
-        if (!full) return;
+      mm.add(
+        { full: FULL_MOTION, fine: FINE_POINTER, small: "(max-width: 767px)", tiny: "(max-height: 360px)" },
+        (ctx) => {
+        const { full, fine, small, tiny } = ctx.conditions as Record<string, boolean>;
+        // With almost no height (a heavily zoomed page) the hero is plain content: no gate, no pin.
+        if (!full || tiny) return;
 
         const s = gsap.timeline({
           defaults: { ease: "none" },
@@ -93,7 +99,10 @@ export default function Hero({ locale }: { locale: Locale }) {
           s.to(lines[li], { yPercent: li === 0 ? -55 : 55, ease: "power2.in", duration: 0.75 }, 0);
         });
 
-        s.to(q(".hero-hud-scroll, .hero-eyebrow"), { autoAlpha: 0, y: -28, duration: 0.15 }, 0)
+        // Opacity only, so the CTAs stay in the tab order (focusing one brings the hero back, below).
+        s.to(q(".hero-hud-scroll, .hero-eyebrow"), { opacity: 0, y: -28, duration: 0.15 }, 0)
+          // faded out, the buttons can't be clicked by accident (reverses when scrolling back up)
+          .set(q(".hero-hud-scroll .pointer-events-auto"), { pointerEvents: "none" }, 0.12)
           .to(q(".hero-name-scroll"), { scale: small ? 1.35 : 1.55, ease: "power2.in", duration: 0.75 }, 0)
           .to(q(".hero-name-scroll"), { autoAlpha: 0, duration: 0.32 }, 0.4)
           .to(q(".hero-circuit-scroll"), { scale: small ? 1.45 : 1.7, duration: 1 }, 0)
@@ -127,7 +136,16 @@ export default function Hero({ locale }: { locale: Locale }) {
         };
         window.addEventListener("pointermove", onMove, { passive: true });
         return () => window.removeEventListener("pointermove", onMove);
-      });
+        },
+      );
+
+      /* ---------- a keyboard user tabbing back into the hero gets it back in full ---------- */
+      // Short on purpose: the visitor may keep tabbing, and a long scroll would still be running
+      // when the next control asks to be brought into view.
+      const onFocus = () => {
+        if (window.scrollY > 0 && root.current!.querySelector(":focus-visible")) scrollToTarget(0, false, 0.5);
+      };
+      root.current!.addEventListener("focusin", onFocus);
 
       /* ---------- pause the circuit pulses once the hero is off screen ---------- */
       const io = new IntersectionObserver(([entry]) => {
@@ -137,6 +155,7 @@ export default function Hero({ locale }: { locale: Locale }) {
 
       return () => {
         cancelled = true;
+        root.current?.removeEventListener("focusin", onFocus);
         io.disconnect();
         mm.revert();
         splits.forEach((s) => s.revert());
@@ -151,8 +170,15 @@ export default function Hero({ locale }: { locale: Locale }) {
   };
 
   return (
-    <section ref={root} id="top" className="relative h-[170vh] md:h-[190vh]">
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden">
+    // With reduced motion nothing animates the gate, so the frame simply scrolls away (no frozen screen,
+    // and the lit trace below never slides over the name).
+    <section
+      ref={root}
+      id="top"
+      aria-labelledby="hero-title"
+      className="relative h-[170vh] md:h-[190vh] motion-reduce:h-[125svh] md:motion-reduce:h-[125svh] tiny:h-auto!"
+    >
+      <div className="sticky top-0 flex h-svh flex-col overflow-hidden motion-reduce:relative tiny:relative! tiny:h-auto! tiny:min-h-svh">
         {/* Layer 0 — horizon glow */}
         <div className="hero-glow-scroll pointer-events-none absolute inset-x-0 top-[58%] flex -translate-y-1/2 justify-center">
           <div className="hero-glow-mouse">
@@ -175,11 +201,14 @@ export default function Hero({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        {/* Layer 2 — circuit traces */}
-        <div ref={circuit} className="hero-circuit-scroll pointer-events-none absolute inset-0">
-          <div className="hero-circuit-mouse absolute inset-[-3%]">
-            <div data-intro className="hero-circuit-mask absolute inset-0 opacity-75">
-              <HeroCircuit />
+        {/* Layer 2 — circuit traces. The vignette mask sits on the still wrapper, not on the layer the scroll
+            scales: a mask on a scaling element is re-rasterized every frame. */}
+        <div className="hero-circuit-mask pointer-events-none absolute inset-0">
+          <div ref={circuit} className="hero-circuit-scroll absolute inset-0">
+            <div className="hero-circuit-mouse absolute inset-[-3%]">
+              <div data-intro className="absolute inset-0 opacity-75">
+                <HeroCircuit />
+              </div>
             </div>
           </div>
         </div>
@@ -190,20 +219,21 @@ export default function Hero({ locale }: { locale: Locale }) {
           <div className="hero-name-mouse gutter w-full">
             {/* wrapper fades on scroll; inner line is revealed by the intro (never both on one element) */}
             <div className="hero-eyebrow mb-6 md:mb-9 short:mb-3!">
-              <p data-intro className="hero-hud label-mono flex items-center gap-3 leading-[1.6] text-mute">
-                <span className="h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
-                {t(hero.eyebrow, locale)}
+              <p data-intro className="hero-hud label-mono flex items-start gap-3 leading-[1.6] text-mute">
+                <span className="section-index mt-[0.8em] h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
+                <span className="text-balance">{t(hero.eyebrow, locale)}</span>
               </p>
             </div>
             <h1
+              id="hero-title"
               data-intro
               aria-label={person.name}
-              className="hero-name relative font-semibold uppercase leading-[0.8] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,16.4vw,17.5rem)] short:text-[clamp(3.4rem,min(16.4vw,26svh),17.5rem)]!"
+              className="hero-name relative font-semibold uppercase leading-[0.8] [@media(max-height:760px)]:max-w-[5.8em] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_15.5rem)*1.25)),17.5rem)] [@media(min-width:768px)_and_(min-height:501px)_and_(max-height:700px)]:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_14rem)*1.25)),17.5rem)]! short:text-[clamp(2.8rem,min(16.4vw,18.5svh),17.5rem)]! [@media(max-height:340px)]:text-[clamp(2.6rem,16svh,17.5rem)]!"
             >
-              <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em]">
+              <span aria-hidden="true" className="hero-name-line block pb-[0.03em]">
                 {person.firstName}
               </span>
-              <span aria-hidden="true" className="hero-name-line block overflow-hidden pb-[0.03em] text-right">
+              <span aria-hidden="true" className="hero-name-line block pb-[0.03em] text-right">
                 {person.lastName}
               </span>
             </h1>
@@ -212,25 +242,34 @@ export default function Hero({ locale }: { locale: Locale }) {
 
         {/* Layer 4 — bottom row: who, what next, status */}
         <div className="hero-hud-scroll gutter pointer-events-none relative pb-8 md:pb-10 roomy:absolute roomy:inset-x-0 roomy:bottom-0">
-          <div className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr] short:grid-cols-[auto_1fr]!">
+          {/* From lg the text column gets more room (French CTAs fit side by side) and the scroll hint is centred
+              on its own, so it stays right above the point where the copper trace starts */}
+          <div className="grid items-end gap-6 md:grid-cols-[1fr_auto_1fr] lg:grid-cols-[minmax(0,1.5fr)_1fr] short:grid-cols-[auto_1fr]!">
             <div data-intro className="hero-hud pointer-events-auto">
-              <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg short:hidden">
+              {/* on short screens (a 200%-zoomed laptop, a big phone held sideways) it stays, just smaller: it's
+                  the hero's only sentence; only under 420px tall is there no room for it next to the name */}
+              <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg short:max-w-[46ch] short:text-sm! short:leading-snug! [@media(max-height:700px)]:text-sm! [@media(max-height:419px)]:line-clamp-2 [@media(max-height:360px)]:hidden">
                 {t(hero.tagline, locale)}
               </p>
-              <div className="mt-5 flex flex-wrap gap-3 short:mt-0!">
+              <div className="mt-5 flex flex-wrap gap-3 [@media(max-height:700px)]:mt-3! [@media(max-height:419px)]:mt-2!">
                 <a href="#projects" onClick={toProjects} className="btn btn-primary btn-sm">
                   {t(hero.ctaProjects, locale)} <span aria-hidden="true">↓</span>
                 </a>
                 <a href={person.cv} download className="btn btn-sm">
                   {t(hero.ctaCv, locale)}
+                  <span className="sr-only"> (PDF)</span>
                 </a>
               </div>
             </div>
-            <div data-intro className="hero-hud hidden flex-col items-center gap-3 md:flex short:hidden!" aria-hidden="true">
+            <div
+              data-intro
+              className="hero-hud hidden flex-col items-center gap-3 md:flex lg:absolute lg:bottom-10 lg:left-1/2 lg:-translate-x-1/2 short:hidden!"
+              aria-hidden="true"
+            >
               <span className="label-mono text-mute">{t(hero.scrollHint, locale)}</span>
               <span className="hint-wire" />
             </div>
-            <p data-intro className="hero-hud label-mono flex items-center gap-3 text-paper/80 md:justify-end md:pb-3 short:justify-end! short:pb-3!">
+            <p data-intro className="hero-hud label-mono flex items-center gap-3 whitespace-nowrap text-paper/80 md:justify-end md:pb-4 short:justify-end! short:pb-4!">
               <span className="status-dot" aria-hidden="true" />
               {t(hero.status, locale)}
             </p>

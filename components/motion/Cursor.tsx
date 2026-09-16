@@ -3,7 +3,9 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 
-const QUERY = "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+// Never replaces the system pointer for people who've asked for more contrast or use high-contrast mode.
+const QUERY =
+  "(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) and (forced-colors: none) and (prefers-contrast: no-preference)";
 
 /**
  * A small dot that tracks the pointer exactly, and a ring that follows with a little lag.
@@ -38,7 +40,7 @@ export default function Cursor() {
       mode = next;
       if (next === "tag") g.textContent = label;
       gsap.to(r, {
-        scale: next === "link" ? 1.9 : next === "tag" ? 0 : 1,
+        scale: next === "link" ? 1.55 : next === "tag" ? 0 : 1,
         borderColor: next === "link" ? "rgb(232 130 58 / 0.9)" : "rgb(237 235 230 / 0.35)",
         duration: 0.45,
         ease: "power3.out",

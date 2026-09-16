@@ -1,0 +1,334 @@
+[
+  {
+    "section": "contact",
+    "viewport": "all (verified 1440 and 375, en; same code path in fr)",
+    "severity": "P0",
+    "description": "In full-motion mode (prefers-reduced-motion: no-preference, which is what most keyboard and screen-reader users have), none of the Contact controls can be reached with Tab until the visitor has scrolled the section into view. Every [data-reveal] wrapper starts as visibility:hidden (CSS, before hydration) and GSAP autoAlpha:0 keeps it that way until its ScrollTrigger fires. visibility:hidden elements cannot take focus. Measured on a fresh load: el.focus() fails on the mailto link, Copy, Download CV, LinkedIn and GitHub (5 of 5; computed visibility 'hidden'). Tabbing forward from the last Projects control ('VIEW WEBSITE ↗') goes straight to the footer's 'BACK TO TOP ↑' and skips all five, both at 1440 and at 375. Scrolling to the footer only then fires the reveal, after focus has already passed. The screen-reader tree for #contact at that point is just the h2: the intro paragraph, email, CV and social links are all missing. These are the page's main calls to action. Fails WCAG 2.1.1 Keyboard (A), 2.4.3 Focus Order (A) and 1.3.1 (A). The existing audit missed it because capture.mjs prime() scrolls the whole page before the keyboard and axe passes.",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-motion-fresh-tab03.png",
+      "shots/contact/p1/agent-a11y/375-en-motion-fresh-tab03.png",
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "app/globals.css:114-117; components/motion/Reveals.tsx:57-58; components/contact/Contact.tsx:28,38,42,53",
+    "suggested_fix": "Never use visibility:hidden as the pre-reveal state. Change the CSS to `html.js [data-reveal]{opacity:0}` and animate `opacity` (not `autoAlpha`) in Reveals.tsx (default: fromTo {opacity:0,y:40} → {opacity:1,y:0}; stagger: from children {opacity:0,y:32}). Content then stays in the accessibility tree and focusable. Also add a `focusin` listener on each [data-reveal] (or document-level) that calls `tween.progress(1)` / `scrollTrigger.kill()` so a focused, still-transparent element becomes visible at once (2.4.7).",
+    "confidence": 0.95,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all (verified 1440, 375; en and fr)",
+    "severity": "P1",
+    "description": "In full-motion mode, a screen reader gets an empty Experience section until the visitor has visually scrolled past it. On a fresh load, 38 of 40 checked nodes in #experience have computed visibility:hidden: the 'Experience' label, the 'Work 04' and 'Education 02' labels and all 6 <li> rows (data-reveal on each li). ariaSnapshot of #experience is only `heading \"What I've done so far.\" [level=2]`, then `list` and `list` with no items. With VoiceOver or NVDA in browse mode, the reading cursor skips from the h2 to the next visible node, so all work and education history is lost unless the page happens to scroll far enough to trigger each row's 'top 88%' reveal first. The h2 itself uses the 'lines' reveal (set visible immediately) and stays readable, which makes the gap harder to notice. Fails 1.3.1 Info and Relationships (A) in effect (content missing from the accessibility tree) and 1.3.2.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json",
+      "shots/experience/p1/agent-a11y/1440-en-motion-partially-powered.png"
+    ],
+    "file_line": "app/globals.css:114-117; components/motion/Reveals.tsx:57-58; components/Experience.tsx:26,35; components/SectionHeader.tsx:17",
+    "suggested_fix": "Same root fix as the contact finding: pre-reveal state = opacity:0 (plus transform), never visibility:hidden or autoAlpha. That keeps rows exposed to AT while they fade in visually.",
+    "confidence": 0.9,
+    "lens": "a11y"
+  },
+  {
+    "section": "skills",
+    "viewport": "all (verified 1440, 375; en and fr)",
+    "severity": "P1",
+    "description": "In full-motion mode, the Skills section is exposed to screen readers as a heading followed by three empty lists. On a fresh load, 17 of 22 checked nodes are visibility:hidden: the 'Skills' label, the intro paragraph, the three group titles (Languages, Foundations, AI) and all 11 chips. The <ul data-reveal=\"stagger\"> is made visible, but Reveals.tsx then sets autoAlpha:0 on every child <li>. ariaSnapshot of #skills is `heading \"The toolkit.\"`, then `list`, `list`, `list` with zero items. A screen-reader user in browse mode hears 'list, 0 items' three times and none of the skills.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/motion/Reveals.tsx:46-48; components/skills/Skills.tsx:19,22; app/globals.css:114-117",
+    "suggested_fix": "In the stagger case, animate `opacity` and `y` on the children instead of `autoAlpha`, and change the global pre-state to opacity:0. That keeps the list items in the accessibility tree.",
+    "confidence": 0.9,
+    "lens": "a11y"
+  },
+  {
+    "section": "footer",
+    "viewport": "1440 (all viewports share the code)",
+    "severity": "P2",
+    "description": "'Back to top' scrolls the page but leaves keyboard focus where it was. Measured: after pressing Enter on the button and waiting 2.6 s, scrollY = 0 but document.activeElement is still the footer button at y ≈ 15802 px (off-screen). The next Tab goes to <body> (end of the document), then to the browser UI or back to the skip link. A keyboard or screen-reader user sees the top of the page while their focus is stranded at the bottom, and a screen reader keeps reading from the footer. Fails 2.4.3 Focus Order (A) and 2.4.7 (the focused element isn't visible).",
+    "evidence": [
+      "shots/footer/p1/agent-a11y/1440-en-backtotop-focus.png",
+      "shots/footer/p1/agent-a11y/1440-en-after-backtotop.png",
+      "shots/footer/p1/agent-a11y/1440-en-after-backtotop-tab.png"
+    ],
+    "file_line": "components/Footer.tsx:23; lib/scroll.ts:31-43",
+    "suggested_fix": "After scrollToTarget(0), move focus to the top of the page with preventScroll so the smooth scroll isn't interrupted: e.g. give #main or the hero h1 tabIndex={-1} and call `el.focus({preventScroll:true})`. Or make the control an <a href=\"#top\"> that Lenis intercepts, and focus the target in the same way.",
+    "confidence": 0.9,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The row DOM order puts the dates before the heading: <span class=xp-dates> then <h3>org</h3>, role/place, description. A screen-reader user moving by heading (H key / rotor), the most common way to scan a CV-style list, lands on 'AGBU Montreal' and reads forward through role, place and description, but never hears that row's dates. They sit before the heading, so they get read as trailing text of the previous row (e.g. '…kept coming back. 2025 — 2026' then heading 'Independent Tutoring'). The ariaSnapshot confirms each listitem starts with a bare `text: Jul — Sep 2026` above the heading. Fails 1.3.2 Meaningful Sequence (A) and 1.3.1.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json",
+      "shots/experience/p1/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/Experience.tsx:38-40",
+    "suggested_fix": "Put the <h3> first in the DOM and the dates after it, and restore the visual order with grid placement (e.g. dates `md:col-start-1 md:row-start-1`, heading block `md:col-start-4`, or `order-first` on mobile). Or wrap the dates in <p> directly under the h3. Mark the dates up as <time>.",
+    "confidence": 0.8,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The group titles 'Work' / 'Education' ('Expérience' / 'Formation' in fr) are plain <p class=label-mono> elements, and the two <ol> lists have no accessible name. Heading outline: h2 'What I've done so far.' → six h3 rows with nothing that separates work from education. Heading navigation can't tell the McGill and Collège rows (education) apart from the jobs, and list navigation announces 'list, 4 items' / 'list, 2 items' with no label. The visual structure (two labelled groups) is not conveyed programmatically. Fails 1.3.1 Info and Relationships (A).",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json",
+      "shots/experience/p1/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/Experience.tsx:26-30",
+    "suggested_fix": "Render the group title as <h3 id=...> (styled the same) and bump the org names to <h4>, or at least add `aria-labelledby` on each <ol> pointing at the title span.",
+    "confidence": 0.75,
+    "lens": "a11y"
+  },
+  {
+    "section": "skills",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The skill group titles (Languages / Foundations / AI; Langages / Fondamentaux / IA) are <p> elements, and the <ul> chip lists aren't linked to them. The Skills section has a single h2 and no sub-headings. Screen-reader users jumping by list (L key / rotor) hear 'list, 4 items, Python…' with no group name. The 'AI' list (Claude Code, ChatGPT, Codex, Gemini) is only understandable if you happen to read the preceding paragraph. Fails 1.3.1 (A).",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json",
+      "shots/skills/p1/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/skills/Skills.tsx:19-22",
+    "suggested_fix": "Use <h3 id={`skills-${i}`} className=\"label-mono …\"> for the group title and `<ul aria-labelledby={`skills-${i}`}>`.",
+    "confidence": 0.75,
+    "lens": "a11y"
+  },
+  {
+    "section": "skills",
+    "viewport": "1440, 1920, 1280s, 768 (full motion; also touch)",
+    "severity": "P2",
+    "description": "The marquee band moves on its own for as long as it's on screen (a 30 s loop, repeat:-1), with no way to pause, stop or hide it. It also speeds up to 7× base speed with scroll velocity (target = 1 + min(6, v/250)) and reverses direction on scroll-up. aria-hidden hides it from screen readers but not from sighted users with vestibular or attention disorders. The only escape is the OS-level prefers-reduced-motion setting. 2.2.2 Pause, Stop, Hide (A) requires a mechanism for moving content that lasts more than 5 s alongside other content. Relying on the platform setting is arguable at best, and the velocity boost makes it worse (2.3.3 Animation from Interactions, AAA).",
+    "evidence": [
+      "shots/skills/p1/1440/en-motion-00.png",
+      "shots/skills/p1/844l/en-motion-01.png"
+    ],
+    "file_line": "components/skills/Marquee.tsx:17-43",
+    "suggested_fix": "Pause the loop on hover and on focus-within of the section, and offer a small visible pause/play toggle (or stop the drift after a few seconds and only move with scroll). Cap the scroll boost at around 2×.",
+    "confidence": 0.55,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The Copy button's live region sits inside the button (<button><span aria-live=\"polite\">…</span></button>). Activating it changes the button's own accessible name from 'Copy' to 'Copied ✓' (ariaSnapshot after Enter: `button \"Copied ✓\"`) and fires a polite announcement at the same time. Screen readers differ here: VoiceOver often reads the name change and the live region, so you hear it twice, while some NVDA/JAWS versions drop live updates inside the focused control. After 1.8 s the text reverts, and the live region announces a spurious 'Copy' (ariaSnapshot after revert: `button \"Copy\"`). The status message is unreliable and noisy (4.1.3 Status Messages, AA).",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-copy-focus-closeup.png",
+      "shots/contact/p1/agent-a11y/1440-en-copy-copied-focus-closeup.png",
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:75-86",
+    "suggested_fix": "Keep the button's name stable (e.g. aria-label or visible text 'Copy email'). Render a separate visually-hidden `<span role=\"status\" aria-live=\"polite\">` outside the button, and set it to 'Email copied' on success. Clear it silently: set it to '' before the next message instead of announcing 'Copy'. The visual '✓' swap can stay, marked aria-hidden.",
+    "confidence": 0.65,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The Copy control is visually indistinguishable from the static 'EMAIL' label beside it (same label-mono, text-mute #8a8f98, 11.5 px). The only thing that marks it as a button is its pill border, color-line #2a2d33 on ink #0b0c0e = 1.42:1, well below the 3:1 that 1.4.11 Non-text Contrast (AA) requires for the visual information that identifies a UI component. The LinkedIn / GitHub .btn borders are also 1.42:1, but their paper text (16.4:1) and button padding make them more recognisable. The problem is sharpest on Copy.",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-copy-focus-closeup.png",
+      "shots/contact/p1/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/contact/Contact.tsx:83; app/globals.css:377",
+    "suggested_fix": "Give the Copy button a border of at least 3:1 against ink (e.g. border-mute #8a8f98 = 6.0:1, or trace-plus, around #5a5f68 ≈ 3.0:1), and/or paper text so it reads as a control. Consider the same border bump for .btn.",
+    "confidence": 0.55,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "LinkedIn and GitHub open in a new tab (target=\"_blank\"), and the only cue is the '↗' glyph, which is aria-hidden. Sighted users get the hint; screen-reader users hear just 'link, LinkedIn' and are then dropped into a new tab or window with the Back button disabled. The information is conveyed visually but not programmatically (1.3.1). Also advisory technique G201 and 3.2.5 Change on Request (AAA).",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-motion-focus-03.png",
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:61-62",
+    "suggested_fix": "Keep the ↗ aria-hidden but add a visually-hidden suffix, e.g. `<span className=\"sr-only\">{locale==='fr' ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>`, or drop target=_blank.",
+    "confidence": 0.6,
+    "lens": "a11y"
+  },
+  {
+    "section": "footer",
+    "viewport": "all",
+    "severity": "P2",
+    "description": "The footer clock re-renders every second forever (setInterval 1000 ms), including when prefers-reduced-motion is set (measured 17:29:17 → 17:29:18 in the reduced-motion context). There is no pause or hide. It is auto-updating content presented in parallel with other content, which is what 2.2.2 Pause, Stop, Hide (A) covers, and the seconds digit is a constant flicker in peripheral vision. It is correctly not aria-live, but some screen readers refresh the virtual buffer on DOM mutation and may reset or re-read around it. The server-rendered and no-JS content is the literal '--:--:--', which is read as 'dash dash colon dash dash colon dash dash' and is not valid <time> content. There is no datetime attribute.",
+    "evidence": [
+      "shots/footer/p1/1440/en-reduced-00.png",
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/Footer.tsx:39-59",
+    "suggested_fix": "Show HH:MM and tick once a minute (aligned to the minute boundary). That removes the moving seconds and 59 of every 60 DOM mutations. Render nothing, or aria-hide the placeholder, until mounted. Add `dateTime` with the ISO time. Optionally stop updating under prefers-reduced-motion.",
+    "confidence": 0.55,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "1440 (all keyboard users)",
+    "severity": "P3",
+    "description": "The Copy pill changes shape on keyboard focus. The global `:focus-visible { border-radius: 2px }` is unlayered CSS, so it beats Tailwind v4's `rounded-full`, which lives in @layer utilities. The measured computed radius goes from 3.35544e+07px (pill) to 2px on focus, so the control turns into a sharp rectangle inside a square ring. The same happens to every Tailwind-rounded focusable on the page. .btn keeps its pill only because its unlayered `.btn{border-radius:999px}` comes later in the file.",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-copy-focus-closeup.png",
+      "shots/contact/p1/agent-a11y/1440-en-copy-copied-focus-closeup.png"
+    ],
+    "file_line": "app/globals.css:58-62; components/contact/Contact.tsx:83",
+    "suggested_fix": "Remove `border-radius` from the global :focus-visible rule (outlines follow the element's own radius in current browsers), or move the rule into `@layer base` so utilities win.",
+    "confidence": 0.9,
+    "lens": "a11y"
+  },
+  {
+    "section": "footer",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The '↑' in 'Back to top ↑' / 'Haut de page ↑' is part of the button's accessible name (ariaSnapshot: `button \"Back to top ↑\"`), so screen readers say 'Back to top, upwards arrow'. This is inconsistent with Contact and Hero, where the ↓ / ↗ glyphs are wrapped in aria-hidden spans.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json",
+      "shots/footer/p1/agent-a11y/1440-en-backtotop-focus.png"
+    ],
+    "file_line": "components/Footer.tsx:24",
+    "suggested_fix": "`{t(footer.backToTop, locale)} <span aria-hidden=\"true\">↑</span>`",
+    "confidence": 0.9,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The Copy button's name, 'Copy' / 'Copier', doesn't say what it copies. It only makes sense from visual proximity to the email, and screen-reader users tabbing (link, then button) hear just 'Copy, button'. The success state 'Copied ✓' also reads the glyph aloud ('Copied check mark'). This is 2.4.6 Headings and Labels (AA) in the weak sense, and a best practice.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:85; content/site.ts:638-639",
+    "suggested_fix": "Add aria-label 'Copy email address' / 'Copier l'adresse courriel' (the visible 'Copy' is contained in the name, so 2.5.3 still passes), and wrap ✓ in aria-hidden.",
+    "confidence": 0.6,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Copy has no failure path. `navigator.clipboard?.writeText(...)` silently does nothing when the Clipboard API is missing (non-secure http origins such as testing on a LAN IP, some in-app webviews). A rejected promise (permission denied) is unhandled and gives no feedback. The user, sighted or screen-reader, gets no status either way (4.1.3).",
+    "evidence": [
+      "shots/contact/p1/1440/en-motion-copied.png"
+    ],
+    "file_line": "components/contact/Contact.tsx:77-82",
+    "suggested_fix": "Handle the missing-API and `.catch` cases: select the email text (or fall back to a hidden textarea + execCommand) and announce 'Couldn't copy, select the address above' through the same status region.",
+    "confidence": 0.6,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The 'Download CV' / 'Télécharger le CV' link (download attribute, /cv/Gregory_Sutjian_CV.pdf) doesn't state the file type or size. Screen-reader users hear 'link, Download CV' and get an unannounced file download (2.4.4 advisory: identify non-HTML targets).",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/1440-en-motion-focus-02.png"
+    ],
+    "file_line": "components/contact/Contact.tsx:55-57",
+    "suggested_fix": "Add a visually-hidden ' (PDF, 120 KB)' or a small visible 'PDF' tag inside the link.",
+    "confidence": 0.5,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 390, 768 (touch)",
+    "severity": "P3",
+    "description": "The Copy button is only 60×30 CSS px on touch viewports (audit smallTargets). That passes 2.5.8 Target Size Minimum (24 px, AA), but it's well under the 44 px of 2.5.5 (AAA) and the platform guidance. At 375 it sits 12 px (gap-y-3) under the multi-line mailto link, so a miss opens the mail app instead of copying.",
+    "evidence": [
+      "shots/contact/p1/375/en-reduced-01.png",
+      "shots/audit-p1-375-motion_reduced.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:83",
+    "suggested_fix": "Add the existing `tap-area` class, or py-3 on coarse pointers (`pointer-coarse:py-3`), to reach 44 px without changing the look.",
+    "confidence": 0.55,
+    "lens": "a11y"
+  },
+  {
+    "section": "contact",
+    "viewport": "320 (reflow) and 375 with WCAG text-spacing",
+    "severity": "P3",
+    "description": "The email link uses `break-all`, so at 320 px (the 1.4.10 Reflow width) the address splits mid-token as 'gregory.sutjian@mail.mcgil' / 'l.ca'. With 1.4.12 text-spacing overrides at 375 it splits as 'mcgi' / 'll.ca'. Nothing is lost, but low-vision and dyslexic users copying the address by eye can misread it.",
+    "evidence": [
+      "shots/contact/p1/agent-a11y/320-en-reduced-contact.png",
+      "shots/contact/p1/agent-a11y/375-en-textspacing.png"
+    ],
+    "file_line": "components/contact/Contact.tsx:46",
+    "suggested_fix": "Use `[overflow-wrap:anywhere]` with a `<wbr/>` before '@' and before 'mail.', so it breaks at meaningful points ('gregory.sutjian' / '@mail.mcgill.ca').",
+    "confidence": 0.5,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The role/place separator is a real text '/' in text-line #2a2d33 on ink, measured at 1.42:1. It fails 1.4.3's 4.5:1 if treated as text, and screen readers read it aloud ('Math Tutor slash Montreal', 'Tuteur en mathématiques barre oblique Montréal'). It is either meaningful, in which case it is too faint, or decorative, in which case it shouldn't be spoken.",
+    "evidence": [
+      "shots/experience/p1/1440/en-motion-00.png",
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/Experience.tsx:42",
+    "suggested_fix": "`<span aria-hidden=\"true\" className=\"text-line\">/</span><span className=\"sr-only\">,</span>`, or raise it to text-mute (6.0:1).",
+    "confidence": 0.7,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The zero-padded counters next to the group titles ('Work 04', 'Education 02', 'Expérience 04') are read aloud as part of the label ('Work zero four'). They duplicate what the <ol> already announces ('list, 4 items'). The date ranges use an em dash with abbreviations ('Jul — Sep 2026', 'févr. — mai 2024'). VoiceOver's default punctuation level drops the em dash ('Jul Sep 2026'), which loses the 'to' meaning, and there's no machine-readable <time>.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/Experience.tsx:28,38",
+    "suggested_fix": "aria-hidden the counter span. Wrap dates as `<time dateTime=\"2026-07\">Jul</time><span aria-hidden> — </span><span className=\"sr-only\"> to </span><time dateTime=\"2026-09\">Sep 2026</time>`, or provide an sr-only range string.",
+    "confidence": 0.55,
+    "lens": "a11y"
+  },
+  {
+    "section": "experience",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "None of the bottom sections is exposed as a landmark. <section id=\"experience\">, #skills and #contact have no aria-labelledby or aria-label, so browsers map them to generic rather than region. The 'In one sentence' statement section is labelled, so the page is inconsistent. Landmark navigation (VoiceOver rotor / NVDA D) shows only header, nav, main and contentinfo.",
+    "evidence": [
+      "shots/a11y-p1-bottom-results.json"
+    ],
+    "file_line": "components/Experience.tsx:11; components/skills/Skills.tsx:10; components/contact/Contact.tsx:15; components/SectionHeader.tsx:21",
+    "suggested_fix": "Give each section's h2 an id and add `aria-labelledby` on the <section> (SectionHeader can take an id prop).",
+    "confidence": 0.6,
+    "lens": "a11y"
+  },
+  {
+    "section": "skills",
+    "viewport": "1440, 1920, 1280s (hover-capable)",
+    "severity": "P3",
+    "description": "The skill chips are static <li> elements, but on hover they look interactive: the border turns copper, a copper glow appears and the side 'pins' light up. Users with cognitive or low-vision needs may try to click them, and nothing happens. The affordance doesn't match the role (hovering over non-controls is a common confusion source under 3.2 Predictable, best practice).",
+    "evidence": [
+      "shots/skills/p1/1440/chip-hover.png"
+    ],
+    "file_line": "app/globals.css:647-655",
+    "suggested_fix": "Tone the hover down to a subtle, non-button change, e.g. only the pins light up with no border or glow change, or drop it entirely.",
+    "confidence": 0.4,
+    "lens": "a11y"
+  },
+  {
+    "section": "footer",
+    "viewport": "1440 (forced-colors: active)",
+    "severity": "P3",
+    "description": "In Windows High Contrast / forced-colors mode, the decorative outline name 'SUTJIAN' (color: transparent + 1px text-stroke) has its transparent fill forced to CanvasText. It renders as a solid 17.5vw block of text that dominates the footer. It is aria-hidden, so this is purely visual clutter for forced-colors users. Also in forced colors, the marquee outline words become solid, which is acceptable.",
+    "evidence": [
+      "shots/footer/p1/agent-a11y/1440-en-forced-colors.png",
+      "shots/skills/p1/agent-a11y/1440-en-forced-colors.png"
+    ],
+    "file_line": "app/globals.css:688-696",
+    "suggested_fix": "`@media (forced-colors: active){ .footer-mark{ forced-color-adjust:none; color:transparent; -webkit-text-stroke-color:GrayText } }` (or display:none).",
+    "confidence": 0.5,
+    "lens": "a11y"
+  }
+]

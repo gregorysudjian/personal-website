@@ -1,0 +1,199 @@
+[
+  {
+    "section": "about",
+    "viewport": "375, 390, 768, 1440, 1920 (en + fr; every width that shows the datasheet)",
+    "severity": "P2",
+    "description": "The datasheet's barcode has 20px of empty track baked into its own box, so the card's footer row does not end on the card's right padding edge. The <svg> is viewBox='0 0 64 24' drawn at h-6 w-16 (exactly 1:1, 64x24 CSS px), but the bar loop only advances to x=44: the widths [2,1,3,1,1,2,1,3,2,1,1,2,3,1,2,1,1,3] with `x += w + 1` place the last painted rect (i=16) at x=43 w=1, and the odd-index entries are never rendered. Measured at 1440: the card runs 56 -> 556, its px-5 content edge is 535, the header strip's 'GS-26' part number ends at exactly 535, the barcode's <svg> box also ends at 535 — but the last bar's ink ends at 515. So the barcode reads as floating 20px (31% of its own width) inside a justify-between row, ragged against the part number directly above it. Same 20px at every viewport because the svg is not fluid.",
+    "evidence": [
+      "shots/about/p3/agent-visual/datasheet-footer-1440x900-2x.png",
+      "shots/about/p3/agent-visual/datasheet-card-2x.png",
+      "shots/global/p3/agent-visual/px.json"
+    ],
+    "file_line": "components/about/Datasheet.tsx:139-150 (Barcode: viewBox '0 0 64 24', className 'h-6 w-16 shrink-0')",
+    "suggested_fix": "Make the viewBox match the ink the loop actually draws: compute the total advance (sum(widths)+gaps = 44 with the current array) and use viewBox={`0 0 ${total} 24`}, or drop the trailing gap and pad the array to fill 64. Keep w-16 so the drawn width is unchanged; only the empty right track disappears and the last bar lands on 535 with GS-26.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "skills",
+    "viewport": "375, 390 (worst), 768 vs 1440/1920",
+    "severity": "P2",
+    "description": "The outlined marquee words use a fixed 2px -webkit-text-stroke while the type scales from 32px to 72px, so the optical weight of the outline more than doubles between phone and desktop. Measured: font-size 32px at 375 -> stroke 0.0625em; 38.4px at 768 -> 0.0521em; 72px at 1440/1920 -> 0.0278em. At 375 the 2px stroke on 32px caps nearly closes the counters of 'AI' and reads as heavy as the solid words' stems; at 1440 the same words are a delicate hairline outline. The solid/outline contrast the band is built on therefore inverts by viewport. The same fixed-stroke problem sits on .footer-mark (1px at 65.6px type at 375 = 0.0152em, vs 336px type at 1920 = 0.0030em, a 5x relative swing), and the two members of the same 'outlined word' motif use different widths (2px vs 1px).",
+    "evidence": [
+      "shots/skills/p3/agent-visual/marquee-375x667-2x.png",
+      "shots/skills/p3/agent-visual/marquee-1440x900-2x.png",
+      "shots/global/p3/agent-visual/optical.json"
+    ],
+    "file_line": "app/globals.css:697-702 (.marquee-outline, -webkit-text-stroke: 2px) and app/globals.css:783-788 (.footer-mark, -webkit-text-stroke: 1px)",
+    "suggested_fix": "Set the stroke in em so it tracks the optical size: `-webkit-text-stroke-width: 0.028em` on .marquee-outline and `0.004em` on .footer-mark (matching what they already look like at 1440/1920), or clamp() it per breakpoint. Then the outline reads the same weight at 32px and 72px, and the two outlined-word treatments agree.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "375, 390 (en + fr); any width where the eyebrow wraps",
+    "severity": "P2",
+    "description": "When the hero eyebrow wraps to two lines the copper dash sits between them instead of introducing the first line. The <p> is `flex items-center`, so the 1px dash is centred on the whole two-line block. Measured at 375 EN: the eyebrow block is 36.84px tall, the dash mid lands at y=191.00 while the first line's cap midline is 183.11 — 7.89px low. Same 7.89px at 390 EN and 375 FR. Where the eyebrow fits on one line (768, 1440) the dash is -1.33px, i.e. correct. Every other copper dash on the page (SectionHeader) is on a single line, so the motif only misreads here — the rule looks like it belongs to line 2 rather than leading line 1.",
+    "evidence": [
+      "shots/hero/p3/agent-visual/hero-bottom-375x667-2x.png",
+      "shots/global/p3/agent-visual/hero.json"
+    ],
+    "file_line": "components/hero/Hero.tsx:208-211 (`label-mono flex items-center gap-3 leading-[1.6]` with `<span className=\"h-px w-8 shrink-0 bg-copper\">`)",
+    "suggested_fix": "Swap items-center for a first-line alignment on the dash: `items-start` plus a top margin of (line-height - 1px)/2 on the dash (mt-[0.55em] at leading-[1.6]), or make the dash `self-start` with `mt-[calc(0.8em-0.5px)]`. Then it stays on the first line's cap midline whether the text wraps or not.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 1920, 1280s, 768, 375 (every width, DPR 2)",
+    "severity": "P3",
+    "description": "The lit copper rail — the page's signature 1px line — never renders crisp, because a 1.5px stroke is centred on an integer x. railX() returns Math.round(gutter/2) = 28 at 1440, and CircuitTrace draws the core path at strokeWidth 1.5, so the ink spans 27.25-28.75 CSS px. Pixel-sampled at DPR 2 in the Experience rail: device columns read x=27.0 rgb(141,83,43) ~55%, x=27.5 rgb(231,132,62) 100%, x=28.0 rgb(231,131,61) 100%, x=28.5 rgb(140,84,44) ~55% — so the rail paints across 4 device columns with two half-lit edges instead of a clean 3. The unpowered track (strokeWidth 1) beside it is crisp, so the powered rail reads both wider and softer than the dim one it replaces.",
+    "evidence": [
+      "shots/global/p3/agent-visual/rail-core-2x.png",
+      "shots/global/p3/agent-visual/px.json"
+    ],
+    "file_line": "lib/routes.ts:9-12 (railX: Math.round(gutter / 2)) with components/CircuitTrace.tsx:202 (strokeWidth 1.5)",
+    "suggested_fix": "Either put the 1.5px stroke on a quarter-pixel centre — `return Math.round(gutter / 2) + 0.25` in railX (device edges then land on whole pixels at DPR 2) — or make the core strokeWidth 2 so a 4-device-px line is fully lit. Do not change the dim track (strokeWidth 1 on an integer is already crisp).",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 1920 (lg+, where the meter shows)",
+    "severity": "P3",
+    "description": "The page has two vertical copper hairlines and they do not mirror each other. The copper trace rail runs at x=28 (gutter/2 = 56/2) from the left, while the scroll-progress meter is `fixed right-4`, i.e. its 1px column sits at x=1423 at 1440 and x=1903 at 1920 — 16px from the right edge, not 28. An 11-12px asymmetry between the two edge rails of the same system, on both widths (the gutter is 56 at 1440 and 1920, so the mismatch does not close). The meter's track colour (--color-line) and 1px width already match the rail's dim track, which makes the offset read as a mistake rather than a different element.",
+    "evidence": [
+      "shots/skills/p3/agent-visual/marquee-right-edge-2x.png",
+      "shots/global/p3/agent-visual/detail.json"
+    ],
+    "file_line": "components/motion/ScrollProgress.tsx:35 (`fixed right-4 top-1/2 z-40 h-28 w-px`)",
+    "suggested_fix": "Place the meter on the mirrored rail: `right-[calc(var(--gutter)/2)]` instead of right-4 (and -mr-px so the 1px column straddles the same line the left rail does). It then lines up with the copper rail at every width and reads as the other end of the same board.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "all (measured 375, 768, 1440, 1920)",
+    "severity": "P3",
+    "description": "One mono label size, five leadings. .label-mono is defined at 0.72rem / line-height 1.3, but four places override it at the same 11.52px: hero eyebrow leading-[1.6] (18.432px), Focus keywords leading-[1.7] (19.584px), Shot fallback leading-[1.6] (18.432px), Experience dates leading-[1.45] (16.704px), against the utility's 14.976px on the other 75 instances. So the same 11.52px uppercase mono sets at 1.30 / 1.45 / 1.60 / 1.70 depending on the section, and any two of them next to each other (Experience dates 1.45 beside the section label 1.30; Focus keywords 1.7 under a 1.3 panel label) show different line rhythm at identical type size.",
+    "evidence": [
+      "shots/global/p3/agent-visual/detail.json",
+      "shots/global/p3/agent-visual/m-1440.json"
+    ],
+    "file_line": "app/globals.css:81-88 (.label-mono line-height 1.3); overrides at components/hero/Hero.tsx:208, components/focus/Focus.tsx:148, components/projects/Shot.tsx:56, components/Experience.tsx:52",
+    "suggested_fix": "Pick two: keep 1.3 for single-line labels and add one modifier (e.g. `.label-mono-wrap { line-height: 1.6 }`) for the labels that are expected to wrap (hero eyebrow, Focus keywords, Shot fallback, Experience dates). Drop the one-off leading-[1.45]/[1.7] values.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "all (measured at 1440; the sizes are viewport-independent)",
+    "severity": "P3",
+    "description": "The uppercase mono tracking does not step monotonically with size — it zig-zags, so smaller labels are sometimes set tighter than larger ones. Measured computed values on the page: 9.60px/1.344px = 0.14em; 9.92px/1.389px = 0.14em; 10.56px/1.267px = 0.12em; 10.88px/1.306px = 0.12em; 11.52px/1.613px = 0.14em; 11.84px/1.421px = 0.12em. So the 11.52px section labels are tracked looser (0.14em) than the 11.84px .btn labels (0.12em) sitting a few rows away, while the 10.56px slide tabs are tighter (0.12em) than the 9.6px badges above them (0.14em). The optical rule (more tracking as the size drops) is broken in both directions.",
+    "evidence": ["shots/global/p3/agent-visual/m-1440.json"],
+    "file_line": "app/globals.css:81-88 (.label-mono 0.14em), app/globals.css:443-461 (.btn 0.12em), components/about/Datasheet.tsx:103 (0.12em), components/projects/Slides.tsx + ChatPreview.tsx + ProjectCard.tsx (0.08em variants)",
+    "suggested_fix": "Define the mono tracking as one ramp keyed to size (e.g. <=10px -> 0.16em, 10-12px -> 0.14em, >=12px -> 0.12em) and route .btn, the badges and the tabs through it instead of per-component arbitrary values.",
+    "confidence": "medium",
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "1440, 1920 (all widths where the panels are at full size)",
+    "severity": "P3",
+    "description": "The display tracking ramp inverts in the middle. Measured computed letter-spacing against size: 48px h2 -0.025em, 48.96px project h3 -0.035em, 72px Focus panel h3 -0.045em (-3.24px), 76.5px statement -0.035em, 86.4px section h2 -0.04em (-3.456px), 118.08px contact h2 -0.045em, 236.16px hero name -0.045em, 252px footer mark -0.05em. So the 72px Focus panel title is tracked tighter than the 76.5px statement and the 86.4px section headings above it — the smaller heading is the tightest of the three, which is the opposite of what optical sizing wants and is visible when 'Software' (72px, -0.045em) sits under 'Three things I keep coming back to.' (86.4px, -0.04em) in the same frame.",
+    "evidence": [
+      "shots/focus/p3/agent-visual/focus-panel-head-1440x900-2x.png",
+      "shots/global/p3/agent-visual/m-1440.json"
+    ],
+    "file_line": "components/focus/Focus.tsx:142 (tracking-[-0.045em] on a clamp(2.6rem,5vw,5.2rem) h3) vs components/SectionHeader.tsx:26 (-0.04em) and components/Statement.tsx:63 (-0.035em)",
+    "suggested_fix": "Move the Focus panel h3 to -0.04em so it sits on the same ramp as the section h2 above it (or make tracking a single clamp() expression driven by font-size across all display type: roughly -0.025em at 48px falling to -0.05em at 250px).",
+    "confidence": "medium",
+    "lens": "visual"
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 768, 1440, 1920 (en + fr); same pattern in about and statement",
+    "severity": "P3",
+    "description": "The full stop that ends an accented sentence is left outside the accent, so it renders in a different face, weight and colour from the word it closes. In 'Let's build *something*.' the word is Instrument Serif italic in copper rgb(232,130,58) while the period is GeistSans in paper rgb(237,235,230) at the full display size (118.08px at 1440, 137.6px at 1920, 43.1px at 375). On top of that .accent carries padding-right: 0.04em, so the period is pushed a further 4.72px (1440) / 5.50px (1920) / 1.72px (375) off the italic 'g' — at 2x the white dot reads as a detached square rather than the end of the sentence. Same construction in the About and Statement headings.",
+    "evidence": [
+      "shots/contact/p3/agent-visual/contact-chip-1440x900-2x.png",
+      "shots/global/p3/agent-visual/detail.json"
+    ],
+    "file_line": "app/globals.css:98-105 (.accent padding-right: 0.04em) with components/Rich.tsx:1-19 (only the *starred* run gets .accent) and content/site.ts (headings written as '…*something*.')",
+    "suggested_fix": "Either pull terminal punctuation into the accent run in Rich.tsx (match `\\*([^*]+)\\*([.,!?]?)` and wrap the trailing mark too) or replace padding-right with a margin-right that the following punctuation can sit inside. Simplest content-side fix: write the headings as '…*something.*'.",
+    "confidence": "medium",
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440, 1920 (and any width where the 16:9 stills are shown in the xl frame)",
+    "severity": "P3",
+    "description": "The 16:9 project stills are pillarboxed inside their own frame, so a dark hairline gutter runs down each side of the screenshot instead of the capture meeting the frame border. Measured at 1440: lf-overview.webp is 2048x1156 (AR 1.7716) drawn into a 752.66x423.59 box (AR 1.7768) with object-contain — contain is height-limited here, so the drawn image is 750.45px wide and a 1.10 CSS px (2.2 device px) band of #0c0b0e shows left and right. clarte-hq-overview.webp (2400x1356, AR 1.7699) leaves 1.47px each side. With object-top the vertical is flush, so the gap only appears on the sides, which reads as the image being 2px narrow rather than as a deliberate letterbox.",
+    "evidence": [
+      "shots/projects/p3/agent-visual/shot-left-edge-2x.png",
+      "shots/global/p3/agent-visual/px.json"
+    ],
+    "file_line": "components/projects/Slides.tsx / components/projects/ProjectCard.tsx:138 (frame aspect) with components/projects/Shot.tsx:61-83 (object-contain object-top)",
+    "suggested_fix": "Make the frame's aspect-ratio match the captures exactly (2048/1156 = 1.7716, i.e. aspect-[512/289]) instead of a rounded 16:11 / 16:9, or switch these stills to object-cover object-top — 5px of crop off a 1156px-tall capture is invisible and the image then meets the border on all four sides.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "all (375, 390, 768, 1440, 1920)",
+    "severity": "P3",
+    "description": "The copper dash that introduces a label comes in three different treatments. SectionHeader uses `section-index h-px w-8 bg-copper` — 32px wide, and when powered it gets a copper glow (box-shadow 0 0 10px 1px rgb(232 130 58 / 0.8), confirmed on all 6 section labels). The hero eyebrow uses `h-px w-8 shrink-0 bg-copper` — same 32px but no .section-index, so it never lights up (computed box-shadow: none). The mobile-menu rows use `h-px w-6 shrink-0 bg-copper` — 24px and also no glow. Three widths/finishes for one motif; the hero's is the one the visitor sees first and it is the only 32px dash on the page that stays dead.",
+    "evidence": [
+      "shots/hero/p3/agent-visual/hero-bottom-375x667-2x.png",
+      "shots/projects/p3/agent-visual/label-dash-1440x900-2x.png",
+      "shots/global/p3/agent-visual/hero.json"
+    ],
+    "file_line": "components/SectionHeader.tsx:20 vs components/hero/Hero.tsx:209 vs components/Nav.tsx:235",
+    "suggested_fix": "Give the hero eyebrow and the mobile-menu dashes the same `section-index` class and w-8, so all three are 32px and share the powered glow (the menu can keep its own on/off rule). One dash component would stop this drifting again.",
+    "confidence": "high",
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 1920 (measurable at every width; visible at DPR 2)",
+    "severity": "P3",
+    "description": "Tracked uppercase leaves a trailing letter-space after the last glyph, so right-aligned and centred mono labels sit ~1.3-1.6px inside the edge they are meant to touch, while left-aligned ones are flush. .label-mono's 0.14em at 11.52px adds 1.61px of dead advance; .btn's 0.12em at 11.84px adds 1.42px, and btn-sm's at 10.56px adds 1.27px. Pixel-scanned on the datasheet header strip at 1440 (px-5 + 1px border = 21px content inset on both sides): the 'DATASHEET' ink starts 21.00px from the visual left edge while the 'GS-26' ink ends 22.00px from the right — a 1px optical asymmetry on a strip that is nominally symmetric. The same sliver makes the footer 'BACK TO TOP ↑' and the hero 'OPEN TO INTERNSHIPS' stop ~1.6px short of the 56px gutter that the left-hand column is flush with, and pushes every .btn label 1.27px left of its pill's centre.",
+    "evidence": [
+      "shots/about/p3/agent-visual/datasheet-strip-2x.png",
+      "shots/footer/p3/agent-visual/footer-meta-1440x900-2x.png",
+      "shots/global/p3/agent-visual/final.json"
+    ],
+    "file_line": "app/globals.css:81-88 (.label-mono letter-spacing 0.14em), app/globals.css:443-461 (.btn letter-spacing 0.12em)",
+    "suggested_fix": "Strip the trailing advance where the text is right-aligned or centred: `margin-right: -0.14em` on right-aligned .label-mono (footer back-to-top, GS-26, hero status) and `padding-right: calc(1.2rem - 0.12em)` on .btn / .btn-sm, or add a shared `.tracks-tight { margin-inline-end: -1em * tracking }` helper.",
+    "confidence": "medium",
+    "lens": "visual"
+  },
+  {
+    "section": "skills",
+    "viewport": "375, 390, 768, 1440, 1920 (all)",
+    "severity": "P3",
+    "description": "The chip's label and its pin strips do not share a midline. The .chip box is 46.78px tall (0.8rem padding x2 + 19.2px line-height + 2px border); the text's cap band leaves 19.81px above the cap top and 17.88px below the baseline, so the label sits 0.97px below the box's optical centre. The ::before/::after pin strips, by contrast, are pinned with `top: 50%; transform: translateY(-50%)` on the box, i.e. exactly centred. At DPR 2 (2x) the ~2 device-px offset between the label's optical centre and the pin block is visible on the wider chips. The same line-box-vs-cap-band drift puts the project status pill's caps 2.03px off centre in a 26.89px pill (8.91 above / 10.94 below) and the contact Copy button's 1.35px off in 32.97px.",
+    "evidence": [
+      "shots/skills/p3/agent-visual/chips-1440x900-2x.png",
+      "shots/global/p3/agent-visual/optical.json"
+    ],
+    "file_line": "app/globals.css:704-736 (.chip padding 0.8rem 1.15rem, ::before/::after top:50% translateY(-50%))",
+    "suggested_fix": "Centre on the cap band rather than the line box: add ~1px to the chip's padding-bottom (padding: 0.8rem 1.15rem 0.86rem) or set line-height: 1 and let the padding do the centring. Same one-pixel correction on the status pill (py-[7px_5px] instead of py-1.5).",
+    "confidence": "medium",
+    "lens": "visual"
+  },
+  {
+    "section": "skills",
+    "viewport": "1440, 1920 (visible wherever solid and outlined words sit side by side)",
+    "severity": "P3",
+    "description": "Fixing UI-106 left the two word styles in the same marquee line set at different tracking, so the band's letter rhythm changes word to word. Measured at 1440: solid words letter-spacing -2.88px on 72px = -0.04em; outlined words -0.72px on 72px = -0.01em — a 0.03em (2.16px per gap) difference inside one continuous line. On top of that the outlined glyphs carry a 2px stroke that widens each letterform by ~2px, so 'AI' and 'PYTHON' are both looser and wider than 'SOFTWARE' and 'MATH' beside them. Same 0.04 / 0.01em split at 375 and 768.",
+    "evidence": [
+      "shots/skills/p3/agent-visual/marquee-1440x900-2x.png",
+      "shots/global/p3/agent-visual/optical.json"
+    ],
+    "file_line": "app/globals.css:697-702 (.marquee-outline letter-spacing -0.01em) overriding components/skills/Marquee.tsx:82 (tracking-[-0.04em])",
+    "suggested_fix": "Meet in the middle rather than at the ends: put the row at -0.02em and the outline at -0.015em, or keep the row tracking and open the outlined words with word-spacing instead of letter-spacing, so only the gaps between outlined words change and the internal rhythm stays common.",
+    "confidence": "medium",
+    "lens": "visual"
+  }
+]

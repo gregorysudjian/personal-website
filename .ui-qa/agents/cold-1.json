@@ -1,0 +1,215 @@
+[
+  {
+    "section": "focus",
+    "viewport": "390 / 375 / 768 / 844l (FR)",
+    "severity": "P0",
+    "description": "In French, the body copy of focus cards 02 (IA) and 03 (Maths) is cut off mid-word at the card's right border. At 390 the Maths paragraph reads \"Des annees de tutorat en algebre, en / geometrie et en calcul ont fait des ma / ma facon d'aborder les problemes : / decomposer, trouver la logique, verifie / reponse.\" - every line is sliced at the card edge with zero right padding, and the sentence is unreadable. Same on the IA card. The text column inside these two cards is wider than the card itself (card 01 Logiciel is fine), so the overflow is hidden by the card's border radius.",
+    "evidence": [
+      "shots/focus/p2/390/fr-reduced-03.png",
+      "shots/focus/p2/375/fr-reduced-04.png",
+      "shots/focus/p2/375/fr-motion-03.png",
+      "shots/focus/p2/768/fr-reduced-01.png",
+      "shots/focus/p2/844l/fr-motion-04.png"
+    ],
+    "suggested_fix": "Make the card's inner text column width-constrained to the card (max-width:100%, box-sizing:border-box, no fixed px width carried over from the desktop 2-column layout) and give it the same left/right padding as card 01; verify with the longest FR strings.",
+    "confidence": 0.95
+  },
+  {
+    "section": "focus",
+    "viewport": "375 / 390 / 768 (EN)",
+    "severity": "P1",
+    "description": "Same overflow in English, milder but still visibly broken: the tag row under the Math card reads \"ALGEBRA · CALCULUS · PROBLEM SOLVI\" - the last word is chopped by the card border - and the sine-curve graphic and body text run flush into the right edge with no padding while card 01 has a proper gutter. Inconsistent padding between the three cards of the same component.",
+    "evidence": [
+      "shots/focus/p2/375/en-reduced-04.png",
+      "shots/focus/p2/768/en-reduced-01.png",
+      "shots/global/p2/375/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Let the tag row wrap (flex-wrap) or shrink, and apply one shared padding token to all three focus cards so 01/02/03 are identical.",
+    "confidence": 0.9
+  },
+  {
+    "section": "global",
+    "viewport": "1440 / 375",
+    "severity": "P1",
+    "description": "The sticky header has no background/scrim in several states, so page text scrolls straight through the nav. On 1440 (footer/mark-hover) the sentence \"I'm looking for an internship or co-op where I can learn fast,\" is printed on top of ABOUT / PROJECTS / EXPERIENCE and collides with CONTACT; on the projects specs-open state \"Every demo site gets its own design 'genome': 10 art directions,\" overlaps CONTACT and the EN / FR switch. On 375 the logo chip sits on top of \"ROLE / Solo project, AI-assisted\". Two layers of text occupy the same pixels - unreadable for both.",
+    "evidence": [
+      "shots/footer/p2/1440/mark-hover.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png",
+      "shots/projects/p2/375/en-motion-specs-open.png",
+      "shots/projects/p2/375/fr-motion-specs-open.png"
+    ],
+    "suggested_fix": "Apply the scrolled header background (solid or blurred scrim + bottom hairline) whenever scrollY > 0 rather than only on scroll-direction events, so it can never be transparent over content; the nav/p2/1440 header-over-content shots show the correct treatment.",
+    "confidence": 0.9
+  },
+  {
+    "section": "hero",
+    "viewport": "1920 / 1440 / 1280s / 844l",
+    "severity": "P1",
+    "description": "There is a full, completely empty screen between the hero and the \"IN ONE SENTENCE\" statement. At 1440 the whole 900px viewport after the hero contains nothing but a thin diagonal copper line; at 1920 the gap is ~950px of black; same at 1280s and 844l. A visitor scrolling past the hero gets one full screen of nothing and reasonably concludes the page has ended or failed to load.",
+    "evidence": [
+      "shots/hero/p2/1440/en-motion-01.png",
+      "shots/hero/p2/1280s/en-motion-01.png",
+      "shots/hero/p2/844l/en-motion-01.png",
+      "shots/global/p2/1920/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Cut the spacer that carries the trace between hero and statement to at most ~40vh, or pin the statement so it enters while the trace is still drawing; the trace can run behind the statement instead of occupying its own screen.",
+    "confidence": 0.85
+  },
+  {
+    "section": "focus",
+    "viewport": "1280s",
+    "severity": "P1",
+    "description": "On the short laptop the horizontal focus carousel never lands: at the final state (counter reads 03 / 03, progress bar full) the Math/Maths card still runs off the right edge of the window - its right border and corner marker are cut, the last words (\"check the answer.\" / \"en geometrie\") sit hard against the viewport edge - and the faint vertical scroll-progress rail is drawn on top of the card text. The last of three cards is never fully visible.",
+    "evidence": [
+      "shots/focus/p2/1280s/en-motion-03.png",
+      "shots/focus/p2/1280s/fr-motion-03.png"
+    ],
+    "suggested_fix": "End the horizontal track with the last card aligned to the page's right gutter (account for the rail width), and clamp the scroll distance so 03/03 equals a fully visible card.",
+    "confidence": 0.65
+  },
+  {
+    "section": "hero",
+    "viewport": "1280s",
+    "severity": "P2",
+    "description": "At 1280x620 the hero name breaks apart: \"GREGORY\" is parked in the top-left and \"SUTJIAN\" is flung to the far right edge with ~450px of empty black between them and a vertical offset, so it reads as two unrelated words rather than one name. The type is also much smaller relative to the viewport than at 1440, leaving a large dead band above the eyebrow line.",
+    "evidence": [
+      "shots/hero/p2/1280s/en-motion-atf.png",
+      "shots/hero/p2/1280s/fr-motion-atf.png",
+      "shots/hero/p2/1280s/en-motion-00.png"
+    ],
+    "suggested_fix": "Keep the two lines on the same optical grid at short heights (indent the second line by a fixed em amount instead of right-aligning it to the viewport), and scale the name by min(vw, vh) so it does not shrink while the gap grows.",
+    "confidence": 0.7
+  },
+  {
+    "section": "hero",
+    "viewport": "844l",
+    "severity": "P2",
+    "description": "In phone landscape the hero drops the tagline entirely - \"I like building things, from AI agents to full websites...\" / \"J'aime construire des choses...\" is absent, so the first screen is just a name and two buttons with no explanation of who this is. The SCROLL/DEFILER cue is also gone. The circuit trace additionally runs straight through the \"TELECHARGER LE CV\" button.",
+    "evidence": [
+      "shots/hero/p2/844l/en-motion-atf.png",
+      "shots/hero/p2/844l/fr-motion-atf.png",
+      "shots/nav/p2/844l/fr-no-menu-button.png"
+    ],
+    "suggested_fix": "Keep the tagline in landscape (one line, smaller type) instead of display:none; if vertical space is tight, shrink the name rather than deleting copy.",
+    "confidence": 0.75
+  },
+  {
+    "section": "statement",
+    "viewport": "375 / 390 / 844l / 1440",
+    "severity": "P2",
+    "description": "Section headings leave one-word widows on phones: \"Three things I / keep coming back / to.\" ends with \"to.\" alone on its own line; \"What I've done so / far.\" leaves \"far.\" alone; the FR contact heading breaks as \"Construisons quelque / chose.\". At 1440 the focus heading breaks as \"Three things I keep / coming back to.\" so the italic phrase splits across lines inconsistently with the other headings.",
+    "evidence": [
+      "shots/focus/p2/375/en-reduced-00.png",
+      "shots/global/p2/375/en-reduced-fullpage.jpg",
+      "shots/contact/p2/768/fr-motion-00.png",
+      "shots/focus/p2/1440/en-motion-00.png"
+    ],
+    "suggested_fix": "Add non-breaking spaces / text-wrap:balance to the display headings so the final punctuation word never lands alone, and check each locale's longest heading.",
+    "confidence": 0.6
+  },
+  {
+    "section": "footer",
+    "viewport": "375 / 390 / 768 / 1440",
+    "severity": "P2",
+    "description": "The giant outlined \"SUTJIAN\" wordmark at the bottom of the footer is sliced off by the end of the document on every viewport - roughly the bottom third of the letters is missing at 1440 and about half at 375/768 - so the page ends on a chopped word rather than a deliberate crop. Its outline is also barely distinguishable from the background (near-black on black).",
+    "evidence": [
+      "shots/footer/p2/1440/en-motion-00.png",
+      "shots/footer/p2/375/en-motion-00.png",
+      "shots/footer/p2/768/fr-motion-00.png",
+      "shots/global/p2/375/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Either show the wordmark whole with bottom padding, or crop it deliberately at a consistent fraction (e.g. exactly half the cap height) at every breakpoint, and lift its stroke opacity a step.",
+    "confidence": 0.6
+  },
+  {
+    "section": "projects",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "Keyboard focus and the expanded accordion are visually sloppy. Focusing a project slide tab (\"01 · LEADS\") draws an orange rectangle whose top edge cuts into the bottom of the app screenshot and whose bottom edge sits on the caption \"The dashboard: new leads ranked by priority...\". With \"HOW IT'S BUILT\" expanded, the focus rectangle around the trigger touches the \"PROBLEM\" label directly beneath it - the panel opens with no separation from its header. Focus styling is also inconsistent across the page: nav links and accordions get a square orange outline, pills get a cream rounded ring.",
+    "evidence": [
+      "shots/global/p2/1440/en-motion-tab10.png",
+      "shots/global/p2/1440/en-motion-tab08.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png",
+      "shots/global/p2/1440/en-motion-tab04.png"
+    ],
+    "suggested_fix": "Use one focus token (same color, width and offset, radius matching the element) everywhere, give it 3-4px outline-offset so it never touches neighbouring text, and add top padding to the expanded accordion panel.",
+    "confidence": 0.6
+  },
+  {
+    "section": "skills",
+    "viewport": "1440 / 375",
+    "severity": "P3",
+    "description": "The toolkit grid wraps badly and wastes space: at 1440 \"Mathematics\" and \"Gemini\" each sit alone on a second row while the three columns end at 1384px and the rest of the row is empty; at 375 \"Bash\" drops alone under Python/Java/C. The decorative IC \"pins\" on the first chip of each row also stick out 4-5px to the left of the column rule, so the chips look misaligned with their LANGUAGES / FOUNDATIONS / AI headings.",
+    "evidence": [
+      "shots/skills/p2/1440/en-motion-00.png",
+      "shots/skills/p2/375/en-motion-01.png",
+      "shots/skills/p2/375/fr-reduced-01.png"
+    ],
+    "suggested_fix": "Widen the columns (or use auto-fit columns) so each group fits on one row, and inset the chips by the pin width so the chip bodies align to the column rule.",
+    "confidence": 0.55
+  },
+  {
+    "section": "statement",
+    "viewport": "1440 / 375",
+    "severity": "P3",
+    "description": "The scroll-linked word-by-word reveal leaves most of the sentence at roughly 2.5:1 contrast (mid-grey on near-black) whenever the reader stops scrolling mid-section - in en-motion-00 more than half of \"I chase that feeling everywhere: in code, in math, and in whatever I haven't tried yet.\" is barely legible. The reduced-motion version shows the whole sentence in full white, which is what the screen should look like when it is stationary.",
+    "evidence": [
+      "shots/statement/p2/1440/en-motion-00.png",
+      "shots/statement/p2/375/fr-motion-00.png",
+      "shots/statement/p2/1440/en-reduced-00.png"
+    ],
+    "suggested_fix": "Raise the un-revealed state to at least 4.5:1 (or animate weight/opacity between 0.55 and 1 instead of 0.25 and 1) so a paused reader always has readable text.",
+    "confidence": 0.5
+  },
+  {
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "The custom cursor sits on top of labels instead of beside them: on the skills chip hover its dot lands inside the word \"Python\" (\"Pyt·hon\"), and on the contact copied state its ring encircles the \"COPIE\" pill, producing a double outline around a component that already has a border.",
+    "evidence": [
+      "shots/skills/p2/1440/chip-hover.png",
+      "shots/contact/p2/1440/fr-motion-copied.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png"
+    ],
+    "suggested_fix": "Use mix-blend-mode/difference or shrink the cursor to a ring only (no centre dot) over text, and suppress the ring expansion over elements that already have a visible border.",
+    "confidence": 0.5
+  },
+  {
+    "section": "projects",
+    "viewport": "375 / 768 / 1440 (FR)",
+    "severity": "P3",
+    "description": "On the French page the embedded product screenshots are still fully English - the Lead Finder dashboard shows \"Hair and beauty businesses in Montreal\", \"Next up\", \"Your leads (12)\", \"80/100 · High\" - right under French copy that promises a bilingual product. The WhatsApp demo header also truncates to \"Commerce demo · Assista...\" on phones.",
+    "evidence": [
+      "shots/global/p2/375/fr-reduced-fullpage.jpg",
+      "shots/nav/p2/375/fr-reduced-header-over-content.png",
+      "shots/global/p2/768/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Ship a French capture of each app screenshot (or at least of the Lead Finder dashboard), and let the WhatsApp demo header shrink its type rather than ellipsing the business name.",
+    "confidence": 0.55
+  },
+  {
+    "section": "about",
+    "viewport": "1440 / 375 (FR)",
+    "severity": "P3",
+    "description": "French spec-sheet copy reads awkwardly: \"JE CHERCHE - Des stages et des stages coop\" repeats the word \"stages\" twice in five words (EN reads cleanly: \"Internships and co-op roles\"), and on 375 the label \"JE CHERCHE\" wraps onto two lines while every other label in the same list stays on one, breaking the row rhythm.",
+    "evidence": [
+      "shots/about/p2/1440/fr-motion-01.png",
+      "shots/global/p2/375/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Rewrite as \"Stages et alternances\" (or \"Stages et stages coop\" -> \"Stages, dont coop\") and keep the label column wide enough for the longest FR label so none of them wrap.",
+    "confidence": 0.5
+  },
+  {
+    "section": "experience",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "In motion mode rows of the timeline stay dimmed after they are fully in view - in en-motion-01 \"College Mariste Champville\" and its description are rendered in mid-grey while the McGill row above them is white, so the last entry looks disabled or unfinished. The reduced-motion capture shows every row at full white, confirming the dim state is the reveal not completing.",
+    "evidence": [
+      "shots/experience/p2/1440/en-motion-01.png",
+      "shots/experience/p2/1440/fr-motion-00.png",
+      "shots/experience/p2/1440/fr-reduced-00.png"
+    ],
+    "suggested_fix": "Trigger the row reveal on a threshold near the bottom of the viewport (or force-complete it when the section's bottom is reached) so no visible row is left at reduced opacity.",
+    "confidence": 0.45
+  }
+]

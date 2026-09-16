@@ -1,0 +1,260 @@
+[
+  {
+    "section": "contact",
+    "viewport": "320 (FR); also 360 FR",
+    "severity": "P1",
+    "description": "The FR contact heading overflows the chip box and gets clipped at the screen edge. The h2 is clamp(3rem,8.2vw,…), so it bottoms out at 48px. At that size the single word \"Construisons\" is 272px wide, but the box's content area at 320px is only 222px (x 49→271). The word runs from x 49 to 321: it crosses the box's right border (x 296) and the section's overflow-hidden cuts off the final \"s\" at the 320px edge. At 360 FR it still overruns the content area by 10px (right 321 vs 311), ending 14px from the border, so the right padding is lost. EN (\"Let's build\", 205px) fits. 320 CSS px is the width of an iPhone SE, or any iPhone with Display Zoom on.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/320-fr-00.png",
+      "shots/contact/p1/agent-mobile/360-fr-00.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:34",
+    "suggested_fix": "Give phones a lower minimum: `text-[clamp(2.3rem,11.5vw,3rem)] md:text-[clamp(3rem,8.2vw,8.6rem)]`. That gives \"Construisons\" ≈208px at 320 and ≈235px at 360, both of which fit. Add `hyphens-auto` as a safety net (the html lang is fr-CA), and optionally use px-5 instead of px-6 on the chip box below 360px.",
+    "confidence": 0.95,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "320 (EN and FR)",
+    "severity": "P2",
+    "description": "`break-all` splits the email address in the middle of a word. At 18.4px the address is 243px wide, but only 222px is available at 320, so it renders as \"gregory.sutjian@mail.mcgil\" / \"l.ca\". Anyone reading or retyping the address sees \"mcgil l.ca\", and the second line is a tiny 4-character tap target for the mailto link. The address fits on one line at ≥360.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/320-en-01.png",
+      "shots/contact/p1/agent-mobile/320-fr-01.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:46",
+    "suggested_fix": "Replace `break-all` with `[overflow-wrap:anywhere]` and put a break opportunity after the @: render `gregory.sutjian@<wbr />mail.mcgill.ca`, so it wraps as \"gregory.sutjian@\" / \"mail.mcgill.ca\". Or lower the clamp minimum to 1rem (≈211px at 320, which fits).",
+    "confidence": 0.95,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 390, 320, 360, 768, 844l (all touch)",
+    "severity": "P2",
+    "description": "The Copy button is a primary mobile action (many phones have no mail app set up), but its tap target is only 60×29.5px (EN) or 77×29.5px (FR), below 44px. At ≤390 it also sits only 11.8px below the 30.6px-tall mailto link, and those two targets do different things. A slightly high tap on Copy lands on the email and opens the mail app instead.",
+    "evidence": [
+      "shots/audit-p1-375-motion_reduced.json",
+      "shots/contact/p1/375/en-motion-01.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:115",
+    "suggested_fix": "Make the pill at least 44px tall (`min-h-11 px-4 inline-flex items-center`), or add the existing `tap-area` class with a smaller inset. Also increase the row's gap-y from 3 to 4 on mobile so the email's and Copy's hit areas can't touch.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "390 (touch); applies to all touch devices",
+    "severity": "P2",
+    "description": "The pill buttons stay stuck in their hover state on touch. `.btn:hover` isn't gated by `(hover: hover)`, so tapping LinkedIn or GitHub (which open a new tab) leaves the button inverted when you come back: paper fill, ink text, ::before at translateY(0). It looks selected or active until you tap somewhere else. Measured after a tap at 390: color rgb(11,12,14), border rgb(237,235,230), :hover=true. Download CV behaves the same way.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/sticky-hover-linkedin-390.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-interact.log"
+    ],
+    "file_line": "app/globals.css:417",
+    "suggested_fix": "Wrap `.btn:hover` and `.btn:hover::before` in `@media (hover: hover) { … }` and keep the `:focus-visible` variants outside it. For immediate touch feedback, add a short `.btn:active` style, such as a slight darkening or `scale(0.98)`. The same applies to `.link-underline:hover` (globals.css:360), which leaves the email underlined after a tap.",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "375 / 390 (touch)",
+    "severity": "P3",
+    "description": "On touch, nothing shows the email is a link. The underline only appears on :hover or :focus-visible, and the address uses the same paper colour as the body text. On a phone it reads as plain text in an 18px box 30.6px tall, and the only thing that looks tappable nearby is the small Copy pill. Users either miss that they can tap it to write an email or tap it by accident when aiming for Copy.",
+    "evidence": [
+      "shots/contact/p1/375/en-motion-01.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:46",
+    "suggested_fix": "On devices without hover, show the underline at rest, e.g. `@media (hover: none) { #contact .link-underline { background-size: 100% 1px } }`, or add a small ↗/✉ glyph. Pad the link vertically (`py-2 -my-2`) so its hit area reaches 44px.",
+    "confidence": 0.6,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 768 (EN/FR)",
+    "severity": "P3",
+    "description": "The Copy pill changes width when tapped. EN grows from 60px to 94px (\"COPIED ✓\", +57%) and FR from 77px to 86px, then shrinks back after 1.8s. On ≥768 and in 844×390 landscape it sits inline after the email, so you can see it grow to the right under your finger. It's a small jump, but it's the only feedback the tap gives.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/copy-chromium-375-granted.png",
+      "shots/contact/p1/768/en-motion-copied.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-interact.log"
+    ],
+    "file_line": "components/contact/Contact.tsx:117",
+    "suggested_fix": "Reserve the width by stacking both labels in one grid cell (`grid` on the button, both spans `col-start-1 row-start-1`, idle or done label `invisible`), or give it `min-w-[7.5rem] justify-center`.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "real iPhone over plain-http LAN / iOS < 13.4 (not reproducible in desktop engines)",
+    "severity": "P3",
+    "description": "This concerns the Copy fallback in the working tree, which runs when navigator.clipboard is missing. It uses `field.select()` on a readonly textarea but doesn't call `setSelectionRange(0, len)`. It also leaves the textarea at its default font size (<16px), with no top/left. iOS Safari doesn't select text from `select()` alone, so `execCommand('copy')` can still return true and show \"Copied ✓\" even though nothing was copied. Focusing a field smaller than 16px can also trigger iOS auto-zoom. If everything fails, the address is selected with no message, which on iOS shows no callout. The desktop simulations pass: Chromium and WebKit with navigator.clipboard removed both show \"COPIED ✓\", with scrollY unchanged and scale 1. Real iOS is the unverified case, and it's the owner's own LAN test path.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/copy-webkit-390-noClipboardAPI.png",
+      "shots/contact/p1/agent-mobile/copy-chromium-375-noClipboardAPI.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-interact.log"
+    ],
+    "file_line": "components/contact/Contact.tsx:78-104",
+    "suggested_fix": "In fallback(), set `field.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;font-size:16px'`, then call `field.focus({preventScroll:true}); field.select(); field.setSelectionRange(0, field.value.length)`. On failure, switch the pill to a visible hint (e.g. \"Hold to copy\") rather than only selecting the address.",
+    "confidence": 0.45,
+    "lens": "mobile"
+  },
+  {
+    "section": "contact",
+    "viewport": "844l (844×390 landscape); 768",
+    "severity": "P2",
+    "description": "In landscape the space above and below the contact box is desktop-sized. With md:py-48 (192px) on contact plus the skills section's bottom padding, there's 368px of empty board between the last skill chip and the contact box, and 192px between the box and the footer. With a 390px-tall viewport and the 80px fixed header, you scroll through more than a full screen of bare traces before the box, and the box itself (612px) is 1.6 screens tall. Pages in landscape feel broken or empty.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/844l-en-gap-before-box.png",
+      "shots/contact/p1/844l/en-motion-02.png"
+    ],
+    "file_line": "components/contact/Contact.tsx:15",
+    "suggested_fix": "Use the existing `short:` custom variant (max-height:500px): `short:py-16` on the section, and `short:py-10` plus a smaller heading clamp on the chip box. Board.tsx re-measures on resize, so the board follows automatically.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "experience",
+    "viewport": "768 (touch tablet) and 844l landscape; EN and FR",
+    "severity": "P2",
+    "description": "At md the rows switch to a 12-column grid with md:gap-8, which spends 11×32=352px on gutters. At 768 the three columns come out at only 153, 214 and 276px (170, 238 and 305px at 844 landscape). The md:text-3xl (30px) org names wrap in 4 of 6 rows: \"Independent / Tutoring\", \"Saint Joseph / University\", \"McGill / University\", \"Collège Mariste / Champville\" (FR: \"Tutorat / indépendant\", \"Université / Saint-Joseph\", …). Roles wrap too (\"Tuteur en mathématiques / Montréal\"), and the description sits in a narrow ~276px column. Every row becomes a ragged 3-column block, and the one-column phone layout would read better.",
+    "evidence": [
+      "shots/experience/p1/768/fr-motion-00.png",
+      "shots/experience/p1/agent-mobile/768-en-rows.png",
+      "shots/experience/p1/agent-mobile/844l-en-rows.png"
+    ],
+    "file_line": "components/Experience.tsx:36-40",
+    "suggested_fix": "Keep the stacked layout until lg (`lg:grid-cols-12 lg:gap-8`), or at md use a tighter template: `md:grid-cols-[9.5rem_1fr_1.25fr] md:gap-x-8` with `md:text-2xl lg:text-3xl` on .xp-org.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "experience",
+    "viewport": "768 FR (touch tablet)",
+    "severity": "P2",
+    "description": "When the FR date wraps, its two lines collide. In the 153px dates column at 768, \"JUIL. — SEPT. 2026\" wraps to \"JUIL. — SEPT.\" / \"2026\". label-mono sets line-height:1, so the two 11.5px uppercase lines have no leading at all (box h≈23px for 2 lines), and they read as a smudge in copper next to the 30px org name. The same zero-leading wrap affects any label-mono text that wraps on tablets.",
+    "evidence": [
+      "shots/experience/p1/768/fr-motion-00.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/Experience.tsx:38 (utility at app/globals.css:70-76)",
+    "suggested_fix": "Add `whitespace-nowrap` to .xp-dates, together with a column wide enough for the longest FR date (~9.5rem). Or give .xp-dates `leading-[1.45]`. More broadly, raise label-mono's line-height to about 1.3; its single-line uses won't change visually.",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "experience",
+    "viewport": "844l landscape, 768; 375 to a lesser degree",
+    "severity": "P2",
+    "description": "The gap between the end of Experience and the Skills marquee is a whole screen of nothing in landscape. Experience's md:py-48 bottom (192px) plus Skills' md:py-44 top (176px) is 368px, against a 390px viewport of which the fixed header takes 80px. Mid-scroll the screen shows only the rail and the header (see screenshot). At 375 portrait the same gap is 256px, 38% of a 667px screen.",
+    "evidence": [
+      "shots/skills/p1/agent-mobile/844l-en-gap-before-marquee.png"
+    ],
+    "file_line": "components/Experience.tsx:11; components/skills/Skills.tsx:10",
+    "suggested_fix": "Add `short:py-16` to both sections (the variant is already defined in globals.css:6 for max-height:500px), and trim phone padding to py-24 so section breaks stay under ~⅓ of the viewport.",
+    "confidence": 0.75,
+    "lens": "mobile"
+  },
+  {
+    "section": "experience",
+    "viewport": "320-390 (touch)",
+    "severity": "P3",
+    "description": "The row dates (and the WORK/EDUCATION group labels and counts) are label-mono: 0.72rem = 11.52px, uppercase, 0.14em tracking. Until the trace powers a row they're also mute (#8a8f98, 6.0:1). On a phone held at arm's length, 11.5px spaced caps are at the edge of comfortable reading. Dates are real content here, unlike the decorative kicker labels.",
+    "evidence": [
+      "shots/experience/p1/375/fr-motion-01.png",
+      "shots/experience/p1/agent-mobile/320-fr-00.png"
+    ],
+    "file_line": "components/Experience.tsx:38; app/globals.css:72",
+    "suggested_fix": "Bump label-mono to about 0.78rem (12.5px) below md, or give just .xp-dates `text-[0.8rem]` on mobile.",
+    "confidence": 0.55,
+    "lens": "mobile"
+  },
+  {
+    "section": "skills",
+    "viewport": "390 (touch); all touch devices",
+    "severity": "P3",
+    "description": "The skill chips look tappable (bordered boxes with pin \"legs\") but do nothing. `.chip:hover` isn't gated by `(hover: hover)`, so a tap lights the chip (copper border, 26px glow, copper pins) and it stays lit until you tap something else. A mobile user who taps \"Python\" gets a stuck highlight and no result, which reads like a broken filter. Verified after a tap: :hover=true, border rgb(232,130,58), box-shadow applied.",
+    "evidence": [
+      "shots/skills/p1/agent-mobile/sticky-hover-chip-390.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-interact.log"
+    ],
+    "file_line": "app/globals.css:666-673",
+    "suggested_fix": "Wrap `.chip:hover`, `.chip:hover::before` and `.chip:hover::after` in `@media (hover: hover)`.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "skills",
+    "viewport": "844l landscape (and 768)",
+    "severity": "P2",
+    "description": "Landscape spacing inside Skills is out of proportion to the screen. There's 163px between the marquee's bottom border and the SKILLS heading, and after the last chip the section still has md:py-44 (176px) before the contact padding starts, which gives the 368px bare stretch before the contact box. Once you add the 368px gap before the marquee (see the experience finding), Skills in 844×390 is mostly empty scrolling around a single band.",
+    "evidence": [
+      "shots/skills/p1/agent-mobile/844l-en-gap-before-marquee.png",
+      "shots/contact/p1/agent-mobile/844l-en-gap-before-box.png"
+    ],
+    "file_line": "components/skills/Skills.tsx:10,14",
+    "suggested_fix": "Add `short:py-14` on the section and `short:mt-12` on the inner gutter (currently mt-24 md:mt-32).",
+    "confidence": 0.7,
+    "lens": "mobile"
+  },
+  {
+    "section": "skills",
+    "viewport": "390 EN, 768 FR",
+    "severity": "P3",
+    "description": "The chips' pin pseudo-elements (5px each side, at -6px) aren't accounted for in the layout, so a chip that ends at its row's edge pushes its pins out of the column. At 390 EN the \"Codex\" chip's right pins reach x=372, 6px past the column/gutter edge (366). At 768 FR \"Structures de données\" is exactly as wide as its 208px column (x 280→488), so both pin sets stick out into the gaps. One more character in a translation would overflow the column. The chip wraps its own text rather than the row, so the pins then sit on a two-line chip.",
+    "evidence": [
+      "shots/skills/p1/768/fr-motion-00.png",
+      "shots/contact/p1/agent-mobile/agentB-bottom-measure.json"
+    ],
+    "file_line": "components/skills/Skills.tsx:22; app/globals.css:633-646",
+    "suggested_fix": "Pad the list horizontally by the pin width (`px-[6px]` on the ul), or keep the gap-x as-is and add `mx-[6px]` to each chip, so the pins stay inside the column. Add `whitespace-nowrap` on .chip so long labels move to a new row instead of breaking.",
+    "confidence": 0.5,
+    "lens": "mobile"
+  },
+  {
+    "section": "footer",
+    "viewport": "768 (touch tablet) and 844l landscape; FR worst",
+    "severity": "P2",
+    "description": "The long FR labels wrap unevenly in the footer's 4-column grid. At md each column is only 161.6px (768) or 179px (844). \"© 2026 GREGORY SUTJIAN\" wraps to 2 lines in both locales. FR \"HEURE LOCALE\" wraps as \"HEURE / LOCALE\" with the clock to its right, while \"FAIT À MONTRÉAL\" and \"HAUT DE PAGE ↑\" stay on one line. label-mono's line-height:1 makes the wrapped lines touch (23px box for 2 lines of 11.5px). The row ends up as four items at three different heights.",
+    "evidence": [
+      "shots/footer/p1/agent-mobile/768-fr-bottom.png",
+      "shots/footer/p1/768/fr-motion-00.png",
+      "shots/footer/p1/844l/fr-motion-00.png"
+    ],
+    "file_line": "components/Footer.tsx:11-21",
+    "suggested_fix": "Use `md:grid-cols-2 lg:grid-cols-4` (a 2×2 grid on tablets and landscape phones), or `md:flex md:flex-wrap md:justify-between md:gap-x-10` with `whitespace-nowrap` on each item. Wrapped footer text also needs a line-height of about 1.4.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "footer",
+    "viewport": "390 (touch); all touch devices",
+    "severity": "P3",
+    "description": "The big outlined last name sticks in its hover state on touch. `.footer-mark:hover` isn't gated by hover capability, so a tap (common while scrolling to the bottom) turns the stroke copper and it stays that way (verified: :hover=true, stroke rgb(232,130,58)). Because the element is aria-hidden and select-none, a stuck copper name suggests it's interactive when it isn't.",
+    "evidence": [
+      "shots/contact/p1/agent-mobile/agentB-bottom-interact.log",
+      "shots/footer/p1/agent-mobile/360-en-bottom.png"
+    ],
+    "file_line": "app/globals.css:713",
+    "suggested_fix": "Wrap `.footer-mark:hover` in `@media (hover: hover)`.",
+    "confidence": 0.7,
+    "lens": "mobile"
+  },
+  {
+    "section": "footer",
+    "viewport": "320-390 (touch)",
+    "severity": "P3",
+    "description": "All of the footer's real content is 11.52px uppercase mono with 0.14em tracking: ©, Made in Montreal, the local-time label and Back to top. Three of the four items are mute #8a8f98 (6.0:1). On a phone this is the smallest text on the page, stacked in four rows with 20px gaps, and it's also where users land at the end of the page. The FR labels are the longest (\"HEURE LOCALE 17:28:08\" spans ~180px of 11.5px caps).",
+    "evidence": [
+      "shots/footer/p1/375/fr-motion-00.png",
+      "shots/footer/p1/agent-mobile/320-fr-bottom.png"
+    ],
+    "file_line": "components/Footer.tsx:12-25; app/globals.css:72",
+    "suggested_fix": "Use 0.78–0.8rem for the footer items below md (e.g. `max-md:text-[0.8rem]`), or raise label-mono's size on mobile across the page.",
+    "confidence": 0.55,
+    "lens": "mobile"
+  }
+]

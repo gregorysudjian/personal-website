@@ -4,6 +4,10 @@
 @custom-variant roomy (@media (min-width: 48rem) and (min-height: 501px));
 /* Very short screens, e.g. a phone held sideways: the hero drops to a compact bottom row. */
 @custom-variant short (@media (max-height: 500px));
+/* Barely any height at all (a laptop zoomed to 200-400%): the hero stops pinning and simply flows. */
+@custom-variant tiny (@media (max-height: 360px));
+/* Screens tall enough to pin the About datasheet beside the text without cutting it off. */
+@custom-variant tall (@media (min-height: 840px));
 
 /* ------------------------------------------------------------ design tokens */
 
@@ -27,11 +31,15 @@
 :root {
   color-scheme: dark;
   --gutter: clamp(1.5rem, 4vw, 3.5rem);
+  /* everything that lights up when the copper spark arrives shares this clock */
+  --dur-power: 0.9s;
 }
 
 /* ------------------------------------------------------------------- base */
 
 html {
+  /* Section heights are set by the scroll animations; the browser's own scroll anchoring fights them. */
+  overflow-anchor: none;
   background: var(--color-ink);
   color: var(--color-paper);
   scrollbar-gutter: stable;
@@ -55,10 +63,17 @@ body {
   color: var(--color-ink);
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-copper);
-  outline-offset: 4px;
-  border-radius: 2px;
+/* In the base layer so utilities (rounded-full pills) keep their own shape; the outline follows it. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 4px;
+  }
+}
+
+/* The skip-link / back-to-top focus target: a container, so no ring around the whole page. */
+#main:focus {
+  outline: none;
 }
 
 /* -------------------------------------------------------------- utilities */
@@ -70,7 +85,8 @@ body {
 @utility label-mono {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  line-height: 1;
+  /* a little air, so labels that wrap (dates, keywords, French) don't collide */
+  line-height: 1.3;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -97,9 +113,10 @@ body {
 .skip-link {
   position: fixed;
   top: 0.75rem;
-  left: 0.75rem;
+  left: var(--gutter);
   z-index: 100;
-  padding: 0.75rem 1rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 999px;
   background: var(--color-paper);
   color: var(--color-ink);
   transform: translateY(-200%);
@@ -110,16 +127,52 @@ body {
 
 /* ---------------------------------------------------- intro / boot states */
 
-/* Elements the intro / scroll reveals animate in start hidden, but only when JS is running. */
-html.js [data-intro],
-html.js [data-reveal] {
+/* Elements the intro / scroll reveals animate in start hidden, but only when JS is running.
+   Scroll reveals only go transparent (never visibility:hidden), so content that hasn't scrolled
+   into view yet can still be reached with Tab and read by screen readers. */
+html.js [data-intro] {
   visibility: hidden;
+}
+html.js [data-reveal],
+html.js .header {
+  opacity: 0;
+}
+/* Sections are focus targets for in-page links (see lib/scroll.ts); no ring around a whole section. */
+section[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* The pinned sentence starts dim, before its words are split and lit one by one (see Statement.tsx). */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .statement-text:not(.is-split) {
+    opacity: 0.2;
+  }
 }
 
 /* Keep descenders (g, y, p) inside the line masks of revealed headings. */
 [data-reveal="lines"] > div {
   padding-bottom: 0.1em;
   margin-bottom: -0.1em;
+}
+
+/* Before the app's JS arrives on a slow first visit, the intro shows its mark instead of a black screen. */
+@keyframes boot-wait {
+  from { opacity: 0; visibility: visible; }
+  to { opacity: 1; visibility: visible; }
+}
+html.js:not(.booted) .boot:not(.is-live) .boot-mark {
+  animation: boot-wait 0.8s ease-out 0.6s both;
+}
+
+/* Plain-content mode (no JS, or the app never arrived): controls that need JS would do nothing, so they
+   step aside and what they would have opened is simply shown. */
+html:not(.js) .specs-panel {
+  height: auto !important;
+}
+html:not(.js) .specs-toggle,
+html:not(.js) .slide-steps,
+html:not(.js) [aria-controls="mobile-menu"] {
+  display: none;
 }
 
 /* The boot overlay only plays once per visit, never without JS or with reduced motion. */
@@ -129,9 +182,12 @@ html.booted .boot {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-intro],
-  html.js [data-reveal] {
+  html.js [data-intro] {
     visibility: visible;
+  }
+  html.js [data-reveal],
+  html.js .header {
+    opacity: 1;
   }
   .boot {
     display: none;
@@ -146,9 +202,14 @@ html.booted .boot {
   z-index: 80;
   pointer-events: none;
   opacity: 0.06;
+  /* promoted only where it actually animates (see the media query below) */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain 0.9s steps(5) infinite;
-  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .grain {
+    will-change: transform;
+  }
 }
 
 @keyframes grain {
@@ -210,9 +271,9 @@ html.booted .boot {
   border: 1px solid var(--color-trace);
   background: var(--color-ink);
   transition:
-    background-color 0.5s var(--ease-out-expo),
-    border-color 0.5s var(--ease-out-expo),
-    box-shadow 0.5s var(--ease-out-expo);
+    background-color var(--dur-power) var(--ease-out-expo),
+    border-color var(--dur-power) var(--ease-out-expo),
+    box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .trace-pad.is-on {
   background: var(--color-copper);
@@ -271,6 +332,7 @@ html.booted .boot {
 /* Live status dot */
 .status-dot {
   position: relative;
+  flex-shrink: 0;
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -351,9 +413,17 @@ html.has-cursor * {
   padding-bottom: 3px;
   transition: background-size 0.6s var(--ease-out-expo);
 }
-.link-underline:hover,
-.link-underline:focus-visible {
-  background-size: 100% 1px;
+/* On touch there's no hover to reveal it, so the email shows as a link from the start. */
+@media (hover: none) {
+  #contact .link-underline {
+    background-size: 100% 1px;
+  }
+}
+/* Hover looks only where there's a real hover; on touch they'd stick after a tap. */
+@media (hover: hover) {
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* Bigger invisible touch area for small text controls; what you see doesn't change. */
@@ -363,7 +433,20 @@ html.has-cursor * {
 .tap-area::before {
   content: "";
   position: absolute;
-  inset: -12px -6px;
+  inset: -16px -8px;
+}
+
+/* Header backdrop once the page has scrolled (see Nav.tsx): the gradient alone lets text show through. */
+.header-solid {
+  background: rgb(11 12 14 / 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgb(42 45 51 / 0.7);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out-expo);
+}
+header.is-scrolled .header-solid {
+  opacity: 1;
 }
 
 .btn {
@@ -374,7 +457,7 @@ html.has-cursor * {
   align-items: center;
   gap: 0.6rem;
   padding: 1.05rem 1.6rem;
-  border: 1px solid var(--color-line);
+  border: 1px solid rgb(237 235 230 / 0.28); /* ~3:1 against the page, so the control's edge is visible */
   border-radius: 999px;
   font-family: var(--font-mono);
   font-size: 0.74rem;
@@ -395,14 +478,29 @@ html.has-cursor * {
   transform: translateY(101%);
   transition: transform 0.6s var(--ease-out-expo);
 }
-.btn:hover,
 .btn:focus-visible {
   color: var(--color-ink);
   border-color: var(--color-paper);
 }
-.btn:hover::before,
 .btn:focus-visible::before {
   transform: translateY(0);
+}
+@media (hover: hover) {
+  .btn:hover {
+    color: var(--color-ink);
+    border-color: var(--color-paper);
+  }
+  .btn:hover::before {
+    transform: translateY(0);
+  }
+}
+/* Touch: a short press state instead of a hover that never goes away (every control, not just pills). */
+@media (hover: none) {
+  .btn:active,
+  a:active,
+  button:active {
+    opacity: 0.75;
+  }
 }
 .btn-primary {
   background: var(--color-copper);
@@ -410,6 +508,7 @@ html.has-cursor * {
   color: var(--color-ink);
 }
 .btn-sm {
+  min-height: 44px;
   padding: 0.8rem 1.2rem;
   font-size: 0.66rem;
 }
@@ -418,7 +517,7 @@ html.has-cursor * {
 
 .section-index {
   flex-shrink: 0;
-  transition: box-shadow 0.9s var(--ease-out-expo);
+  transition: box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .section-label.is-powered .section-index {
   box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
@@ -447,15 +546,17 @@ html.has-cursor * {
 /* ------------------------------------------------------------------ focus */
 
 /* Keep in sync with HORIZONTAL in components/focus/Focus.tsx.
-   Windows too small for the panels (phones held sideways, small narrow windows) get the stacked list. */
-@media (min-width: 768px) and (min-height: 900px) and (prefers-reduced-motion: no-preference),
-  (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
+   Windows too small for the panels (phones held sideways, portrait tablets, small windows) get the stacked list. */
+@media (min-width: 1000px) and (min-height: 700px) and (prefers-reduced-motion: no-preference),
   (min-width: 1200px) and (min-height: 580px) and (prefers-reduced-motion: no-preference) {
   html.js .focus-frame {
     position: sticky;
     top: 0;
     height: 100svh;
-    overflow: hidden;
+    /* clip, not hidden: find-in-page or a screen reader can't scroll the pinned frame sideways */
+    overflow: clip;
+    /* the card entering at the edge fades instead of being cut mid-word */
+    mask-image: linear-gradient(to right, transparent, black 2.5rem, black calc(100% - 2.5rem), transparent);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -472,6 +573,13 @@ html.has-cursor * {
   }
   html.js .focus-meter {
     display: flex;
+  }
+
+  /* Still too tight after the compact sizes (text-only zoom, a large default font): the panel's text
+     scrolls rather than being cut off. Set from Focus.tsx after a second measure. */
+  html.js .focus-tight .focus-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   /* Only when the text wouldn't fit (short laptop windows): sizes follow the screen height so the
@@ -540,6 +648,10 @@ html.has-cursor * {
 .slide-progress {
   animation: slide-progress 4.2s linear forwards;
 }
+@keyframes slide-glide {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--glide-to, 0)); }
+}
 @keyframes slide-progress {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
@@ -582,23 +694,16 @@ html.has-cursor * {
 }
 .xp-org {
   color: var(--color-mute);
-  transition:
-    color 0.9s var(--ease-out-expo),
-    transform 0.6s var(--ease-out-expo);
+  transition: color var(--dur-power) var(--ease-out-expo);
 }
 .xp-dates {
-  transition: color 0.9s var(--ease-out-expo);
+  transition: color var(--dur-power) var(--ease-out-expo);
 }
 .xp-row.is-powered .xp-org {
   color: var(--color-paper);
 }
 .xp-row.is-powered .xp-dates {
   color: var(--color-copper);
-}
-@media (hover: hover) {
-  .xp-row:hover .xp-org {
-    transform: translateX(10px);
-  }
 }
 
 /* ----------------------------------------------------------------- skills */
@@ -607,15 +712,17 @@ html.has-cursor * {
    stroke, so the overlapping shapes inside letters like H don't show through. */
 .marquee-outline {
   color: var(--color-ink);
-  -webkit-text-stroke: 2px var(--color-mute);
+  -webkit-text-stroke: 0.028em var(--color-mute); /* scales with the type, unlike a fixed 2px */
   paint-order: stroke fill;
+  letter-spacing: -0.015em; /* meets the solid words' rhythm halfway; they can't share a value (the stroke eats the gap) */
 }
 
 .chip {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.8rem 1.15rem;
+  /* a hair more below, so the caps sit on the pins' midline */
+  padding: 0.8rem 1.15rem 0.86rem;
   border: 1px solid var(--color-line);
   border-radius: 3px;
   background: var(--color-graphite);
@@ -644,22 +751,24 @@ html.has-cursor * {
 .chip::after {
   right: -6px;
 }
-.chip:hover {
-  border-color: var(--color-copper);
-  color: var(--color-paper);
-  box-shadow: 0 0 26px -6px rgb(232 130 58 / 0.55);
-}
-.chip:hover::before,
-.chip:hover::after {
-  background: repeating-linear-gradient(to bottom, var(--color-copper) 0 1px, transparent 1px 4px);
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-copper);
+    color: var(--color-paper);
+    box-shadow: 0 0 26px -6px rgb(232 130 58 / 0.55);
+  }
+  .chip:hover::before,
+  .chip:hover::after {
+    background: repeating-linear-gradient(to bottom, var(--color-copper) 0 1px, transparent 1px 4px);
+  }
 }
 
 /* ---------------------------------------------------------------- contact */
 
 .chip-box {
   transition:
-    border-color 1.2s var(--ease-out-expo),
-    box-shadow 1.4s var(--ease-out-expo);
+    border-color var(--dur-power) var(--ease-out-expo),
+    box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .chip-corner {
   position: absolute;
@@ -667,7 +776,7 @@ html.has-cursor * {
   height: 14px;
   margin: -1px;
   border-color: var(--color-mute);
-  transition: border-color 1s var(--ease-out-expo);
+  transition: border-color var(--dur-power) var(--ease-out-expo);
 }
 .contact.is-powered .chip-box {
   border-color: rgb(232 130 58 / 0.55);
@@ -678,21 +787,34 @@ html.has-cursor * {
 .contact.is-powered .chip-corner {
   border-color: var(--color-copper);
 }
+.contact.is-powered .section-index {
+  box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
+}
 .contact .accent {
-  transition: text-shadow 1.4s var(--ease-out-expo);
+  transition: text-shadow var(--dur-power) var(--ease-out-expo);
 }
 .contact.is-powered .accent {
   text-shadow: 0 0 34px rgb(232 130 58 / 0.55);
 }
 
 .footer-mark {
-  margin-bottom: -2.4vw;
+  margin-bottom: -0.5vw;
   color: transparent;
   -webkit-text-stroke: 1px var(--color-trace);
   transition: -webkit-text-stroke-color 0.8s var(--ease-out-expo);
 }
-.footer-mark:hover {
-  -webkit-text-stroke-color: var(--color-copper);
+@media (hover: hover) {
+  .footer-mark:hover {
+    -webkit-text-stroke-color: var(--color-copper);
+  }
+}
+/* High-contrast mode would fill the outlined name solid; keep it a quiet outline. */
+@media (forced-colors: active) {
+  .footer-mark {
+    forced-color-adjust: none;
+    color: transparent;
+    -webkit-text-stroke-color: GrayText;
+  }
 }
 
 /* ------------------------------------------------ reduced motion: be still */

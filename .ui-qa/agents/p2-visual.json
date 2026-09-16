@@ -1,0 +1,272 @@
+[
+  {
+    "section": "hero",
+    "viewport": "768, 844l, 1280s, 1440, 1920 (every width >= 768), reduced motion, en + fr",
+    "severity": "P1",
+    "description": "REGRESSION of UI-067 (the reduced-motion dead scroll). The fix `motion-reduce:h-[125svh]` only works below md, because `md:h-[190vh]` is emitted later in the stylesheet and wins. From 768 up the hero stays 190vh while its frame is a static 100svh block, so reduced-motion visitors scroll through a full screen of bare ink between the hero's bottom row and the Statement label. Measured (hero bottom to 'IN ONE SENTENCE' label): 938px at 1440x900 (hero 1710, frame 900), 1050px at 768x1024 (hero 1946), 1100px at 1920x1080 (hero 2052), 1178-900 at 1280x620. At 390 it is 339px (125svh applies there). The screenshot at 1440 shows only the copper diagonal on empty ink, and the hero's grid-floor lines stop in a hard horizontal cut at the frame's bottom edge (the floor mask is still 30% opaque there). Every other section boundary on the page is 208-368px, so this one is 3x the page's rhythm.",
+    "evidence": [
+      "shots/hero/p2/agent-visual/reduced-hero-to-statement-1440.png",
+      "shots/hero/p2/agent-visual/reduced-hero-to-statement-768.png",
+      "shots/hero/p2/agent-visual/reduced-hero-to-statement-1920.png",
+      "shots/hero/p2/agent-visual/reduced-hero-to-statement-390.png",
+      "shots/global/p2/1440/en-reduced-fullpage.jpg",
+      "shots/global/p2/agent-visual/p2vis-verify-herogap.json"
+    ],
+    "file_line": "components/hero/Hero.tsx:169",
+    "suggested_fix": "Stack the variants so the reduced-motion height beats the breakpoint one: `h-[170vh] md:h-[190vh] motion-reduce:h-auto md:motion-reduce:h-auto` (the frame is already `motion-reduce:relative h-svh`, so the section then ends right where the frame does). The Statement's own `motion-reduce:py-32` then gives about 128px, close to the page's other boundaries.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "375, 390, 768 (stacked list; both motion modes), fr worst, en at 375 and 768",
+    "severity": "P1",
+    "description": "REGRESSION of UI-180. The keyword line can no longer wrap at all, so it runs past the panel's right edge and the panel's overflow-hidden cuts it off. Each keyword and its ' · ' separator sit inside one `whitespace-nowrap` span, which leaves no break opportunity anywhere in the line (measured: 1 line in every panel at every width). Overflow past the panel edge: 375 FR panel 2 +13px ('API DE LL…'), panel 3 +64px ('RÉSOLUTION DE PRO…'); 390 FR panel 3 +49px; 375 EN panel 3 +13px ('PROBLEM SOLVIN…'); 768 FR panel 2 cut at 'API DE LL', panel 3 +53px; 768 EN panel 3 runs 51px into the right padding. At 375 FR the unbreakable line also widens the body grid track, so the body paragraph above it runs to the panel border as well ('j'apprends' touches the right edge). Clipped text in the section that introduces the owner's interests, and only on phones and tablets.",
+    "evidence": [
+      "shots/focus/p2/agent-visual/keywords-clip-375-fr.png",
+      "shots/focus/p2/agent-visual/keywords-clip-375-en.png",
+      "shots/focus/p2/agent-visual/keywords-clip-768-fr-reduced.png",
+      "shots/focus/p2/agent-visual/keywords-clip-768-en-reduced.png",
+      "shots/global/p2/agent-visual/p2vis-verify-keywords.json"
+    ],
+    "file_line": "components/focus/Focus.tsx:146-156 (span at :151)",
+    "suggested_fix": "Keep only the keyword itself unbreakable and leave a normal space after the separator, e.g. `<span className=\"whitespace-nowrap\">{k}{j < all.length - 1 ? \" ·\" : \"\"}</span>{j < all.length - 1 ? \" \" : \"\"}`. Add `min-w-0` to `.focus-body` so no single long token can widen the column again.",
+    "confidence": 0.95,
+    "lens": "visual"
+  },
+  {
+    "section": "hero",
+    "viewport": "768 (touch tablet) fr; up to 1023 fr",
+    "severity": "P2",
+    "description": "REGRESSION of UI-088. The FR hero CTAs still stack on a tablet: 'VOIR LES PROJETS' (179px) at y=884 and 'TÉLÉCHARGER LE CV' (170px) at y=940, while EN at the same width sits side by side (both at y=940). The fix only widened the text column from lg (`lg:grid-cols-[minmax(0,1.5fr)_1fr]`). At md the `[1fr_auto_1fr]` grid still leaves the left column about 300px, less than the 361px FR needs. So the two locales still get different bottom rows at 768, which the issue listed explicitly. At 1024 FR they fit (y 684 / 684).",
+    "evidence": [
+      "shots/hero/p2/agent-visual/cta-rows-768-fr.png",
+      "shots/hero/p2/768/fr-reduced-00.png",
+      "shots/global/p2/agent-visual/p2vis-verify-misc.json"
+    ],
+    "file_line": "components/hero/Hero.tsx:233",
+    "suggested_fix": "Give the text column more room at md too, e.g. `md:grid-cols-[minmax(0,1.7fr)_auto_minmax(0,1fr)]`, which gives a left column of about 365px at 768. Or use a 12px gap and `flex-nowrap` with `btn-sm` padding 1rem at md, so both FR pills fit in 361px.",
+    "confidence": 0.9,
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "768, 1280s, 1440, 1920 (reduced; motion gives the same numbers where nothing is pinned)",
+    "severity": "P2",
+    "description": "The spacing between sections still has two outliers. Measured from the last content of one section to the first content of the next at 1440 reduced: Statement→About 320, About→Focus 208, Focus→Projects 304, Projects→Experience 320, Experience→marquee 288, Skills chips→Contact box 368, Contact box→footer 192. About→Focus is 100-110px tighter than every other chapter change (About md:pb-24 96 + Focus frame py-28 112; 210 at 1440 motion, 180 at 1280x620 motion). Skills→Contact is the widest gap on the page (Skills md:pb-44 176 + Contact md:py-48 192). The pass-1 rhythm fix (UI-188) retuned only Projects, and UI-104's skills→contact half is still 368. At 768 the 368px band above the contact box is mostly empty.",
+    "evidence": [
+      "shots/global/p2/1440/en-reduced-fullpage.jpg",
+      "shots/global/p2/768/fr-reduced-fullpage.jpg",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "components/about/About.tsx:10; components/focus/Focus.tsx:102; components/skills/Skills.tsx:10; components/contact/Contact.tsx:19",
+    "suggested_fix": "Settle on a single boundary of about 304-320px at md+. For example, About `md:pb-32` (Focus's py-28 then gives 240; or make the focus frame `md:pt-48` in its stacked state) and Skills `md:pb-32` (128 + 192 = 320). Keep the phone values, which are already even (192-256).",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "statement",
+    "viewport": "all (md+ worst), en + fr",
+    "severity": "P3",
+    "description": "The copper-dash mono label is one pattern, but the gap from it to the display text below takes four values. SectionHeader (About, Focus, Projects, Experience, Skills) uses 24px. Contact uses 32px (mt-8). The Statement uses 48px at md+ (md:mb-12) and 32px on phones. The hero eyebrow uses 36px (md:mb-9). Measured at 1440: 24/24/24/24/24 vs contact 32, statement 48, hero 36. The Statement label also has no rail pad (the rail passes x=23.5 with no pad near y=1838, while every section label has one at its own y: 2702.8, 3846.8, 5684, 9905.3, 11790.4) and its dash lacks `.section-index`. So it looks like a section label but never lights up like one.",
+    "evidence": [
+      "shots/global/p2/1440/en-reduced-fullpage.jpg",
+      "shots/statement/p2/1440/en-motion-01.png",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "components/Statement.tsx:54-58; components/contact/Contact.tsx:33-41; components/hero/Hero.tsx:207; components/SectionHeader.tsx:19-26",
+    "suggested_fix": "Use 24px (mb-6) under every copper-dash label, or one deliberate second step (e.g. 32px) shared by the Statement, hero and Contact. Give the Statement label `data-pad` plus `section-index` and `CircuitTrace padsAt=\"[data-pad]\"`, like the other labels.",
+    "confidence": 0.85,
+    "lens": "visual"
+  },
+  {
+    "section": "contact",
+    "viewport": "768, 1440, 1920 (md+)",
+    "severity": "P3",
+    "description": "The Contact header is the only one that doesn't follow the SectionHeader scale. It is built by hand, so every metric drifts a little. The h2 is 118px at 1440 (8.2vw) against 86.4px for every other h2 (+37%), 137.6 vs 99.2 at 1920 and 63 vs 46 at 768. Its leading is 0.96 against 1.02, and its tracking -0.045em against -0.04em. The label gap is 32 against 24 (UI-117's gap half was left as is). The intro is 20px with a 44ch cap, while the Projects and Skills intros are 18px with 46ch. A finale can be bigger, but here it reads as a different type system, not a deliberate step.",
+    "evidence": [
+      "shots/contact/p2/1440/en-motion-00.png",
+      "shots/projects/p2/1440/en-reduced-00.png",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "components/contact/Contact.tsx:33-47",
+    "suggested_fix": "Render SectionHeader inside the chip box, with a `size=\"xl\"` prop that only scales the h2 (keep leading 1.02, tracking -0.04em, mt-6), and use the shared intro style (text-lg, 46ch). Or keep the bigger h2 but take everything else from the SectionHeader tokens.",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "1280s, 1440, 1920 (lg+); 768-1023 for the card",
+    "severity": "P3",
+    "description": "About is the only section whose label and h2 don't start on the page gutter. From lg they sit in the right column: label and h2 at x=740 (1440), 980 (1920), 660 (1280). Every other section starts at x=56 / 51.2 (Contact's label sits inside its centred box). The rail pad that powers the About label is at x=23.5, next to the datasheet's header strip, 700px away from the label. Between 768 and 1023 the datasheet is centred (`mx-auto max-w-[500px]`, card x≈134-634 at 768), the only centred block in an otherwise left-aligned page at that width (the contact box is full width there).",
+    "evidence": [
+      "shots/about/p2/1440/en-motion-00.png",
+      "shots/global/p2/768/fr-reduced-fullpage.jpg",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "components/about/About.tsx:15-17, 47-48; components/about/Datasheet.tsx:53",
+    "suggested_fix": "Put the SectionHeader above the two-column grid (full width, on the gutter, as in every other section) and start the datasheet and text columns under it. Below lg, left-align the datasheet (`mx-0`) like the rest of the page.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "1440 (390 in brackets)",
+    "severity": "P3",
+    "description": "The gap from a section's header to its content changes from section to section. Measured at 1440 (390): About h2→lead 48 (48), Focus h2→panels 48 (56), Skills intro→groups 80 (64), Projects intro→first card 112 (80), Experience h2→first group 112 (80), Contact text→email row 48. Projects and Experience share one value, but Skills (the same header+intro shape as Projects) uses 80, and Focus and About 48.",
+    "evidence": [
+      "shots/global/p2/1440/en-reduced-fullpage.jpg",
+      "shots/skills/p2/1440/en-reduced-00.png",
+      "shots/projects/p2/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/skills/Skills.tsx:16; components/projects/Projects.tsx:17; components/Experience.tsx:15; components/focus/Focus.tsx:116; components/about/About.tsx:19",
+    "suggested_fix": "Use one header→content token, e.g. mt-16 md:mt-24 (64/96), for Projects, Experience and Skills. Keep 48 only where the next thing is running text (About lead), and give Focus the same token in its stacked state.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "1280s (1280x620) and other short laptop windows where focus-compact switches on",
+    "severity": "P3",
+    "description": "On short laptop windows the Focus h2 drops out of the heading scale. `.focus-compact .focus-frame h2` sizes it at min(6vw, 8.5vh), which is 52.7px at 1280x620, while the About, Projects, Experience and Skills h2s stay at 76.8px. Scrolling down you get 76.8 → 52.7 → 76.8. Only this section's heading shrinks, so it reads as a sub-heading and not the next chapter.",
+    "evidence": [
+      "shots/focus/p2/1280s/en-motion-00.png",
+      "shots/about/p2/1280s/en-motion-00.png",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "app/globals.css:559-561",
+    "suggested_fix": "Leave the h2 at the shared clamp and win the height elsewhere (the panel h3, body padding and track margin already shrink). Or apply the same vh cap to every SectionHeader h2 on short screens (e.g. a `short-ish` variant at max-height 700px).",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "skills",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The two mono group sub-labels are built differently. Experience ('WORK 04' / 'EDUCATION 02'): label, then 24px, then the list's top rule, with a zero-padded count on the right. Skills ('LANGUAGES', 'FOUNDATIONS', 'AI'): label with its own 16px padding-bottom and border-b, then 24px, then the chips, with no count. Both are `h3.label-mono text-mute mb-6` in the same role, yet the rule sits 24px vs 16px below the text and only one carries a count. Seen one after the other on the page, the rules land at different distances from their labels.",
+    "evidence": [
+      "shots/experience/p2/1440/en-reduced-00.png",
+      "shots/skills/p2/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/Experience.tsx:26-30; components/skills/Skills.tsx:19",
+    "suggested_fix": "Pick one construction. For example, give Skills h3 `flex justify-between pb-4 border-b` plus the same count span (`03`/`03`/`04`), and move Experience's rule onto the h3 (`pb-4 border-b`, list `border-t-0`), so both read label / count / rule at 16px.",
+    "confidence": 0.7,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "320-639 (375, 390), en + fr",
+    "severity": "P3",
+    "description": "On phones the page's label→value lists switch layouts from section to section. The About facts (6.5rem label column, 18px values) and the datasheet rows (5.5rem, 14px) stay two-column at 390. The project Role/Stack list stacks the label above the value (`grid-cols-1` below sm, dt width 342 = full column, dd at x=24), and the How-it's-built specs stack too. One page gives a phone reader two different forms of the same pattern.",
+    "evidence": [
+      "shots/global/p2/390/en-reduced-fullpage.jpg",
+      "shots/projects/p2/390/en-reduced-01.png",
+      "shots/about/p2/390/en-reduced-01.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:129, 165",
+    "suggested_fix": "Either keep the project list two-column on phones (`grid-cols-[6.5rem_1fr]`, the About value, which fits 'TECHNOLOGIES' at 11.5px), or stack the About facts below sm the same way. A single phone rule for all dl patterns.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "projects",
+    "viewport": "375, 390 (max-sm), en + fr",
+    "severity": "P3",
+    "description": "UI-193 is only half done, and the result is a new size mismatch inside the same card. The title-bar slug and badge and the slide tabs were raised to 10.56px (0.66rem) on phones, but the status pill ('IN PROGRESS' / 'EN COURS', 0.62rem = 9.92px), the chat-header 'AI AGENT' badge (0.58rem = 9.28px) and agent.log (0.6rem) were left as they were. At 390 in the WhatsApp card, the copper 'ILLUSTRATIVE DEMO' badge (10.56px) sits directly above the copper 'AI AGENT' pill (9.28px). The status pill under each frame is now smaller than the slug in the frame above it.",
+    "evidence": [
+      "shots/projects/p2/390/en-reduced-01.png",
+      "shots/projects/p2/390/fr-reduced-01.png",
+      "shots/global/p2/agent-visual/p2vis-measure.json"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:103; components/projects/ChatPreview.tsx:106, 134",
+    "suggested_fix": "Apply the same `max-sm:text-[0.66rem] max-sm:tracking-[0.08em]` to the status pill, the chat badge and the agent.log header, so every copper and mono micro-label in a card shares one phone size.",
+    "confidence": 0.8,
+    "lens": "visual"
+  },
+  {
+    "section": "global",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The glyph language is ambiguous. '↓' means two different things: 'View projects ↓' (in-page jump, Hero) and 'Download CV ↓' (file download, Contact). Meanwhile the matching in-page jump in the other direction uses '↑' (Back to top), the header nav's in-page jumps use no glyph, and the 404's internal 'Back to the site →' uses '→', the only place on the site with a →. So '↓' is either movement or download depending on the section, and in-page navigation comes in three treatments.",
+    "evidence": [
+      "shots/hero/p2/1440/en-reduced-00.png",
+      "shots/contact/p2/1440/en-reduced-01.png",
+      "shots/global/p2/1440/404-nested.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:239; components/contact/Contact.tsx:70; components/Footer.tsx:30; components/NotFoundBody.tsx:42-45",
+    "suggested_fix": "Fix a small glyph key: ↓/↑ for moving within the page, ↗ for a new tab, and one distinct mark for downloads (e.g. '↧', or the visible mono suffix 'PDF'). Use → for the 404's page links only if the nav gets the same treatment.",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The copper 'live status' dot is placed three different ways. Hero 'OPEN TO INTERNSHIPS': dot before the text, no container. Project status: dot before the text, inside an outlined pill. Datasheet 'Status: Always learning': dot after the value, 12px to its right (gap-2 plus ml-1). The trailing dot in the datasheet is the odd one out and reads as a stray bullet at the end of the line.",
+    "evidence": [
+      "shots/about/p2/1440/en-motion-00.png",
+      "shots/hero/p2/1440/en-reduced-00.png",
+      "shots/projects/p2/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:96-98; components/hero/Hero.tsx:258-260; components/projects/ProjectCard.tsx:102-108",
+    "suggested_fix": "Put the datasheet dot before the value with the same 8px gap as the hero and pills (`<dd className=\"flex items-center gap-2\"><span className=\"status-dot\"/>…`).",
+    "confidence": 0.65,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "The zero-padded index numerals come in several styles. The Focus panel number '01' is `font-mono text-sm`: 14px, untracked, copper. The Focus meter '01 / 03' is label-mono (11.52px, 0.14em). The Experience counts '04'/'02' are label-mono 11.52px. The slide tabs' '01 ·' are label-mono 9.6px, and agent.log's '01' is 11px mono. The panel number is the only untracked 14px mono numeral on the page, so it looks like body code, not a label.",
+    "evidence": [
+      "shots/focus/p2/1440/en-motion-00.png",
+      "shots/experience/p2/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:135",
+    "suggested_fix": "Use `label-mono text-copper` for the panel number (the Experience dates and project kickers already use that copper label).",
+    "confidence": 0.6,
+    "lens": "visual"
+  },
+  {
+    "section": "about",
+    "viewport": "1440, 1920 (all widths; visible at DPR 1 and 2)",
+    "severity": "P3",
+    "description": "The grid-tick part of UI-185 is still unfixed (the footer measure was fixed). The card's 72px bg-grid sits behind the see-through 'DATASHEET … GS-26' header strip, so its vertical lines show as faint ticks inside the strip at x≈201/273/345/417 (1440; pixel 51 vs 44 around it). They show nowhere else on the card: the photo covers the middle, and the mask fades the bottom. The strip looks unevenly printed next to the clean chrome bars of the code window and project frames.",
+    "evidence": [
+      "shots/about/p2/1440/en-motion-00.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:60-63",
+    "suggested_fix": "Give the header strip an opaque ground (`bg-graphite`), or start the grid below it (`top-12` on the grid div).",
+    "confidence": 0.75,
+    "lens": "visual"
+  },
+  {
+    "section": "contact",
+    "viewport": "all",
+    "severity": "P3",
+    "description": "Primary pills come in two sizes for top-level actions. Hero 'View projects' and the project 'View website' CTAs are `btn btn-sm`: 44px tall, 10.56px text, 0.8/1.2rem padding. Contact 'Download CV' and the 404 'Back to the site' are full `btn`: 53.4px, 11.84px, 1.05/1.6rem. Both are copper and both are the section's main action, but the page's first CTA is 18% shorter and has 11% smaller text than the last. (UI-089 is about the hero's own hierarchy; this is about the same variant differing between sections.)",
+    "evidence": [
+      "shots/hero/p2/1440/en-reduced-00.png",
+      "shots/contact/p2/1440/en-reduced-01.png",
+      "shots/projects/p2/1440/en-reduced-01.png"
+    ],
+    "file_line": "components/hero/Hero.tsx:238-244; components/projects/ProjectCard.tsx:184; components/contact/Contact.tsx:69",
+    "suggested_fix": "Decide the rule. For example, btn-sm inside dense cards (projects) and full btn for chapter-level CTAs (hero and contact), or btn-sm everywhere except the 404. Then apply it to the hero CTAs.",
+    "confidence": 0.5,
+    "lens": "visual"
+  },
+  {
+    "section": "focus",
+    "viewport": "all (visible at 1440)",
+    "severity": "P3",
+    "description": "The two window-chrome bars share size (37.9px tall, 16px padding, 9.92px mute slug), but their traffic lights differ. The Focus code window's third dot is copper (bg-copper/80), while all four project frames use three grey dots. It looks like a 'live' light that the project windows lack, or like a mismatch.",
+    "evidence": [
+      "shots/focus/p2/1440/en-motion-00.png",
+      "shots/projects/p2/1440/en-reduced-00.png"
+    ],
+    "file_line": "components/focus/Illustrations.tsx:155-157; components/projects/ProjectCard.tsx (title-bar dots)",
+    "suggested_fix": "Use the same dot colours in both (all bg-line), or give the project frames the same copper third dot.",
+    "confidence": 0.45,
+    "lens": "visual"
+  }
+]

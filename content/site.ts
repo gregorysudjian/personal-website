@@ -50,8 +50,11 @@ export const meta = {
 export const ui = {
   skipToContent: { en: "Skip to content", fr: "Aller au contenu" },
   menu: { en: "Menu", fr: "Menu" },
+  mainNav: { en: "Main navigation", fr: "Navigation principale" },
   close: { en: "Close", fr: "Fermer" },
   switchLanguage: { en: "Voir le site en français", fr: "View the site in English" },
+  // Read by screen readers only, after links that open in a new tab.
+  newTab: { en: "(opens in a new tab)", fr: "(s'ouvre dans un nouvel onglet)" },
   nav: [
     { id: "about", label: { en: "About", fr: "À propos" } },
     { id: "projects", label: { en: "Projects", fr: "Projets" } },
@@ -64,8 +67,9 @@ export const ui = {
 
 export const hero = {
   eyebrow: {
-    en: "Computer Engineering — McGill University",
-    fr: "Génie informatique — Université McGill",
+    // the no-break space keeps the dash with the word before it when the line wraps
+    en: "Computer Engineering\u00a0— McGill University",
+    fr: "Génie informatique\u00a0— Université McGill",
   },
   tagline: {
     en: "I like building things, from AI agents to full websites, and I'm always up for learning something new.",
@@ -78,6 +82,8 @@ export const hero = {
 };
 
 /* -------------------------------------------------------------- statement */
+
+export const statementLabel: Text = { en: "In one sentence", fr: "En une phrase" };
 
 export const statement: Text = {
   en: "My favourite part of building something is the moment I understand how it *actually* works. I chase that feeling everywhere: in code, in math, and in whatever I haven't tried yet.",
@@ -255,6 +261,8 @@ export const projects = {
     chat: {
       header: { en: "Demo business · Assistant", fr: "Commerce démo · Assistant" },
       badge: { en: "AI agent", fr: "Agent IA" },
+      // Read by screen readers only, before each message.
+      speakers: { customer: { en: "Customer", fr: "Client" }, agent: { en: "Assistant", fr: "Assistant" } },
       messages: [
         { from: "customer", text: { en: "Hi! Can I book a haircut this week?", fr: "Bonjour ! Je peux réserver une coupe cette semaine ?" } },
         {
@@ -637,6 +645,9 @@ export const contact = {
   emailLabel: { en: "Email", fr: "Courriel" },
   copy: { en: "Copy", fr: "Copier" },
   copied: { en: "Copied", fr: "Copié" },
+  // Read by screen readers only: what the Copy button does, and the message once it's done.
+  copyLabel: { en: "Copy email address", fr: "Copier l'adresse courriel" },
+  copiedStatus: { en: "Email address copied", fr: "Adresse courriel copiée" },
   cvLabel: { en: "Download CV", fr: "Télécharger le CV" },
 };
 

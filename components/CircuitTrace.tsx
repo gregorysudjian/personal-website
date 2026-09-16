@@ -43,7 +43,11 @@ export default function CircuitTrace({ route, anchor = "62%", padsAt, onPowered,
       const w = el.offsetWidth;
       const h = el.offsetHeight;
       const targets = padsAt ? Array.from(section.querySelectorAll<HTMLElement>(padsAt)) : [];
-      const tops = targets.map((t) => offsetWithin(t, section).y);
+      // A pad sits level with a small label's copper dash, or on the top edge of a larger row.
+      const tops = targets.map((t) => {
+        const o = offsetWithin(t, section);
+        return Math.round(o.h <= 48 ? o.y + o.h / 2 : o.y);
+      });
       const key = `${w}x${h}:${tops.join(",")}`;
       if (!w || !h || key === last) return;
       last = key;
@@ -54,7 +58,7 @@ export default function CircuitTrace({ route, anchor = "62%", padsAt, onPowered,
         w,
         h,
         pts: r.pts,
-        pads: [...r.pads.map((i) => r.pts[i]), ...tops.map((y) => [rx, y + 12] as Pt)],
+        pads: [...r.pads.map((i) => r.pts[i]), ...tops.map((y) => [rx, y] as Pt)],
         targets: [...r.pads.map(() => null), ...targets],
       });
     };

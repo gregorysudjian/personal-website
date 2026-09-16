@@ -1,0 +1,276 @@
+[
+ {
+  "section": "about",
+  "viewport": "375, 1440 (all; motion)",
+  "severity": "P1",
+  "description": "On a fresh load with motion, scroll reveals set visibility:hidden (html.js [data-reveal] + GSAP autoAlpha), which takes the content out of the accessibility tree until it scrolls past 88% of the viewport. Measured at HEAD 0cea574: 22 of 23 About nodes and 10 of 11 Focus nodes were hidden. ariaSnapshot(#about) returned only 'heading \"Hi, I'm Gregory.\" level 2': no portrait, no datasheet <dl>, no paragraphs, no facts. #focus returned only its h2, with none of the three h3 panels. A screen-reader user using the headings or landmarks list, or reading in browse mode without scrolling, gets an empty About and Focus (WCAG 1.3.1 / 4.1.2). NOTE: an uncommitted working-tree change (Reveals.tsx and globals.css now animate opacity only) fixes this. Re-run after it: hidden=0 in About and Focus, full tree. Keep it and commit it. The residual focus-visibility problem is logged separately under projects.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/measurements.txt",
+   "shots/about/p1/agent-a11y/aria-about-fr-reduced.txt",
+   "shots/focus/p1/agent-a11y/aria-focus-fr-reduced.txt"
+  ],
+  "file_line": "components/motion/Reveals.tsx:48,58 (HEAD autoAlpha); app/globals.css:114-117 (HEAD visibility:hidden)",
+  "suggested_fix": "Keep the opacity-only reveal (never visibility/autoAlpha) and commit it. Add a test that ariaSnapshot('#about') contains the <dl> terms and all three Focus h3s straight after load.",
+  "confidence": 0.9,
+  "lens": "a11y"
+ },
+ {
+  "section": "about",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Reading order: the Datasheet card (the 'Datasheet GS-26' text, the portrait, a 4-row <dl> and the footer) comes before the section label and the h2 'Hi, I'm Gregory.' in the DOM. Screen readers read the card first. Jumping to the About heading lands after it, so the card is out of context, and the same facts appear twice (Origin 'Lebanon → Montreal' / Based in 'Montreal'). This is a 1.3.2 meaningful-sequence and best-practice issue.",
+  "evidence": [
+   "shots/about/p1/agent-a11y/aria-about-fr-reduced.txt"
+  ],
+  "file_line": "components/about/About.tsx:14-21",
+  "suggested_fix": "Put the text column (SectionHeader + paragraphs) first in the DOM and move the datasheet column visually with md:order-first, or make the card a <figure>/<aside aria-label> so it's announced as a complementary unit after the heading.",
+  "confidence": 0.7,
+  "lens": "a11y"
+ },
+ {
+  "section": "about",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The Datasheet card has no accessible name or structure. Its title row is two bare spans that read as 'Datasheet GS-26' run together ('Fiche technique GS-26' in FR), so nothing tells assistive tech that the portrait and the <dl> belong to one card. 'GS-26' is read as a word or number ('G S minus 26' in some voices).",
+  "evidence": [
+   "shots/about/p1/agent-a11y/aria-about-fr-reduced.txt"
+  ],
+  "file_line": "components/about/Datasheet.tsx:52-63",
+  "suggested_fix": "Wrap the card in role=\"group\" (or <figure>) with aria-labelledby pointing at the title span; give the part number aria-hidden or an aria-label like 'part GS 26'.",
+  "confidence": 0.55,
+  "lens": "a11y"
+ },
+ {
+  "section": "about",
+  "viewport": "1280s (1280x620), 844l",
+  "severity": "P3",
+  "description": "The sticky datasheet is taller than short viewports. At 1280x620 the card is 682px tall at top:112px, so its bottom sits at 794px, past the 620px viewport. While it's stuck, the Origin and Status rows and the footer can't be seen until the whole About column has scrolled past. The same happens to anyone using browser zoom or a larger default font on a laptop. This hurts low-vision and magnifier users (1.4.10-adjacent).",
+  "evidence": [
+   "shots/about/p1/agent-a11y/1280s-fr-sticky-datasheet-cut.png",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/about/About.tsx:15 (md:sticky md:top-28)",
+  "suggested_fix": "Make it sticky only when it fits: e.g. [@media(min-width:768px)_and_(min-height:840px)]:sticky, or cap it with max-h-[calc(100svh-8rem)] and let the image shrink.",
+  "confidence": 0.6,
+  "lens": "a11y"
+ },
+ {
+  "section": "focus",
+  "viewport": "1440, 1920, 1280s (horizontal mode, motion)",
+  "severity": "P1",
+  "description": "Horizontal Focus section: bringing panel 2 or 3 into view with find-in-page, a screen reader's virtual cursor, or a magnifier's focus tracking scrolls the overflow:hidden sticky .focus-frame sideways. The page never resets that scroll, so the layout breaks for good. Measured by calling scrollIntoView() on the 'Math' h3 at the section start: frame.scrollLeft went 0 → 1846px at 1440 (1651px at 1280x620). After another 400px of wheel scroll the panels sat at x=[-2279..-1242], [-1210..-173], [-141..895]. Panels 1-2 and the section heading had left the viewport and panel 3 kept sliding off, over empty space. Paging the whole page with PageDown does work (12 presses moved the track the full -1846px), so keyboard scrolling itself is fine. The problem is programmatic scroll-into-view, which is exactly how assistive tech brings offscreen content into view.",
+  "evidence": [
+   "shots/focus/p1/agent-a11y/1440-en-scrollintoview-panel3.png",
+   "shots/focus/p1/agent-a11y/1440-en-after-scrollintoview-wheel.png",
+   "shots/focus/p1/agent-a11y/1280s-en-after-scrollintoview-wheel.png",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "app/globals.css:504-513 (html.js .focus-frame { overflow: hidden }); components/focus/Focus.tsx:55-70",
+  "suggested_fix": "Use overflow: clip instead of hidden on .focus-frame; clip can't be scrolled by code, so it can't get out of step. Better still, listen for 'scroll' on the frame: when scrollLeft ≠ 0, map it to the matching page position (section top + scrollLeft, since the mapping is 1:1), set frame.scrollLeft = 0, then window.scrollTo(target). Find-in-page and the screen reader then land on the right panel.",
+  "confidence": 0.85,
+  "lens": "a11y"
+ },
+ {
+  "section": "focus",
+  "viewport": "1440, 1920 (horizontal mode; text-only zoom / large default font)",
+  "severity": "P2",
+  "description": "At 200% text size (Firefox 'Zoom text only' or a large default font in Chrome, simulated with html font-size 200%, FR), the horizontal panels keep their fixed height, min(54vh,560px), and overflow-hidden, so the body text is cut off. At 1440 the panels are 325px tall and the last line sits 322/345/462px below each panel's bottom; at 1920 it is 114/137/254px below. The focus-compact fallback switches on but isn't enough, and the h3 and illustration sizes are vw/vh-based, so they don't give way. Only the heading and the first line of body text show (WCAG 1.4.4 Resize text).",
+  "evidence": [
+   "shots/focus/p1/agent-a11y/1440-fr-text200.png",
+   "shots/focus/p1/agent-a11y/1920-fr-text200.png",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "app/globals.css:518-521 (.focus-panel height), components/focus/Focus.tsx:42-51 (size() tooTight check only toggles compact)",
+  "suggested_fix": "When tooTight is still true after applying focus-compact, drop the horizontal layout (revert the matchMedia branch and use the stacked list), or give panels min-height instead of height. Re-run size() on a ResizeObserver of .focus-body so font-size changes are caught too, not just refreshInit.",
+  "confidence": 0.7,
+  "lens": "a11y"
+ },
+ {
+  "section": "focus",
+  "viewport": "all (both locales)",
+  "severity": "P2",
+  "description": "Panel 1's CodeWindow illustration is plain HTML and isn't aria-hidden, unlike the NeuralNet and MathPlot SVGs. Screen readers read it out before the 'Software' heading: 'agent.py 1 def run_agent(task): 2 context = memory.recall(task) … 8 # → done. ship it.' On /fr this is English text inside lang=fr-CA with no lang override (3.1.2 Language of parts). The line numbers are text-line #2a2d33 on ink, 1.42:1, and they are exposed to assistive tech. The decorative panel numbers '01'/'02'/'03' are also read as text before each h3 ('text: 02').",
+  "evidence": [
+   "shots/focus/p1/agent-a11y/aria-focus-fr-reduced.txt",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/focus/Illustrations.tsx:149 (CodeWindow root), components/focus/Focus.tsx:131",
+  "suggested_fix": "Add aria-hidden=\"true\" to the CodeWindow root div, as the two SVGs have. Add aria-hidden to the 0{i+1} span and the decorative square at Focus.tsx:131-132.",
+  "confidence": 0.85,
+  "lens": "a11y"
+ },
+ {
+  "section": "focus",
+  "viewport": "all (motion)",
+  "severity": "P2",
+  "description": "Endless decorative motion with no user control: all three Focus illustrations run GSAP timelines with repeat:-1 (code typing plus a blinking .caret, the network pulses, the sine readout), and the copper status-dot 'ping' loops forever in the Datasheet and on every project status pill. They loop while visible, next to text people are reading, and last well over 5s. The only way to stop them is the OS reduced-motion setting, which a page control can't replace under WCAG 2.2.2 (Pause, Stop, Hide). Rated P2 rather than P1 because it is decorative and reduced motion is honoured.",
+  "evidence": [
+   "shots/focus/p1/agent-a11y/aria-focus-fr-reduced.txt"
+  ],
+  "file_line": "components/focus/Illustrations.tsx:65,137,196; app/globals.css .caret and .status-dot::after (animation: ping … infinite); components/about/Datasheet.tsx:85",
+  "suggested_fix": "Play each illustration once, or for a bounded number of loops (e.g. repeat: 2), then rest on the final frame; give the status-dot ping an animation-iteration-count of about 3. Alternatively, add one global 'Pause animations' toggle that sets a data-paused attribute the CSS and the timelines both obey.",
+  "confidence": 0.6,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "375, 1440, 1280s (motion)",
+  "severity": "P1",
+  "description": "Keyboard focus order on the first pass (HEAD 0cea574): the stagger reveal hid every project's detail column with visibility:hidden until it scrolled into view, so Tab skipped controls that weren't revealed yet. Measured at 1440 and at 375: after Clarté's 'VIEW WEBSITE', Tab went straight to the footer's 'BACK TO TOP'. It skipped the 'How it's built' buttons of WhatsApp AI Agent and This website, and every Experience and Contact control, email link included. Screen readers had no project h3 at all on load (the ariaSnapshot of #projects held articles with images and tab buttons only). This fails 2.1.1 and 2.4.3. NOTE: the uncommitted opacity-only change to Reveals.tsx fixes it. Re-measured: Tab now reaches all 4 'How it's built' buttons and the email link. Needs committing and a regression test.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/motion/Reveals.tsx:46-48 (HEAD stagger autoAlpha)",
+  "suggested_fix": "Commit the opacity-only reveals. Add a Playwright check: on a fresh load with no scrolling, the Tab sequence contains 4× 'How it's built', 2× 'View website', then the contact email.",
+  "confidence": 0.95,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "375, 1440, 1280s (motion, working tree)",
+  "severity": "P2",
+  "description": "Remaining problem after the opacity-only reveal fix: keyboard focus now lands on controls that are still at opacity 0, so the copper focus ring can't be seen at first (2.4.7 Focus Visible). Measured effective opacity of document.activeElement at t=0 / t=250ms / t=1.75s: WhatsApp and This website 'HOW IT'S BUILT' went 0 / 0 / 1 at 1440, 375 and 1280x620; the contact email link went 0 / 0.74 / 1. The reveal only starts once the element passes 'top 88%', then fades over 1.2s plus the stagger delay. A control focused inside the bottom 12% of the viewport would stay invisible.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/measurements.txt",
+   "shots/projects/p1/agent-a11y/opac.mjs"
+  ],
+  "file_line": "components/motion/Reveals.tsx:24 (start 'top 88%'), :48-49, :59-60",
+  "suggested_fix": "Add a document 'focusin' listener in Reveals: if the target is inside a [data-reveal] element (or its stagger child) that hasn't revealed yet, finish that tween at once (tween.progress(1) or ScrollTrigger.getById(...).animation.progress(1)), or gsap.set the element to opacity 1. A CSS fallback also works: [data-reveal]:focus-within, [data-reveal] > :focus-within { opacity: 1 !important; }.",
+  "confidence": 0.8,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all (motion)",
+  "severity": "P1",
+  "description": "The WhatsApp chat demo loops forever with no way to pause, stop or hide it (WCAG 2.2.2, Level A). The GSAP timeline has repeat:-1 and plays whenever it is visible. Hovering doesn't hold it: while the mouse stayed over the demo, the visible bubble count per second read 1,1,2,2,3,3,4,4,4,4,0,1,1,2,2,3. The preview has 0 focusable elements, so focus can't hold it either. The Slides component got hover/focus hold in 43d4a5b; the chat did not.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/1440-en-chat-loop.png",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/projects/ChatPreview.tsx:39,52,54",
+  "suggested_fix": "Play it once and rest on the finished conversation, with a small 'Replay' button. If it must loop, add a visible Pause/Play toggle (button with aria-pressed and a translated label) in the chat header, and pause on pointerenter and focusin as Slides does.",
+  "confidence": 0.9,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "390 touch, 375, 768 (motion); SR browse mode everywhere",
+  "severity": "P1",
+  "description": "The auto-advancing slides still have no lasting way to pause or stop (2.2.2 A / 2.2.1). The hold added in 43d4a5b only lasts while a mouse is over the slides or focus is inside them. On touch, pointerType 'touch' is ignored, and iOS Safari doesn't focus a button on tap. Measured at 390 touch: tap '02' with focus not kept → the pressed state went 010 → 001 within 4.6s, so the slide the visitor picked is replaced. Left alone, it cycles 001 → 100 forever. A mouse user who clicks a tab and then moves the pointer away also has the choice overridden. Screen-reader users in browse mode never move focus, so it never holds for them.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/measurements.txt",
+   "shots/projects/p1/agent-a11y/1440-en-slides-focused-02-t5s.png"
+  ],
+  "file_line": "components/projects/Slides.tsx:59-67 (timer), :90-93 (hold only for mouse/focus), :138 (onClick only sets active)",
+  "suggested_fix": "Treat any explicit tab choice (click, tap or keyboard) as 'stop autoplay': onClick={() => { setActive(i); setAuto(false); }} and gate the timer on auto. Add a Pause/Play button as the first control in the tab row (aria-label 'Pause slideshow' / 'Mettre en pause'). Hold on touchstart too.",
+  "confidence": 0.85,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P2",
+  "description": "Chat demo semantics: who said what is shown only visually (left/right alignment, copper versus graphite bubble). Screen readers get one merged run of text: 'AI agent Hi! Can I book a haircut this week? Hi! Sure. I have Tuesday… Tuesday at 10 please Booked: Tuesday at 10:00… agent.log' (1.3.1). With motion, the bubbles switch between display:none and visibility:hidden, so what's in the accessibility tree changes every ~12s: a snapshot 2.5s in held only the first message. The agent.log lines (English words like 'reply sent' and 'booking saved ✓') have no lang override on /fr (3.1.2).",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/aria-projects-fr-reduced.txt",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/projects/ChatPreview.tsx:33-34,48-49 (display toggling), :76-87 (bubbles as bare divs), :97-110 (agent log)",
+  "suggested_fix": "Keep a static transcript for assistive tech: an <ol aria-label=\"Demo conversation\"> with visually hidden 'Customer:' / 'Agent:' prefixes (translated), and aria-hidden on the animated visual copy. Add aria-hidden to the typing dots, and lang=\"en\" (or aria-hidden) on the agent.log column.",
+  "confidence": 0.75,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "375, 390 (FR; all phone widths with text spacing)",
+  "severity": "P2",
+  "description": "Slide captions are cut to 2 lines with an ellipsis (line-clamp-2), so part of the text is lost on screen. At 375 FR, Lead Finder slides 1 and 3 and Clarté slide 2 overflow (scrollHeight 52 > clientHeight 34; slide 1 ends '…un score de 0 à…'); at 390 FR, Lead Finder slides 1 and 3 do. With WCAG 1.4.12 text spacing applied (line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em), every caption at 375 and 390 in both locales is clipped (56 > 38): a 1.4.12 AA failure. The FR tab label '01 · PROSPECTS' also wraps onto 2 lines at 375/390 while its siblings stay on 1.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/375-fr-caption-clamped-slide1.png",
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/projects/Slides.tsx:167 (line-clamp-2 min-h-[2lh])",
+  "suggested_fix": "Remove line-clamp-2. Keep the reserved min-h-[2lh] (3lh below md) so the frame barely moves, or reserve the height of the longest caption for that slideshow by measuring the captions once.",
+  "confidence": 0.9,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Slide tab semantics: the tabs are separate aria-pressed toggle buttons ('01 · Leads, toggle button, pressed') for what is a single-choice set. There's no group name, no aria-controls, and no link to the image or caption they change. They come before the card's h3 in the DOM, so a screen-reader user hears '01 · Website' or '01 · Leads' with no project context (2.4.6 / 1.3.1 best practice). Pressing one changes the image above the buttons, which a screen-reader user can only perceive through the caption live region.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/aria-projects-fr-reduced.txt"
+  ],
+  "file_line": "components/projects/Slides.tsx:133-162",
+  "suggested_fix": "Wrap the buttons in role=\"group\" with aria-label '<project title> screens' (or use aria-roledescription=\"carousel\" on the slideshow region, following the APG carousel pattern). Keep aria-pressed but add aria-controls pointing at the slide viewport, or switch to aria-current=\"true\" on the active one.",
+  "confidence": 0.65,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Alt text repeats the caption. The active image reads 'Lead Finder's dashboard with leads ranked by priority' and then the caption reads 'The dashboard: new leads ranked by priority, each with a transparent 0–100 score'. Clarté: 'The Clarté HQ overview with requests, upcoming lessons and payments', then 'My private dashboard: requests, upcoming lessons and payments…'. Screen-reader users hear the same thing twice. Inactive slides are correctly aria-hidden, so there are no duplicate hidden alts.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/aria-projects-fr-reduced.txt"
+  ],
+  "file_line": "content/site.ts slide alt/caption pairs (projects.items[0].media.slides, [2].media.slides); components/projects/Slides.tsx:108,122",
+  "suggested_fix": "Mark each slide up as a figure whose caption is the <figcaption>, and make the alt describe only what the caption doesn't (e.g. 'Screenshot'), or use alt=\"\" with aria-describedby on the caption.",
+  "confidence": 0.55,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all (esp. reduced motion)",
+  "severity": "P3",
+  "description": "The progress bars don't show which slide is current. Earlier slides keep a full copper bar (i < active renders no scale-x-0), and with reduced motion or after a slide's animation ends, the active bar is also full. With '02' active, bars 01 and 02 look the same. The current slide then shows only through label lightness: paper against paper/55, about a 3:1 difference, the same colour and the same weight (1.4.1 / 1.4.11, borderline).",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/1440-en-slides-focused-02-t5s.png"
+  ],
+  "file_line": "components/projects/Slides.tsx:143-147, :157",
+  "suggested_fix": "Show past slides' bars at bg-paper/30 (or empty) so only the active bar is copper. Add a non-colour cue on the active label (font-weight or an underline).",
+  "confidence": 0.6,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "The external 'View website ↗' links use target=\"_blank\", and the ↗ is aria-hidden, so assistive tech isn't told the link opens a new tab. The two links also share an accessible name ('View website' / 'Voir le site') but lead to different sites, and the articles have no accessible name to tell them apart. NOTE: content/site.ts in the working tree adds a ui.newTab string, which may already be heading here.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/aria-projects-fr-reduced.txt"
+  ],
+  "file_line": "components/projects/ProjectCard.tsx:233-243, :96 (article without aria-labelledby)",
+  "suggested_fix": "Add <span className=\"sr-only\">{t(ui.newTab)}</span> inside each link and aria-labelledby={titleId} on each <article>. Optionally use aria-label '<Title>: View website (opens in a new tab)'.",
+  "confidence": 0.7,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Small text margins in the preview title bar and tabs. The 'Real app screens' / 'Illustrative demo' badge is text-copper/80 at 0.58rem (9.28px) on graphite, giving 4.58:1, only 0.08 above AA. The slug is text-mute at 0.62rem (9.92px) on graphite, 5.47:1. The inactive tab labels were paper/45 at 9.6px, 3.95:1, which is the axe failure; 43d4a5b changed them to paper/55, measured at 5.41:1, which passes. Axe's 'incomplete' contrast items were all in nav/hero; in About, Focus and Projects every other text node measures 5.4:1 or better, composited over the actual background.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/measurements.txt"
+  ],
+  "file_line": "components/projects/ProjectCard.tsx:112 (text-[0.58rem] text-copper/80), :109; components/projects/Slides.tsx:157",
+  "suggested_fix": "Use full text-copper for the badge (about 6.5:1 on graphite) and bring the 0.58–0.62rem mono labels up to at least 0.65rem.",
+  "confidence": 0.7,
+  "lens": "a11y"
+ },
+ {
+  "section": "projects",
+  "viewport": "all",
+  "severity": "P3",
+  "description": "Missing structure in the card details. In the 'How it's built' panel, the Problem, Solution and How-it-works labels are <p> elements, so they aren't headings or <dt>s and screen-reader users can't jump between them. The Stack <dd> holds bare spans, which read as one run: 'Next.js TypeScript Supabase Claude API DuckDB Vitest', where 'Claude API DuckDB' is ambiguous. The accordion itself works: aria-expanded, aria-controls, inert and aria-hidden all toggle correctly, and focus stays on the button.",
+  "evidence": [
+   "shots/projects/p1/agent-a11y/aria-projects-fr-reduced.txt"
+  ],
+  "file_line": "components/projects/ProjectCard.tsx:217-224 (spec labels), :190-195 (stack chips)",
+  "suggested_fix": "Render the specs as a <dl>, with each label as a <dt> and the text as a <dd>. Render the stack as <ul role=\"list\"> with an <li> per chip.",
+  "confidence": 0.6,
+  "lens": "a11y"
+ }
+]

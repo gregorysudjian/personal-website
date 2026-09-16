@@ -12,6 +12,7 @@ import { offsetWithin, railX } from "@/lib/routes";
  */
 export default function Board({ powered }: { powered: boolean }) {
   const root = useRef<HTMLDivElement>(null);
+  const wasPowered = useRef(false);
   const [geo, setGeo] = useState<{ w: number; h: number; chip: Rect; traces: BoardTrace[] } | null>(null);
 
   useEffect(() => {
@@ -42,8 +43,15 @@ export default function Board({ powered }: { powered: boolean }) {
       const instant = window.matchMedia(REDUCED_MOTION).matches;
       const lit = q(".board-lit");
       const pads = q(".board-pad");
+      // Already lit and only the size changed (resize/rotation): show the new board lit, don't replay it.
+      const replay = !(powered && wasPowered.current);
+      wasPowered.current = powered;
 
-      if (powered) {
+      if (powered && !replay) {
+        gsap.set(lit, { strokeDashoffset: 0 });
+        gsap.set(pads, { fill: "#e8823a", stroke: "#ffb27a" });
+        gsap.set(q(".board-glow, .board-pulses"), { autoAlpha: 1 });
+      } else if (powered) {
         gsap.to(lit, {
           strokeDashoffset: 0,
           duration: instant ? 0 : 1.1,

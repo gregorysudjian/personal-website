@@ -1,0 +1,275 @@
+[
+  {
+    "section": "nav",
+    "viewport": "1440, 1920, 375, 390",
+    "severity": "P1",
+    "description": "The sticky header has no opaque background or backdrop blur, so page content scrolls straight underneath it and prints on top of the nav. At 1440 (projects specs-open) the word CONTACT sits directly on the sentence 'Every demo site gets its own design \"genome\": 10 art directions,' and EN / FR overprints the end of that same line - two layers of text in the same pixels, unreadable. Same thing in FR at 1920 where 'A PROPOS PROJETS PARCOURS CONTACT' and EN/FR land on top of 'Plus de 2 800 commerces extraits d'Overture Maps... stockes dans Supabase'. At 375 the MENU button collides with the word 'built.' of the 'Things I've built.' heading and the logo mark sits on top of the same heading. In footer/mark-hover the nav sits on top of 'I'm looking for an internship or co-op where I can learn fast,'. In about/datasheet-tilt the ghost of 'Hi, I'm Gregory.' bleeds through the header bar. A recruiter will hit this within two scrolls.",
+    "evidence": [
+      "shots/projects/p3/1440/en-motion-specs-open.png",
+      "shots/projects/p3/1920/fr-motion-specs-open.png",
+      "shots/nav/p3/375/en-motion-header-over-content.png",
+      "shots/footer/p3/1440/mark-hover.png",
+      "shots/about/p3/1440/datasheet-tilt.png",
+      "shots/projects/p3/375/en-motion-specs-open.png"
+    ],
+    "suggested_fix": "Give the header a real surface once scrolled past the hero: background rgba(13,13,13,0.85) plus backdrop-filter: blur(12px) and a 1px bottom hairline, applied on a .is-scrolled class. The existing top gradient is not enough - it fades to transparent exactly where the nav labels sit. Alternatively hide the header on scroll-down / reveal on scroll-up, which is already what happens at 768.",
+    "confidence": 0.95
+  },
+  {
+    "section": "hero",
+    "viewport": "844l",
+    "severity": "P1",
+    "description": "In landscape (844x390) the hero tagline is gone entirely. On every other viewport the hero reads eyebrow -> GREGORY SUTJIAN -> 'I like building things, from AI agents to full websites, and I'm always up for learning something new.' -> buttons. At 844l it jumps straight from SUTJIAN (ends y=265) to the buttons (y=305) with a 40px void where the sentence should be, and the SCROLL cue is missing too. The single line that tells a visitor what this person actually does has been dropped on the one device orientation where the hero is the whole screen. Identical in FR.",
+    "evidence": [
+      "shots/hero/p3/844l/en-motion-atf.png",
+      "shots/hero/p3/844l/en-motion-00.png",
+      "shots/nav/p3/844l/fr-no-menu-button.png",
+      "shots/hero/p3/1440/en-reduced-atf.png"
+    ],
+    "suggested_fix": "Do not display:none the tagline at short heights. Shrink the name (clamp on the 844l breakpoint), drop the eyebrow rule to one line, and keep the tagline at 14-15px - it is one sentence and it is the point of the hero. If something must go, cut the SCROLL cue and the OPEN TO INTERNSHIPS chip, not the pitch.",
+    "confidence": 0.85
+  },
+  {
+    "section": "footer",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P1",
+    "description": "The giant outlined SUTJIAN wordmark at the very bottom of the page is sliced off mid-glyph by the end of the document on every single viewport. At 1440 the letters are cut roughly at their waist - you see the top ~60% of S U T J I A N and nothing else, with the page simply ending. It does not read as a deliberate bleed because there is no continuation and no bottom padding; it reads as a container that ran out of height. Hovering it makes it worse: mark-hover lights the outline bright orange, so the amputated letterforms become the loudest thing on the screen. It is also the last impression a recruiter takes away.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/375/en-motion-00.png",
+      "shots/footer/p3/1440/mark-hover.png",
+      "shots/contact/p3/1440/en-reduced-01.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Either let the full wordmark sit inside the footer with 32-48px of breathing room below it, or commit to the bleed properly by cropping at a deliberate fraction (e.g. exactly 50% of cap height) and adding overflow:hidden on a sized footer so it is obviously intentional. Right now it is an accident of document height.",
+    "confidence": 0.9
+  },
+  {
+    "section": "global",
+    "viewport": "844l",
+    "severity": "P2",
+    "description": "In landscape the entire page renders in the narrow mobile single column, pinned to the left, so roughly 45-55% of every screen is dead black. about/844l/en-motion-01: the datasheet card occupies x=36-392 and x=392-844 is completely empty. projects/844l: the Lead Finder window is 423px wide (x=36-459) while the paragraph describing it runs to x=703 - the media is half the width of its own caption, and both float in the left half of an 844-wide screen. nav/844l/header-over-content shows the same. A landscape phone is not a narrow phone; the layout never notices the extra width.",
+    "evidence": [
+      "shots/about/p3/844l/en-motion-01.png",
+      "shots/projects/p3/844l/en-motion-02.png",
+      "shots/nav/p3/844l/en-motion-header-over-content.png",
+      "shots/experience/p3/844l/en-motion-02.png"
+    ],
+    "suggested_fix": "Base the layout breakpoints on width, not on a phone/tablet guess. At >=768px wide (which 844l is) use the tablet two-column treatment, or at minimum let media panels and text share one max-width and centre the column so the empty space is split evenly instead of dumped on the right.",
+    "confidence": 0.85
+  },
+  {
+    "section": "skills",
+    "viewport": "768",
+    "severity": "P2",
+    "description": "The toolkit grid is two columns wide with three groups, so AI wraps onto a second row under LANGUAGES and leaves a ~360x210px empty rectangle in the bottom-right of the block where FOUNDATIONS' second row would be. On top of that the vertical rhythm breaks: the gap from the intro paragraph down to the LANGUAGES label is ~100px, but the gap from the 'Bash' chip down to the AI label is only ~42px, so AI is crammed against the group above it while a hole sits next to it. The block reads as a grid that gave up.",
+    "evidence": [
+      "shots/skills/p3/768/en-motion-00.png",
+      "shots/skills/p3/768/fr-reduced-00.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "At 768 use a single full-width column with three stacked groups (chips have room to breathe), or three equal columns with smaller chips. Either way make the group-to-group gap a single token so AI is not 58px tighter than LANGUAGES.",
+    "confidence": 0.85
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P2",
+    "description": "The COPY button next to the email is 33px tall while DOWNLOAD CV, LINKEDIN and GITHUB directly beneath it are all 54px tall - measured on footer/1440 (COPY border rows 230-262 vs LINKEDIN 306-359) and identical 33px at 375. It sits in the same card, uses the same pill shape and the same faint border, but is visibly a different size class, so the row reads as a mistake rather than a hierarchy. On touch viewports 33px is also under the 44px minimum tap target, and 'copy my email address' is the single action a recruiter is most likely to take on a phone.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/375/en-motion-00.png",
+      "shots/contact/p3/375/en-reduced-01.png",
+      "shots/contact/p3/768/en-reduced-00.png"
+    ],
+    "suggested_fix": "Either make COPY the same 54px pill as its siblings, or if it is meant to be a quiet utility give it a min-height of 44px with a 44px hit area on touch and deliberately differentiate it (icon-only, or text link with an icon) so the size difference reads as intent.",
+    "confidence": 0.85
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P2",
+    "description": "The outlined buttons (LINKEDIN, GITHUB, COPY, DOWNLOAD CV in its hero variant) have a border of rgb(47,50,55) on a rgb(17,17,19) card - a contrast ratio of about 1.45:1, well under the 3:1 minimum for a UI component boundary. At DPR 1 on any screen that is not a calibrated monitor the pills effectively vanish and the labels look like floating text. Sampled directly at footer/1440 x=524,y=306 and x=853,y=230.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/contact/p3/1920/en-reduced-00.png",
+      "shots/contact/p3/768/en-reduced-00.png",
+      "shots/hero/p3/1440/en-reduced-atf.png"
+    ],
+    "suggested_fix": "Raise the idle border to at least rgba(255,255,255,0.28) (~#4e4e52 on this background, ~3.1:1) and keep the current value for the hover/rest delta. The orange primary already carries the emphasis - the secondaries just need to be visible.",
+    "confidence": 0.8
+  },
+  {
+    "section": "nav",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "The mobile menu opens on a mostly empty screen. At 375x667 the first item's marker is at y=345 - the top 52% of the overlay is pure black. At 390x844 it is worse: first marker at y=522, so 62% of the screen is empty before any nav item appears, and the last item's rule ends at y=780 leaving another 64px below. Four links and a CLOSE button floating in the bottom third of a full-screen overlay looks like content failed to render, not like a layout choice. Identical in FR (where CLOSE becomes FERMER).",
+    "evidence": [
+      "shots/nav/p3/375/en-motion-menu-open.png",
+      "shots/nav/p3/390/fr-motion-menu-open.png",
+      "shots/nav/p3/390/en-motion-menu-open.png",
+      "shots/nav/p3/375/fr-reduced-menu-open.png"
+    ],
+    "suggested_fix": "Centre the item stack vertically in the overlay, or anchor it to the bottom with a consistent 48px inset and put something in the top half that earns its place - the EN/FR switch enlarged, the email address, or the OPEN TO INTERNSHIPS status. Do not leave 60% of a full-screen overlay blank.",
+    "confidence": 0.85
+  },
+  {
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "The 404 page does not look like the same product. There is no header bar, no nav, no EN/FR switch - just a bare logo lockup floating at y=249 after 230px of empty black. Everything is jammed into the left third: the widest element ('Page introuvable.') ends at x=770, leaving ~670px of dead black to the right, and another ~230px below the buttons. The FR line is also rendered in mid-grey while the EN line is white, so a French visitor's own language is the visibly demoted one.",
+    "evidence": [
+      "shots/global/p3/1440/404-status404.png",
+      "shots/global/p3/1440/404-nested.png"
+    ],
+    "suggested_fix": "Reuse the site header (logo + EN/FR at minimum) so the 404 is recognisably the same site, centre the block vertically and horizontally, and either render only the active language at full contrast or set both lines to the same weight/colour.",
+    "confidence": 0.8
+  },
+  {
+    "section": "projects",
+    "viewport": "375, 390, 1440",
+    "severity": "P2",
+    "description": "The app screenshots inside the project window frames are cropped through the middle of their own content instead of at a clean edge. In the Clarte Math window at 1440 an orange CTA button at the bottom-left of the embedded screenshot is sliced exactly in half by the caption strip, with the strip's orange progress rule sitting on top of the severed button. At 390 the Lead Finder embed is cut mid-row through 'St-Viateur Bagel / Bakery - Montreal', and the Clarte Math embed is cut through the middle of a line of body copy ('it together.'). It reads as an image that overflowed its box, not as a framed screenshot.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/projects/p3/390/en-reduced-slide2.png",
+      "shots/projects/p3/375/en-motion-slide3.png"
+    ],
+    "suggested_fix": "Set a fixed aspect ratio on the media frame and use object-fit: cover with object-position tuned per screenshot so the crop lands in whitespace, or add a short bottom fade-to-transparent over the last 40px so the cut reads as a deliberate fade rather than a guillotine.",
+    "confidence": 0.75
+  },
+  {
+    "section": "projects",
+    "viewport": "1440, 1920, 390",
+    "severity": "P2",
+    "description": "The WhatsApp AI Agent mock is mostly empty. At 1440 the conversation panel has ~190px of blank dark space between the 'Demo business - Assistant' header and the first bubble, and the AGENT.LOG column beside it has content in roughly its top third with ~250px of nothing below - two dead rectangles side by side inside the only project card that has no live link. At 390 the AGENT.LOG column is dropped entirely and the void above the first bubble remains. Next to the Lead Finder card, which is packed with real UI, this card looks like the screenshot failed to load.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/projects/p3/1920/fr-motion-specs-open.png"
+    ],
+    "suggested_fix": "Size the chat panel to its content instead of matching the tallest sibling, add two or three more messages so the thread fills the frame, and let AGENT.LOG scroll/fill or collapse when it has fewer than N lines.",
+    "confidence": 0.7
+  },
+  {
+    "section": "about",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "In the About spec list the label column is too narrow for its longest label: 'LOOKING FOR' breaks across two lines as 'LOOKING' / 'FOR' while every other label (BASED IN, SCHOOL, NEXT UP) sits on one. Worse, the em-dash marker that prefixes each label is vertically centred, so on the two-line row the dash floats in the gap between 'LOOKING' and 'FOR' instead of aligning with the first line like it does on the other three rows. The value beside it ('Internships and co-op roles') also wraps, producing a ragged 2x2 block in the middle of an otherwise tidy list.",
+    "evidence": [
+      "shots/about/p3/390/en-reduced-02.png",
+      "shots/about/p3/375/en-motion-03.png",
+      "shots/global/p3/390/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Widen the label column to fit the longest label (or shorten it to 'SEEKING'), set white-space: nowrap on the label, and align the dash to the first text line (align-items: baseline / flex-start) so it never floats mid-row.",
+    "confidence": 0.8
+  },
+  {
+    "section": "contact",
+    "viewport": "375, 390, 768 vs 1440, 1920",
+    "severity": "P2",
+    "description": "The email address is styled as two different components depending on viewport. At 375/390/768 'gregory.sutjian@mail.mcgill.ca' carries a link underline; at 1440/1920 the identical element in the identical settled state has no underline at all and reads as plain text sitting next to a COPY button. At 768 it is worse - there are two underlines stacked: a tight one under the full address plus a second, heavier rule about 8px below it that only spans the first ~40% of the string ('gregory.su'), which looks like an animated underline that stalled.",
+    "evidence": [
+      "shots/contact/p3/768/en-reduced-00.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg",
+      "shots/contact/p3/375/en-reduced-01.png",
+      "shots/contact/p3/1440/en-reduced-01.png"
+    ],
+    "suggested_fix": "Pick one treatment for the mailto link across all widths. If there is an animated underline element, make sure its idle width is 0 or 100% - never a stuck fraction - and do not layer it on top of a text-decoration underline.",
+    "confidence": 0.7
+  },
+  {
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "The first-visit intro passes through a frame that looks like a rendering failure. At boot-900ms the word GREGORY is sliced by a hard horizontal edge at y~480 - only the top halves of the letters are drawn, with the bottoms missing - the letters sit at inconsistent vertical offsets from each other ('GRE' lower than 'GOR'), and all that remains of SUTJIAN is a lone arc fragment floating at y=640-680. The header, eyebrow, tagline and buttons are all absent. A first-time visitor sees cut-off type and a stray shape, which reads as a broken font load, not as a reveal.",
+    "evidence": [
+      "shots/global/p3/1440/boot-900ms.png",
+      "shots/global/p3/1440/boot-300ms.png",
+      "shots/global/p3/1440/boot-1700ms.png"
+    ],
+    "suggested_fix": "Mask the reveal with a clip that moves with the line rather than one that leaves glyphs bisected mid-flight, or reveal by opacity/translate on whole lines. Whatever frame you freeze on should never show a letterform cut through its middle.",
+    "confidence": 0.7
+  },
+  {
+    "section": "nav",
+    "viewport": "1440, 1920, 1280s",
+    "severity": "P2",
+    "description": "The keyboard focus ring on the language switcher is a hard-cornered rectangle drawn around BOTH 'EN' and 'FR' (tab07), so a keyboard user cannot tell which of the two is focused. Every other focus ring on the site is a rounded pill that hugs a single control (tab01 skip link, tab08 VIEW PROJECTS, tab09 DOWNLOAD CV), so this one is both ambiguous and stylistically off-system.",
+    "evidence": [
+      "shots/global/p3/1440/en-motion-tab07.png",
+      "shots/global/p3/1440/en-motion-tab08.png",
+      "shots/global/p3/1440/en-motion-tab01.png",
+      "shots/global/p3/1920/en-reduced-tab07.png"
+    ],
+    "suggested_fix": "Move the focus ring onto each individual EN / FR anchor with the same border-radius and orange outline used elsewhere, and exclude the '/' separator from the focusable box.",
+    "confidence": 0.75
+  },
+  {
+    "section": "statement",
+    "viewport": "1920",
+    "severity": "P3",
+    "description": "At 1920 the whole sentence fits on one screen, so the scroll-linked word reveal shows the reader a paragraph where the last four lines sit at roughly rgb(58,58,58) on rgb(19,19,19) - about 1.5:1 - and the accented italic 'actually' is a near-black brown. Anyone who stops scrolling before the reveal completes (en-motion-00) is looking at a section whose entire content is a mostly illegible block. Separately, the headline measure is capped at ~1350px and left-aligned, leaving a ~570px empty column on the right of an otherwise empty section.",
+    "evidence": [
+      "shots/statement/p3/1920/en-motion-00.png",
+      "shots/statement/p3/1920/en-motion-01.png",
+      "shots/statement/p3/1440/en-motion-00.png"
+    ],
+    "suggested_fix": "Raise the un-revealed colour floor to at least rgba(255,255,255,0.32) so the text is always readable and the reveal is a brightening rather than an appearance, and either widen the measure or centre the block on >=1600px widths.",
+    "confidence": 0.65
+  },
+  {
+    "section": "hero",
+    "viewport": "375, 390",
+    "severity": "P3",
+    "description": "The hero eyebrow wraps badly on phones: 'COMPUTER ENGINEERING' takes line 1 and line 2 begins with the em dash - '- MCGILL UNIVERSITY'. A line starting with a dangling dash looks like a bullet that lost its list. The eyebrow's rule marker also starts at x~20 while the text starts at x~71, which is a different left edge from the GREGORY headline at x~23 just below it.",
+    "evidence": [
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/global/p3/375/en-reduced-fullpage.jpg",
+      "shots/hero/p3/375/en-motion-atf.png"
+    ],
+    "suggested_fix": "Wrap the dash with the preceding word (&nbsp; before the em dash) or stack the eyebrow as two lines by design ('COMPUTER ENGINEERING' / 'MCGILL UNIVERSITY') with no dash on phones.",
+    "confidence": 0.7
+  },
+  {
+    "section": "footer",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "In the footer meta row the three static items (c 2026 GREGORY SUTJIAN / MADE IN MONTREAL / LOCAL TIME 19:37) sit on rows 681-688 while BACK TO TOP sits on 682-690 - about 2px lower and 1px larger, so the only interactive item in the row is the one that does not line up. It is also styled identically to the static labels (same size, same colour, same tracking) with only a small arrow to hint that it is a control, which on mobile becomes a fourth indistinguishable line in a stack.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/1920/en-reduced-00.png",
+      "shots/footer/p3/375/en-motion-00.png"
+    ],
+    "suggested_fix": "Put all four items on one baseline grid with a single font-size, and differentiate BACK TO TOP as a control - brighter colour, a hover underline, or a bordered pill consistent with the site's other secondary buttons.",
+    "confidence": 0.7
+  },
+  {
+    "section": "experience",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "Each experience row uses a date column roughly 340px wide to hold ~120px of text ('JUL - SEP 2026' ends at x=175, the job title does not start until x=396), so every row carries a 220px empty gutter between the date and the title. Across six rows it reads as a broken three-column grid rather than a deliberate wide measure, and it pushes the descriptions to the far right of the page.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/experience/p3/1440/en-reduced-00.png",
+      "shots/experience/p3/1920/en-reduced-01.png"
+    ],
+    "suggested_fix": "Narrow the date column to its content width (~180px) and reclaim the space for the title/description columns, or right-align the date against the title column so the gap becomes an intentional gutter.",
+    "confidence": 0.6
+  },
+  {
+    "section": "global",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "The custom cursor is a ~64px orange ring with no pointer tip, and it is drawn over the element it is pointing at rather than around it. On the hero CTA the ring's stroke cuts straight through the button label ('VIEW PROJECTS' is crossed between the W and the P); on the nav it spans from ABOUT to EXPERIENCE so there is no way to tell which link is under the cursor; on the COPIED confirmation pill the ring is twice the height of the 33px pill and the word COPIED is struck through by it. It obscures exactly the thing the user is trying to read.",
+    "evidence": [
+      "shots/global/p3/1440/cursor-over-link.png",
+      "shots/nav/p3/1440/en-motion-link-hover.png",
+      "shots/contact/p3/1440/en-motion-copied.png",
+      "shots/hero/p3/1440/en-motion-cta-hover.png"
+    ],
+    "suggested_fix": "Shrink the ring to ~28-32px, drop its opacity over interactive elements, or keep a small centre dot for precision. Never let the ring stroke land on top of a label - a mix-blend-mode: difference ring or a ring that scales to the hovered element's bounds both solve it.",
+    "confidence": 0.6
+  }
+]

@@ -1,0 +1,274 @@
+[
+  {
+    "section": "projects",
+    "viewport": "667x375, 740x360 (landscape phones under 768px wide, en+fr); 844x390 as well",
+    "severity": "P1",
+    "description": "On a phone held sideways, the preview window is far taller than the screen, so the demo can't be seen as a whole. Below 768px wide the frame keeps its portrait aspect-[3/4], and the (max-width:767px) phone capture is blown up to full width. At 667x375 the window is 614x853 (2.3 screens tall). At 740x360 it is 681x942 (2.6 screens). The screen, the slide tabs and the caption are never on screen together. While a scroll slide glides, the tabs sit about 480px below the fold. The WhatsApp chat column is 759px (667x375) or 848px (740x360) tall. Its bubbles are bottom-aligned, so the visible part is an empty dark box under the header (see 740x360-fr card2). At 844x390 the md 16/11 frame is 777x569, still 1.46 screens.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/667x375-en-motion-card1.png",
+      "shots/projects/p1/agent-mobile/740x360-fr-reduced-card2.png",
+      "shots/projects/p1/844l/en-motion-01.png",
+      "shots/projects/p1/844l/en-motion-02.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:118",
+    "suggested_fix": "Cap the frame by viewport height instead of width alone. For example, add max-h-[min(80svh,…)] with the aspect on the inner box, or switch to a landscape aspect under a short-screen query (@media (max-height:500px) → aspect-[16/10] plus w-auto max-w-full mx-auto, like the site's existing 'short' variant). Size it so the screen, the tabs and the caption fit in about 85svh. Give the chat column the same treatment, or top-align the bubbles when the box is taller than the conversation.",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "focus",
+    "viewport": "320, 360, 375, 390, 430, 844x390 (en+fr)",
+    "severity": "P1",
+    "description": "The agent.py code window still cuts off code on every phone width. The in-progress fix in the working tree (container-query font size) shrinks the text but still clips line 3, 'plan = model.think(task, context)'. It overruns the pre by 18px at 320, 14px at 375, 13px at 390 and 12px at 844x390. The code is now also too small to read: 7.8px at 320, 10.1px at 375, 10.75px at 390. The font floor is clamp(0.45rem …), which is 7.2px. Before that change (HEAD, measured 00:38), 8/8 lines were clipped at 320 (up to 148px), 5 at 375, 4 at 390 and 430, and 6 at 844x390, where md:p-10 plus md:text-[0.8rem] left the pre only 224px wide. The root cause is still the double padding: .focus-art has p-6/md:p-10, and the code window sits inside it.",
+    "evidence": [
+      "shots/focus/p1/agent-mobile/320x568-fr-reduced-code-current.png",
+      "shots/focus/p1/agent-mobile/320x568-fr-reduced-code.png",
+      "shots/focus/p1/375/en-reduced-00.png",
+      "shots/focus/p1/844l/en-motion-01.png"
+    ],
+    "file_line": "components/focus/Illustrations.tsx:160 (font clamp) + components/focus/Focus.tsx:127 (p-6 md:p-10 around it)",
+    "suggested_fix": "Let the code window use the full art box on phones: drop the outer p-6 for the software panel, or use p-3 on it. Keep the font at 11px or more. Where 34 characters still don't fit, shorten the widest line (e.g. 'plan = model.think(task, ctx)'), or wrap the long lines with a continuation indent. Don't scale the text below about 10px, and check that the container query accounts for px-4 plus the w-4/mr-4 gutter (about 64px, not 2rem).",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "360, 375, 390 (fr); 320, 360 (en)",
+    "severity": "P2",
+    "description": "Slide captions are cut off with an ellipsis on phones. line-clamp-2 on 12.5px text hides the third line. At 375 FR (measured by tapping each tab), Lead Finder slide 1 ('…chacun avec un score de 0 à 100 transparent') and slide 3 ('…à valider par une personne avant tout envoi') are clamped, and so is Clarté slide 2 ('…en un coup d'œil (données de démo)'). At 390 FR: Lead Finder 1 and 3. At 360 FR: all four French captions checked. At 360 EN: Lead Finder 3. At 320 EN: Lead Finder 1 and Clarté 1. scrollHeight is 52 against a clientHeight of 34, so a full line is lost. The end of the caption is the information part (the score, 'demo data', review before sending).",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/375-fr-bakery-caption-clamped.png",
+      "shots/projects/p1/agent-mobile/320x568-fr-reduced-card1.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:167",
+    "suggested_fix": "Reserve 3 lines on phones (line-clamp-3 min-h-[3lh], md:line-clamp-2 md:min-h-[2lh]), or drop the clamp and let min-h keep the layout stable. The frame is aspect-locked, so taking the extra line out of the screen area is fine.",
+    "confidence": 0.9,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "320 (en+fr), 360-390 (fr)",
+    "severity": "P2",
+    "description": "Slide tab labels wrap in some tabs and not others, so the tabs are uneven. The label is block-level 9.6px mono (0.6rem with 0.14em tracking) in a 1fr column. At 320 EN, '02 · DESIGNS' breaks after the dot ('02 · / DESIGNS', label 19px tall) while '01 · LEADS' and '03 · DEMO' stay on one line. At 320-390 FR, '01 · PROSPECTS' wraps. At 320 FR, '02 · DESIGNS' and '02 · TABLEAU DE BORD' wrap too. Wrapped tabs grow from 38 to 47px, the caption moves down, and the number sits alone on the first line with label-mono's line-height 1.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/320x568-fr-reduced-card1.png",
+      "shots/projects/p1/375/fr-reduced-01.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:156",
+    "suggested_fix": "Keep the number and the label together: put '0{i+1} ·' in a nowrap span, and use a non-breaking space after the dot. Let the label itself truncate, or use tracking-[0.06em] below sm. Alternatively, show only the number on the smallest widths ('01', '02', '03') and put the full label in the caption line.",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "375x667, 390x844 touch (Chrome/Android behaviour); iPhone Safari by platform behaviour",
+    "severity": "P2",
+    "description": "On touch, the hold added in 43d4a5b works differently from one platform to the next and isn't visible. In Chromium touch emulation, tapping a tab focuses the button. onFocus then sets held, and the slideshow stops for good. It stayed on the tapped slide for 14s, and still for 10s after scrolling 3000px away and back, because blur only comes from tapping something else. The progress bar freezes half filled, which looks broken rather than paused. A JS element.click(), which doesn't move focus, keeps auto-advancing. iOS Safari doesn't focus buttons on tap, so there the tapped slide is replaced after its remaining time. Neither platform offers a touch pause control, although the slides and scroll glides run longer than 5s.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/375-en-tap-designs-then-8s.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:92",
+    "suggested_fix": "Base the hold on an explicit 'user took over' state set in the tab onClick, not on focus. Show it (a small pause/play toggle next to the tabs, or a 'paused' state on the bar) and let a second tap or a play button resume. Keep focus-within holding only for keyboard users (:focus-visible).",
+    "confidence": 0.75,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "375x667, 390x844 touch (motion)",
+    "severity": "P2",
+    "description": "Scroll slides move too fast to read on a phone, or run for too long. The speed is a fixed number of screenshot pixels per second. On phones, where the view is only 342px tall, the bakery demo (speed 520) glides 3776px in 7.26s. Sampled transforms went from -53 to -3398px in 5.6s, so a whole frame's worth of content passes every 0.66s. The Clarté phone capture is 7238px tall at 375, so at 300px/s (measured about 281px/s) the slide stays up for about 25s. Nothing lets you slow it down, scrub it or swipe it. Touch-dragging the screen scrolls the page, not the screenshot.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/375-en-bakery-scroll-mid.png",
+      "shots/projects/p1/agent-mobile/375-en-clarte-scroll-mid.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:21 (SCROLL_SPEED) + content/site.ts:344 (speed: 520), :444 (speed: 300)",
+    "suggested_fix": "Express speed in view-heights per second (e.g. 0.35 × view.clientHeight per second), or cap the glide at 12-15s and move in steps with pauses. On touch, consider letting the screenshot be dragged: overflow-y:auto with the auto-glide paused on touchstart.",
+    "confidence": 0.7,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "320-430 (en+fr)",
+    "severity": "P2",
+    "description": "Mono micro-labels in the project frame are below a readable size on phones: slide tab labels 9.6px (0.6rem, uppercase, 0.14em tracking), the title-bar slug 9.92px (0.62rem), and the 'Real app screens' / 'Illustrative demo' badge and the chat 'AI agent' badge 9.28px (0.58rem). The status pill is 9.92px, and the agent.log (tablet and landscape only) is 11px. Phones don't enlarge these, and uppercase letter-spaced mono at 9-10px is hard to read at arm's length.",
+    "evidence": [
+      "shots/projects/p1/375/en-motion-01.png",
+      "shots/projects/p1/375/en-motion-03.png",
+      "shots/projects/p1/agent-mobile/320x568-en-motion-card2.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:110, :112, :161; components/projects/Slides.tsx:156; components/projects/ChatPreview.tsx:70",
+    "suggested_fix": "Set a floor of about 11px (0.7rem) for all mono labels on phones, with less tracking (0.08em) so they still fit, e.g. text-[0.7rem] tracking-[0.08em] md:text-[0.6rem] md:tracking-[0.14em].",
+    "confidence": 0.7,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "320 (en+fr); chat header also 360 (en+fr) and 375 (fr)",
+    "severity": "P3",
+    "description": "Ellipses are still cut into the WhatsApp frame chrome after the 'window dots give way on phones' fix. At 320 the slug 'whatsapp-ai-agent' is still truncated (scrollWidth 125 against clientWidth 113) next to the shrink-0 'ILLUSTRATIVE DEMO' badge. The chat header 'Demo business · Assistant' / 'Commerce démo · Assistant' is truncated at 320 and 360 in both languages and at 375 FR. The AI agent pill takes the space, leaving 'Demo business · …'.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/320x568-en-motion-card2.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:110-113; components/projects/ChatPreview.tsx:68-72",
+    "suggested_fix": "Below sm, hide the demo badge in the title bar (the chat header already says 'AI agent'), or move it onto its own line. In the chat header, let the name wrap to 2 lines (drop truncate, add leading-tight), or shorten it to 'Assistant' under 400px of container width (@container query).",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "320 (fr)",
+    "severity": "P3",
+    "description": "In French, the Role/Stack list squeezes the stack pills into a single column at 320. The dl uses grid-cols-[auto_1fr] with gap-x-8, and the 'TECHNOLOGIES' label is 102px wide, which leaves 138px for the pills. Every card's stack becomes one pill per row: six rows for Lead Finder and seven for WhatsApp, a tall ragged list. 'Projet solo, assisté par IA' wraps to 2 lines in that same 138px column.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/320x568-fr-acc-open.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:186",
+    "suggested_fix": "Below sm, stack the dt above the dd (grid-cols-1, with the dt as a small label on top), or use gap-x-4 and a fixed 6rem label column.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "320x568, 375x667 (fr; en similar)",
+    "severity": "P3",
+    "description": "'How it's built' opens a very long block on phones, and the only way to close it is at the top. Opening the Lead Finder panel adds 637px of text at 375 FR (the panel runs from y=356 to 992 in a 667px viewport) and 715px at 320 FR. After reading to the end, you have to scroll a full screen back up to reach the minus toggle, and nothing marks where the panel ends before the next card's links.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/375x667-fr-acc-open.png",
+      "shots/projects/p1/agent-mobile/320x568-fr-acc-open.png"
+    ],
+    "file_line": "components/projects/ProjectCard.tsx:199-229",
+    "suggested_fix": "On phones, make the toggle sticky while the panel is open (sticky top-16 bg-ink), or add a small 'Close ↑' control at the end of the panel that collapses it and scrolls the toggle back into view.",
+    "confidence": 0.6,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "768 touch (iPad), 320-430 touch",
+    "severity": "P2",
+    "description": "Scroll slides load very large images into permanently promoted layers, which risks jank or blank frames and tab reloads on iOS. On tablets (768 and up, the laptop source), the Clarté page is 2200x9782 (EN) or 2200x10200 (FR), 21.5-22.4 MP (about 86-90 MB decoded), and the bakery page is 2048x9318 (19.1 MP). Both sit in one card-stack frame next to 2-3 more slides. All of them are in the DOM and load once the card is near. Each tall image has will-change-transform, and the frame (ProjectCard :103) carries will-change-transform on touch too, where nothing tilts. Phones get 729x16235 (11.8 MP) for Clarté, laid out 7238-7572px tall at 375-390. That is one layer about 21,000 device px tall at DPR 3, past WebKit's usual tile and texture budgets.",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/375-en-clarte-scroll-mid.png",
+      "shots/projects/p1/768/en-motion-slide3.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:109; components/projects/ProjectCard.tsx:103; content/site.ts:437-438",
+    "suggested_fix": "Cut the tall captures into 2-3 stacked tiles (e.g. 2200x3200 each), or cap the phone capture at 1170x8000 and the tablet one at 1600 wide. Add will-change only while a slide is active and gliding. Only mount (or set src on) the active and next slide.",
+    "confidence": 0.45,
+    "lens": "mobile"
+  },
+  {
+    "section": "projects",
+    "viewport": "390-430 at DPR 3 (modern iPhones); 667x375, 740x360 landscape",
+    "severity": "P3",
+    "description": "The phone captures are too low-resolution for 3x screens, so text inside the screenshots looks soft. The -m captures are 780px wide (lf-*, site-*), and the Clarté ones only 729 and 710px. At 390 CSS px on a DPR-3 iPhone the frame needs 1020-1170 device px, so images render at 0.62-0.7x. Sideways, the (max-width:767px) source still applies and the frame is 612-679 CSS px wide. The same 780px image is then stretched over 1836-2037 device px (about 0.4x).",
+    "evidence": [
+      "shots/projects/p1/agent-mobile/667x375-en-motion-card1.png"
+    ],
+    "file_line": "components/projects/Shot.tsx:25",
+    "suggested_fix": "Give the phone source a 3x variant (srcSet with 780w and 1170w plus sizes='(max-width:767px) 92vw'). For landscape phones, pick the source by aspect (orientation: portrait) or use the laptop capture when the width is 600px or more.",
+    "confidence": 0.55,
+    "lens": "mobile"
+  },
+  {
+    "section": "focus",
+    "viewport": "667x375, 740x360 (landscape phones, stacked list); 844x390 panels",
+    "severity": "P2",
+    "description": "On a phone held sideways, each Focus drawing fills the screen before the text starts. Below md the art box is aspect-square at full width: 612x612 at 667x375 (1.6 screens) and 679x679 at 740x360 (1.9 screens). Panels are 943-1039px tall, so you scroll almost two screens of looping animation per panel before reaching 'Software' / 'AI' / 'Math', and a panel is never seen whole. At 844x390 the md two-column panels are 393-433px tall, still more than the screen.",
+    "evidence": [
+      "shots/focus/p1/agent-mobile/667x375-en-motion-code.png",
+      "shots/focus/p1/agent-mobile/740x360-fr-reduced-code.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:125",
+    "suggested_fix": "Cap the art height by the viewport: aspect-square max-h-[55svh] w-full, or aspect-[16/9] under (max-height:500px). Better, use the md:grid-cols-2 layout from about 560px wide so the art sits beside the text in landscape.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "focus",
+    "viewport": "320-390 (fr: all three panels; en: AI and Math up to 390)",
+    "severity": "P2",
+    "description": "Keyword lines under each panel crowd together when they wrap. .label-mono forces line-height:1, so two uppercase lines of 11.5px mono sit in 23px with no leading. 'ALGEBRA · CALCULUS · PROBLEM / SOLVING' at 375 EN, and in French 'AGENTS · AUTOMATISATION · API / DE LLM' and 'ALGÈBRE · CALCUL · RÉSOLUTION / DE PROBLÈMES', which also splits the terms mid-phrase. At 320 EN, 'AGENTS · AUTOMATION / LLM APIS' wraps as well.",
+    "evidence": [
+      "shots/focus/p1/375/fr-reduced-04.png",
+      "shots/focus/p1/375/fr-reduced-02.png",
+      "shots/focus/p1/agent-mobile/320x568-fr-reduced-keywords.png",
+      "shots/focus/p1/844l/fr-motion-03.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:144 (label-mono: app/globals.css:77-82)",
+    "suggested_fix": "Add leading-[1.7] to this p, and render each keyword as a nowrap span joined by ' · ' so line breaks only fall between keywords (or use a flex-wrap list with gap-x-3 gap-y-2).",
+    "confidence": 0.85,
+    "lens": "mobile"
+  },
+  {
+    "section": "focus",
+    "viewport": "320-390 (en+fr)",
+    "severity": "P3",
+    "description": "Text inside the AI and Math drawings is unreadable on phones. The SVG is 400 units scaled to 222-292px, so fontSize 10-13 renders at 7-10px. INPUT/HIDDEN/OUTPUT are 8px at 320 and 9px at 375-390. The x/y axis letters and the live readouts 'x = 1.57' and 'f′(x) = 0.00' are 8-10px, and 'f(x) = sin x' is 9-12px. The layer labels are also hard-coded English in the French page ('INPUT / HIDDEN / OUTPUT' under 'IA').",
+    "evidence": [
+      "shots/focus/p1/375/en-motion-02.png",
+      "shots/focus/p1/375/en-motion-03.png",
+      "shots/focus/p1/375/fr-reduced-02.png"
+    ],
+    "file_line": "components/focus/Illustrations.tsx:95-109, :241-242",
+    "suggested_fix": "Scale the SVG text up on small art boxes: fontSize 16-18 in viewBox units, or compute it from the rendered width. Otherwise drop the readouts on phones. Translate the layer labels (entrée / cachée / sortie) or pass them in from site.ts.",
+    "confidence": 0.7,
+    "lens": "mobile"
+  },
+  {
+    "section": "focus",
+    "viewport": "375x667, 320x568 (en+fr)",
+    "severity": "P3",
+    "description": "In the stacked phone list, each Focus panel is taller than the screen. At 375x667 the panels are 685-755px, and at 320x568 they are 671-759px (1.2-1.34 screens). The square art is 270-325px, and the body adds p-8, gap-10 and a 41.6px title. So a sentence of about 25 words costs over a screen of scrolling, the whole section is about 2,400px long, and the title/text/keywords never share the screen with the drawing that goes with them.",
+    "evidence": [
+      "shots/focus/p1/375/en-motion-01.png",
+      "shots/focus/p1/375/en-motion-02.png",
+      "shots/focus/p1/375/en-motion-03.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:125, :131",
+    "suggested_fix": "On phones, use an aspect-[4/3] or aspect-[16/10] art box and a tighter body (p-6 gap-6), so a panel fits in about 90svh.",
+    "confidence": 0.45,
+    "lens": "mobile"
+  },
+  {
+    "section": "about",
+    "viewport": "320 (en+fr), 360 (fr)",
+    "severity": "P2",
+    "description": "At 320 the About facts give most of the row to a mostly empty label column. grid-cols-[8rem_1fr] with gap-6 leaves the values only 120px (EN) or 127px (FR) at text-lg. 'Internships and co-op roles', 'Whatever I haven't learned yet', 'Des stages et des stages coop' and 'Tout ce que je n'ai pas encore appris' each take 3 lines (84px), and even 'Montréal, Canada' and 'Université McGill' wrap to 2. The 128px label column holds 6-10 character labels, and the row reads like a narrow ragged column hugging the right edge.",
+    "evidence": [
+      "shots/about/p1/agent-mobile/320x568-fr-reduced-facts.png",
+      "shots/about/p1/375/fr-motion-03.png"
+    ],
+    "file_line": "components/about/About.tsx:36",
+    "suggested_fix": "Below sm, stack the label above the value (grid-cols-1 gap-2, with the dt as a small mono label), or use grid-cols-[6.5rem_1fr] gap-4 and text-base for the dd.",
+    "confidence": 0.8,
+    "lens": "mobile"
+  },
+  {
+    "section": "about",
+    "viewport": "320 (en+fr), 360-390 (fr), 844x390",
+    "severity": "P3",
+    "description": "Datasheet values wrap in a narrow column on small phones and in landscape. The rows use grid-cols-[7rem_1fr] gap-4 inside px-5, which leaves 102px (320 EN), 109px (320 FR) and 130px (844x390, where the md column makes the card 300px wide). At 320, 'Lebanon → Montreal', 'Always learning', 'Bâtisseur curieux', 'Liban → Montréal' and 'Toujours en apprentissage' wrap to 2 lines, which breaks the spec-sheet single-line look. The Status dot then floats off to the side of a 2-line value. 'Toujours en apprentissage' still wraps at 360-390 FR.",
+    "evidence": [
+      "shots/about/p1/agent-mobile/320x568-fr-reduced-datasheet.png",
+      "shots/about/p1/844l/en-motion-03.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:81",
+    "suggested_fix": "Use grid-cols-[5.5rem_1fr] and px-4 below sm (the labels are 4-7 characters), and give the status dot shrink-0.",
+    "confidence": 0.75,
+    "lens": "mobile"
+  },
+  {
+    "section": "about",
+    "viewport": "667x375, 740x360 (landscape phones, single column); 375x667 portrait",
+    "severity": "P2",
+    "description": "Sideways, the portrait alone is taller than the screen, and the About heading is almost 3 screens down. Below md the datasheet is max-w-[500px], so at 667x375 and 740x360 the card is 500x726 and its 5:4 photo is 398px tall, more than the 375 or 360px viewport. The section label and 'Hi, I'm Gregory.' start 969px below the section top at 667x375 (2.6 screens). In portrait, the heading starts 831px down at 375x667 and 843px at 390x844, so tapping About in the menu lands on a bare photo card with no heading. The a11y agent noted the reading-order side; this is the scroll-distance and orientation side.",
+    "evidence": [
+      "shots/about/p1/agent-mobile/667x375-en-motion-datasheet.png",
+      "shots/about/p1/375/en-motion-00.png",
+      "shots/about/p1/375/en-motion-01.png"
+    ],
+    "file_line": "components/about/About.tsx:13-16; components/about/Datasheet.tsx:52, :65",
+    "suggested_fix": "On phones, render the SectionHeader before the datasheet (a mobile-only header, or order-first on the text column with the card after the lead paragraph). In landscape, cap the photo box with max-h-[60svh], or use md-style side-by-side columns from about 600px wide when the height is 500px or less.",
+    "confidence": 0.7,
+    "lens": "mobile"
+  }
+]

@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, REDUCED_MOTION } from "@/lib/gsap";
-import { playWhenVisible } from "@/lib/visible";
 import { t, type Locale } from "@/lib/i18n";
 import { projects } from "@/content/site";
 import Mark from "../Mark";
@@ -15,7 +14,8 @@ const LOG: string[][] = [
   ["booking saved ✓"],
 ];
 
-/** Demo: a customer chats with the WhatsApp agent, which answers and books a slot. */
+/** Demo: a customer chats with the WhatsApp agent, which answers and books a slot.
+ *  Plays three times while on screen (held while the mouse is over it), then rests on the whole conversation. */
 export default function ChatPreview({ locale }: { locale: Locale }) {
   const root = useRef<HTMLDivElement>(null);
   const chat = projects.previews.chat;
@@ -36,14 +36,21 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
       };
       reset();
 
-      const tl = gsap.timeline({ repeat: -1, paused: true, onRepeat: reset, defaults: { ease: "expo.out", duration: 0.7 } });
+      const tl = gsap.timeline({
+        repeat: 2,
+        paused: true,
+        onRepeat: reset,
+        // The last round ends on the full conversation instead of an empty window.
+        onComplete: () => gsap.to([...bubbles, ...logs], { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.04 }),
+        defaults: { ease: "expo.out", duration: 0.7 },
+      });
       chat.messages.forEach((m, i) => {
         if (m.from === "agent") {
           tl.set(typing, { display: "flex" }, "+=0.3")
             .fromTo(typing, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.3 })
             .set(typing, { display: "none" }, "+=1");
-        } else {
-          tl.to({}, { duration: i === 0 ? 0.6 : 1.1 });
+        } else if (i > 0) {
+          tl.to({}, { duration: 1.1 });
         }
         tl.set(bubbles[i], { display: "block" });
         tl.fromTo(bubbles[i], { autoAlpha: 0, y: 14, scale: 0.97 }, { autoAlpha: 1, y: 0, scale: 1 });
@@ -51,15 +58,44 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
       });
       tl.to([...bubbles, ...logs], { autoAlpha: 0, duration: 0.5, stagger: 0.03, ease: "power2.in" }, "+=2.8");
 
-      return playWhenVisible(root.current!, tl);
+      // Plays while on screen, holds while the mouse is over it.
+      const el = root.current!;
+      let visible = false;
+      let hovered = false;
+      const sync = () => (visible && !hovered ? tl.play() : tl.pause());
+      const io = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        sync();
+      }, { threshold: 0.2 });
+      io.observe(el);
+      const hover = (e: PointerEvent) => {
+        if (e.pointerType !== "mouse") return;
+        hovered = e.type === "pointerenter";
+        sync();
+      };
+      el.addEventListener("pointerenter", hover);
+      el.addEventListener("pointerleave", hover);
+      return () => {
+        io.disconnect();
+        el.removeEventListener("pointerenter", hover);
+        el.removeEventListener("pointerleave", hover);
+      };
     },
     { scope: root },
   );
 
   return (
     <div ref={root} className="@container absolute inset-0 flex text-[13px]">
+      {/* Screen readers get the whole conversation at once; the animated version below is visual only. */}
+      <ol className="sr-only">
+        {chat.messages.map((m, i) => (
+          <li key={i}>
+            {t(chat.speakers[m.from], locale)}: {t(m.text, locale)}
+          </li>
+        ))}
+      </ol>
       {/* chat column */}
-      <div className="flex min-w-0 flex-1 flex-col border-line @min-[520px]:border-r">
+      <div className="flex min-w-0 flex-1 flex-col border-line @min-[520px]:border-r" aria-hidden="true">
         <div className="flex items-center gap-3 border-b border-line px-4 py-3">
           <span className="grid h-8 w-8 place-items-center rounded-full border border-line bg-graphite text-paper">
             <Mark className="h-4 w-4" />
@@ -67,7 +103,7 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-paper">{t(chat.header, locale)}</p>
           </div>
-          <span className="label-mono rounded-full border border-copper/40 px-2 py-1 text-[0.58rem] text-copper">
+          <span className="label-mono rounded-full border border-copper/40 px-2 py-1 text-[0.62rem] text-copper max-sm:text-[0.66rem] max-sm:tracking-[0.08em]">
             {t(chat.badge, locale)}
           </span>
         </div>
@@ -94,7 +130,7 @@ export default function ChatPreview({ locale }: { locale: Locale }) {
       </div>
 
       {/* agent log */}
-      <div className="hidden w-[38%] flex-col @min-[520px]:flex">
+      <div className="hidden w-[38%] flex-col @min-[520px]:flex" aria-hidden="true">
         <div className="label-mono border-b border-line px-4 py-[1.13rem] text-[0.6rem] text-mute">agent.log</div>
         <div className="flex flex-1 flex-col gap-3 p-4 font-mono text-[11px] leading-relaxed">
           {LOG.map((lines, i) => (

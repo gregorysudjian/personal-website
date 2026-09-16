@@ -1,0 +1,201 @@
+[
+  {
+    "section": "focus",
+    "viewport": "1440x900 desktop (also 1100x900); any window resize or browser zoom that switches Focus between the horizontal and stacked layouts and back",
+    "severity": "P1",
+    "description": "Resizing the window across the Focus horizontal/stacked threshold and back sends the page to the very top (scrollY 0), even if the visitor was reading Projects. Steps: open /en at 1440x900, scroll to the Clarté card (scrollY 9970), resize to 900x600 (Focus stacks; position kept at 9969), then resize back to 1440x900. Observed: scrollY 0 and the hero fills the screen. It reproduced 3 out of 3 times: from mid-Focus (5811 -> 0), from Projects (9970 -> 0), and with a height-only change 1100x900 -> 1100x650 -> 1100x900 (9402 -> 0). The last one changes only Focus's media query (the hero's max-width:767 query stays put), so the Focus matchMedia re-run is what causes it. Afterwards the Focus meter is also stale: it shows '02' with a half-full bar while progress is 0, until the pin starts. Real-world triggers: docking devtools at the bottom, snapping a window to half height, and zooming to 150% then back to 100% (1440x900 at 150% is a 960x600 CSS viewport). Expected: the reading position is kept, or at least the same section stays on screen.",
+    "evidence": [
+      "shots/focus/p1/agent-interaction/resize-stacked-and-back-projects-1440.png",
+      "shots/focus/p1/agent-interaction/resize-stacked-and-back-mid-focus-1440.png",
+      "shots/focus/p1/agent-interaction/resize-mid-to-900x600.png",
+      "shots/focus/p1/agent-interaction/resize-mid-to-1440x900.png"
+    ],
+    "file_line": "components/focus/Focus.tsx:85 (ScrollTrigger.refresh() called inside the gsap.matchMedia callback, lines 38-91)",
+    "suggested_fix": "Remove the explicit ScrollTrigger.refresh() inside mm.add. gsap.matchMedia already refreshes when a context activates, and a nested refresh records the temporary scroll 0 and restores it. If a refresh is still needed, defer it with ScrollTrigger.addEventListener('matchMedia', ...) or requestAnimationFrame. As a safety net, save the element at the top of the viewport before the revert and scroll back to it (lenis.scrollTo(el, {immediate:true})) after the refresh. Also reset the meter (count '01', bar scaleX 0) in the mm cleanup and when the context starts.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "390x844 touch (any touch device where tapping a button focuses it, e.g. Chrome Android)",
+    "severity": "P2",
+    "description": "Tapping a slide tab on a touch screen freezes the slideshow for good. Steps: 390x844 touch, scroll to Lead Finder, tap '02 · DESIGNS'. Observed: the tapped button keeps focus, so onFocus sets held=true. Touch never fires the mouse-only pointerleave that would clear it, and blur never happens. The progress bar stays at scaleX 0 with animation-play-state paused for 12+ s, and it is still paused after scrolling 1500px away and back (tested 18 s later). On Clarté the same tap stops the carousel from ever reaching the dashboard slide. Expected: a tap jumps to that slide and autoplay carries on, or at least resumes after a while or once the card leaves the screen. The empty, paused bar reads as broken.",
+    "evidence": ["shots/projects/p1/agent-interaction/slides-touch-tap-frozen-390.png"],
+    "file_line": "components/projects/Slides.tsx:90-93",
+    "suggested_fix": "Hold on keyboard focus only: onFocus={(e) => e.target.matches(':focus-visible') && setHeld(true)}. Clear the hold when the card leaves the screen (setHeld(false) in the IntersectionObserver callback when !isIntersecting). For touch, restart the countdown on tap instead of holding.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop (fine pointer)",
+    "severity": "P2",
+    "description": "Hovering holds the countdown but not the scroll slide's glide. Steps: 1440x900, scroll to Clarté, and while slide 01 · WEBSITE is gliding move the pointer onto the preview. Observed: the progress bar freezes (scaleX 0.16, paused) while the screenshot keeps gliding, translateY going from -124 to -2376px over 6 s of hovering. The visitor who stopped to read watches the page scroll away under the cursor. After the pointer leaves, the bar runs about 9 s more over a page that is already parked at the bottom. The Lead Finder 03 · DEMO slide behaves the same way. Expected: hover pauses the glide along with the bar.",
+    "evidence": ["shots/projects/p1/agent-interaction/hover-hold-scrollslide-keeps-gliding-1440.png"],
+    "file_line": "components/projects/Slides.tsx:111-115 (glide keyed on `playing`, the timer and bar on `advancing` at line 45)",
+    "suggested_fix": "Drive the glide from `advancing` and make it pausable. Use WAAPI (img.animate([{transform:'translateY(0)'},{transform:`translateY(${-distance}px)`}], {duration: glide, delay: SCROLL_PAUSE, fill:'forwards'})) and call .pause()/.play() alongside the bar, or a GSAP tween you pause and resume. A CSS transition cannot be paused mid-way.",
+    "confidence": 0.9,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop (the same logic runs on every viewport)",
+    "severity": "P2",
+    "description": "Scrolling away from a scroll slide mid-glide and coming back desyncs the glide from the timer, so the slide advances halfway down the page. Steps: 1440x900, let Clarté 01 · WEBSITE play for 6 s, scroll 1400px down (below the 35% threshold), wait 1.2 s, scroll back. Observed: the countdown resumes where it stopped (bar at 0.52), but the image snaps back to the top and glides again from 0. The bar fills while the screenshot is at -1437px of 2921, and the slide switches to the dashboard at about 55% of the page, so the request form at the bottom is never shown. Expected: the glide resumes from where it paused, or the whole slide restarts, glide and timer together.",
+    "evidence": ["shots/projects/p1/agent-interaction/scrollslide-advances-mid-page-after-return-1440.png"],
+    "file_line": "components/projects/Slides.tsx:61-69 (the remaining time is kept) vs 111-115 (the transform resets to 0 when !playing)",
+    "suggested_fix": "Pause the glide and resume it from its current offset (a pausable WAAPI or GSAP tween, as in the hover finding), so both share one clock. Otherwise, reset remaining.current to the full duration whenever the active slide is a scroll slide and becomes visible again.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop, image arriving late (slow network, or delayed 5 s through a route); window resize has the same effect",
+    "severity": "P2",
+    "description": "When a scroll slide's screenshot finishes loading after the slide has started, the slide's duration changes mid-slide (8000 -> 11137 ms for Clarté). The progress bar jumps backwards (0.537 -> 0.431) because animation-duration changes under a running animation. The countdown also restarts from the full 11137 ms, so the bar reaches 100% at t=14.5 s and then sits full for about 4.5 s until the slide advances at t=19 s, while the image is still gliding. A window resize while a scroll slide is up re-measures, changes the duration and causes the same jump. Expected: a monotonic bar that stays in step with the advance.",
+    "evidence": ["shots/projects/p1/agent-interaction/slow3g-clarte-800ms-1440.png"],
+    "file_line": "components/projects/Slides.tsx:57-59 (remaining reset on every duration change), 76 (measure on load/resize), 150 (animationDuration)",
+    "suggested_fix": "Know the distance before the image loads: pass the capture's intrinsic width and height from content/site.ts, set width/height on the <img>, and compute distance = viewWidth * h / w - viewHeight. If it must change mid-slide, keep the elapsed time (remaining = newDuration - elapsed) and set a negative animation-delay on the bar so it continues from the same fraction.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop at about 400 kbps (Slow 3G-like CDP throttling); every viewport on a slow connection",
+    "severity": "P2",
+    "description": "No loading state: the slide area is a blank white rectangle until the screenshot arrives, and autoplay keeps stepping through slides that haven't loaded. Steps: load /en, apply 400 kbps / 400 ms throttling, scroll to Clarté. Observed: from 0.8 s to 8 s the frame is pure white (slide 01's clarte-laptop-en.webp is 546 KB). At 9 s it auto-advances to 02 while slide 01 has never painted, and at 16 s it goes back to 01, still white. The 20 s run ended without slide 01 completing, while the inactive slide 02 (125 KB) finished first. Every slide in a card is in the viewport under opacity 0, so all of them lazy-load at once and the inactive ones take bandwidth from the visible one. Expected: a dark or skeleton placeholder in the site's palette, and the timer waiting for the current slide's image.",
+    "evidence": [
+      "shots/projects/p1/agent-interaction/slow3g-clarte-800ms-1440.png",
+      "shots/projects/p1/agent-interaction/slow3g-clarte-6000ms-1440.png",
+      "shots/projects/p1/agent-interaction/slow3g-clarte-12000ms-1440.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:96 (bg-white), 61-69 (the timer ignores load state); components/projects/Shot.tsx:27 (loading=lazy on every slide)",
+    "suggested_fix": "Use bg-ink or bg-graphite with a subtle shimmer until img.complete, and switch to white only for loaded 'contain' stills (e.g. a data-loaded attribute on the slide). Don't let `advancing` be true until the active slide's image has loaded. Give the first slide fetchPriority='high'. Render later slides' src only once the slide before them has loaded, or use loading='lazy' plus decoding on demand.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop; 390x844 touch while offline",
+    "severity": "P2",
+    "description": "No error state for a missing screenshot. Steps: block /projects/clarte-laptop-en.webp, lf-overview.webp or site-en.webp (route.abort), or go offline before scrolling to Projects. Observed: in Lead Finder and Clarté a broken-image icon plus alt text drawn in near-white on the white slide ground, which is almost invisible, inside an otherwise empty frame. Autoplay keeps rotating into the broken slide, and the scroll slide still gets the 8 s default. On card 4 the broken icon and alt text sit top-left in a dark void. Expected: a designed fallback such as the project name and 'Preview unavailable' on the dark ground, with broken slides skipped by autoplay.",
+    "evidence": [
+      "shots/projects/p1/agent-interaction/img404-clarte-1440.png",
+      "shots/projects/p1/agent-interaction/img404-leadfinder-1440.png",
+      "shots/projects/p1/agent-interaction/img404-site-1440.png",
+      "shots/projects/p1/agent-interaction/offline-leadfinder-390.png"
+    ],
+    "file_line": "components/projects/Shot.tsx:27; components/projects/Slides.tsx:96",
+    "suggested_fix": "Add an onError handler to Shot that sets a failed flag. Render a fallback block in its place: bg-graphite, the label-mono project slug and a one-line 'preview unavailable' message, with color:transparent on the img so the alt text doesn't overlap. In Slides, skip failed indices when advancing.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 and 390x844, prefers-reduced-motion: reduce",
+    "severity": "P2",
+    "description": "With reduced motion the scroll slides can't be read past the first screen. Steps: enable reduced motion, go to Lead Finder, click '03 · DEMO', or look at Clarté's '01 · WEBSITE'. Observed: the screenshot stays at translateY 0. Only the top of a 3424px (Lead Finder demo) or roughly 3300px (Clarté) page is visible, hovering does nothing, and the frame can't be scrolled. The caption says the request form is 'at the bottom', and reduced-motion visitors can never see it. Expected: a static alternative that shows the whole page, such as a scrollable viewport.",
+    "evidence": [
+      "shots/projects/p1/agent-interaction/reduced-scrollslide-card1-390.png",
+      "shots/projects/p1/agent-interaction/reduced-scrollslide-card3-1440.png"
+    ],
+    "file_line": "components/projects/Slides.tsx:48-50 (no playing under reduced motion) and 111 (transform only when playing)",
+    "suggested_fix": "Under reduced motion, give the active scroll slide's container overflow-y:auto, overscroll-behavior:contain, tabIndex=0 and an aria-label so it can be scrolled by hand (Lenis needs data-lenis-prevent on it). Otherwise, show a 'cover' crop of the key part of the page instead of the top.",
+    "confidence": 0.8,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 desktop (all viewports)",
+    "severity": "P3",
+    "description": "The outgoing scroll slide visibly rewinds during the crossfade. When the Lead Finder 03 · DEMO slide (scrolled to about -2998px) hands over to 01, its transform snaps back to 0 with a 0.6 s ease while it is still fading out. 150 ms after the switch it is at 23% opacity and y=-1594, so mid-page bakery content ('LA BOULANGERIE') streaks upward, ghosted over the dashboard.",
+    "evidence": ["shots/projects/p1/agent-interaction/scrollslide-rewind-during-crossfade-1440.png"],
+    "file_line": "components/projects/Slides.tsx:111-115",
+    "suggested_fix": "When a slide becomes inactive, hold its transform until the 0.8 s fade has finished: transition 'transform 0s linear 0.8s', or reset it in a transitionend handler on the .slide opacity.",
+    "confidence": 0.85,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "390x844 and 375x667 touch",
+    "severity": "P3",
+    "description": "On phones the Clarté website slide stays up for about 25 s (measured animationDuration 25433 ms at 390). The 300 px/s speed is applied to the much taller phone capture (clarte-web-en-m.webp), so a visitor scrolling at a normal pace almost never sees the second slide (the dashboard) unless they tap the tab. The desktop equivalent is 11 s.",
+    "evidence": ["shots/projects/p1/agent-interaction/reduced-scrollslide-card3-390.png"],
+    "file_line": "content/site.ts:442 (speed: 300); components/projects/Slides.tsx:41-44",
+    "suggested_fix": "Cap the scroll slide duration, for example derive the speed so the glide takes at most about 10-12 s (speed = max(current.speed, distance / 10)), or add a mobile speed to the slide definition.",
+    "confidence": 0.75,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "1440x900 and 375x667",
+    "severity": "P3",
+    "description": "The chat demo shows an empty chat window at the start and at every loop. When the card first comes fully into view, the chat column is blank (header only) for about 1.5 s before the first bubble: measured frames 4068-5091 ms all '-,-,-,-'. At the end of each loop all bubbles fade out, and the window stays empty for roughly another second before the first message returns. A visitor who glances at the card at that moment sees an empty chat with one fading log line. Scrolling away and back resumes mid-conversation, which is fine.",
+    "evidence": [
+      "shots/projects/p1/agent-interaction/chat-full-1440.png",
+      "shots/projects/p1/agent-interaction/chat-after-return-375.png"
+    ],
+    "file_line": "components/projects/ChatPreview.tsx:37 (reset hides every bubble), 46 (0.6 s lead-in), 52 (fade-out then repeat)",
+    "suggested_fix": "Show the first customer bubble in the initial state, or start the timeline at the first bubble (tl.play(label)). At the loop point, fade the old conversation out while the first new bubble fades in (overlap with '<'), so the window is never empty.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "focus",
+    "viewport": "1440x900 and 1920x1080 (horizontal mode)",
+    "severity": "P3",
+    "description": "The Focus counter runs ahead of the panels. It divides progress into thirds, but the track only travels two panel-widths, since panel 1 starts in view and panel 3 ends in view. Jumping to 70% progress shows '03 / 03' while panel 2 is still 84% on screen and panel 3 only 52%. '03' appears as soon as progress passes 66.7%, when panel 3 is about a third visible.",
+    "evidence": ["shots/focus/p1/agent-interaction/resize-before-1440x900.png"],
+    "file_line": "components/focus/Focus.tsx:66",
+    "suggested_fix": "const i = Math.round(self.progress * (n - 1)) + 1;, which changes number when the next panel becomes the dominant one.",
+    "confidence": 0.6,
+    "lens": "interaction"
+  },
+  {
+    "section": "focus",
+    "viewport": "768x900 desktop window, FR (the edge of the first horizontal query)",
+    "severity": "P3",
+    "description": "Compact mode doesn't guarantee a fit. After Focus switches to focus-compact, it never checks again. In FR at 768x900, panel 3's keyword line ('ALGÈBRE · CALCUL · RÉSOLUTION DE PROBLÈMES', which wraps to 3 lines) ends 1px above the panel's bottom border, so the text touches the edge. EN at the same size has 42px to spare, and 768x1024 has 47px.",
+    "evidence": ["shots/focus/p1/agent-interaction/fr-768x900-panel3-text-at-edge.png"],
+    "file_line": "components/focus/Focus.tsx:42-50",
+    "suggested_fix": "After applying focus-compact, measure again. If it is still under 16px, add a second tighter class, or treat this size as stacked (tighten the first query to min-height 960px). Otherwise, keep the keywords on one line with ellipsis in compact mode.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "about",
+    "viewport": "390x844 touch (portrait delayed 8 s); 1440x900 (portrait blocked)",
+    "severity": "P3",
+    "description": "The datasheet portrait has no loading or error state. While /_next/image?url=/images/gregory.webp is loading, the 5:4 photo area is an empty grid (img complete=false, transparent background), so the card reads as a datasheet with a missing part. When the photo arrives it pops in with no fade. If the request fails, a broken-image icon and the alt text 'Portrait of Gregory Sutjian' appear top-left over the grid. A <Chip/> fallback already exists and is only used when no photo is set.",
+    "evidence": [
+      "shots/about/p1/agent-interaction/portrait-loading-390.png",
+      "shots/about/p1/agent-interaction/img404-portrait-1440.png"
+    ],
+    "file_line": "components/about/Datasheet.tsx:66-76",
+    "suggested_fix": "Render <Chip/> behind the Image (absolute, under it) as the loading and failure state, fade the photo in onLoad, and hide it onError. Otherwise, import the photo statically and use placeholder='blur'.",
+    "confidence": 0.75,
+    "lens": "interaction"
+  },
+  {
+    "section": "about",
+    "viewport": "1440x900 desktop (fine pointer)",
+    "severity": "P3",
+    "description": "The datasheet glare doesn't reset when the pointer leaves. Steps: move the pointer to the card's top-right corner, then off the card. Observed: the tilt eases back to 0, but --gx/--gy stay at 99%/2%, so the copper glare hotspot stays parked in the corner where the cursor left. Each exit leaves it somewhere different.",
+    "evidence": ["shots/about/p1/agent-interaction/datasheet-glare-after-leave-1440.png"],
+    "file_line": "components/about/Datasheet.tsx:36-39",
+    "suggested_fix": "In leave(), tween the glare back to its rest position: gsap.to(c, {'--gx':'50%', '--gy':'0%', duration: 0.9, ease: 'power3'}), or fade the glare layer's opacity out on leave and in on enter.",
+    "confidence": 0.7,
+    "lens": "interaction"
+  },
+  {
+    "section": "projects",
+    "viewport": "touch (latent, not visible with the current content)",
+    "severity": "P3",
+    "description": "A latent bug in the media type:'scroll' path that no current project uses. The touch auto-scroll timeline evaluates y: () => -distance() and duration once, the first time it plays. The <img> is loading='lazy', so offsetHeight is usually 0 at that point, which gives a 0 -> 0 tween that never scrolls even after the image loads. Desktop hover re-measures on each pointerenter, so only touch is affected. The 'Hover to scroll' cursor label and this code are dead until a project uses type 'scroll'.",
+    "evidence": [],
+    "file_line": "components/projects/ProjectCard.tsx:72-77 and 128-137",
+    "suggested_fix": "Call tl.invalidate().restart() from the img's load listener (or ScrollTrigger-style invalidateOnRefresh), or delete the unused 'scroll' media branch.",
+    "confidence": 0.5,
+    "lens": "interaction"
+  }
+]

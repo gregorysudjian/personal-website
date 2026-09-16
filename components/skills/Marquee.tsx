@@ -22,25 +22,45 @@ export default function Marquee({ words }: { words: string[] }) {
         let direction = 1;
         let target = 1;
         let speed = 1;
+        let held = false; // pointer over the band: ease to a stop so it can be read
         const tick = () => {
-          target += (direction - target) * 0.04; // boost decays back to cruising speed
+          target += ((held ? 0 : direction) - target) * 0.04; // boost decays back to cruising speed
           speed += (target - speed) * 0.12;
           loop.timeScale(speed);
         };
-        gsap.ticker.add(tick);
-
         const st = ScrollTrigger.create({
           trigger: root.current,
           start: "top bottom",
           end: "bottom top",
           onUpdate: (self) => {
             direction = self.direction;
-            target = direction * (1 + Math.min(6, Math.abs(self.getVelocity()) / 250));
+            if (!held) target = direction * (1 + Math.min(6, Math.abs(self.getVelocity()) / 250));
           },
-          onToggle: (self) => (self.isActive ? loop.play() : loop.pause()),
+          // runs (and ticks) only while on screen
+          onToggle: (self) => {
+            if (self.isActive) {
+              loop.play();
+              gsap.ticker.add(tick);
+            } else {
+              loop.pause();
+              gsap.ticker.remove(tick);
+            }
+          },
         });
-        if (!st.isActive) loop.pause();
-        return () => gsap.ticker.remove(tick);
+        if (st.isActive) gsap.ticker.add(tick);
+        else loop.pause();
+
+        const el = root.current!;
+        const hold = (e: PointerEvent) => {
+          if (e.pointerType === "mouse") held = e.type === "pointerenter";
+        };
+        el.addEventListener("pointerenter", hold);
+        el.addEventListener("pointerleave", hold);
+        return () => {
+          gsap.ticker.remove(tick);
+          el.removeEventListener("pointerenter", hold);
+          el.removeEventListener("pointerleave", hold);
+        };
       });
     },
     { scope: root },
@@ -55,10 +75,11 @@ export default function Marquee({ words }: { words: string[] }) {
     ));
 
   return (
-    <div ref={root} className="overflow-hidden border-y border-line py-5 md:py-6" aria-hidden="true">
+    // Above the copper rail (it passes under the band), on the page colour.
+    <div ref={root} className="relative z-[2] overflow-hidden border-y border-line bg-ink py-5 md:py-6" aria-hidden="true">
       <div
         ref={row}
-        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.04em]"
+        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.02em] motion-reduce:pl-[var(--gutter)]"
       >
         {set("a")}
         {set("b")}

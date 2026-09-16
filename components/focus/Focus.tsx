@@ -9,9 +9,9 @@ import SectionHeader from "../SectionHeader";
 import { CodeWindow, MathPlot, NeuralNet } from "./Illustrations";
 
 const ART = { software: CodeWindow, ai: NeuralNet, math: MathPlot } as const;
-// Keep in sync with the focus rules in globals.css. Smaller windows get the stacked list.
+// Keep in sync with the focus rules in globals.css. Smaller windows (and portrait tablets, where the
+// panels would be too narrow for their drawings) get the stacked list.
 const HORIZONTAL = [
-  "(min-width: 768px) and (min-height: 900px)",
   "(min-width: 1000px) and (min-height: 700px)",
   "(min-width: 1200px) and (min-height: 580px)",
 ]
@@ -34,19 +34,23 @@ export default function Focus({ locale }: { locale: Locale }) {
 
   useGSAP(
     () => {
+      if (!document.documentElement.classList.contains("js")) return; // plain-content mode
       const mm = gsap.matchMedia();
       mm.add(HORIZONTAL, () => {
         const section = root.current!;
         const panels = gsap.utils.toArray<HTMLElement>(".focus-panel", section);
         const distance = () => Math.max(0, track.current!.scrollWidth - frame.current!.clientWidth);
-        const size = () => {
-          // Normal sizes unless a panel's text would reach its bottom edge; then the compact sizes (see globals.css).
-          section.classList.remove("focus-compact");
-          const tooTight = panels.some((p) => {
+        const tight = () =>
+          panels.some((p) => {
             const last = p.querySelector(".focus-body")?.lastElementChild;
             return last ? p.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom < 16 : false;
           });
-          section.classList.toggle("focus-compact", tooTight);
+        const size = () => {
+          // Normal sizes unless a panel's text would reach its bottom edge; then the compact sizes (see globals.css).
+          section.classList.remove("focus-compact", "focus-tight");
+          section.classList.toggle("focus-compact", tight());
+          // Compact still not enough (text-only zoom, a large default font): let the panel text scroll.
+          section.classList.toggle("focus-tight", tight());
           section.style.height = `${distance() + window.innerHeight}px`;
         };
         size();
@@ -63,7 +67,8 @@ export default function Focus({ locale }: { locale: Locale }) {
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               gsap.set(bar.current, { scaleX: self.progress });
-              const i = Math.min(n, Math.floor(self.progress * n * 0.999) + 1);
+              // The track travels n-1 panel widths: show the panel that's most in view.
+              const i = Math.round(self.progress * (n - 1)) + 1;
               if (count.current) count.current.textContent = String(i).padStart(2, "0");
             },
           },
@@ -82,7 +87,8 @@ export default function Focus({ locale }: { locale: Locale }) {
           );
         });
 
-        ScrollTrigger.refresh();
+        // (no ScrollTrigger.refresh() here: matchMedia already refreshes when this layout switches on,
+        // and a nested refresh sent the page back to the top when a resize crossed the threshold)
         return () => {
           ScrollTrigger.removeEventListener("refreshInit", size);
           section.style.height = "";
@@ -94,12 +100,12 @@ export default function Focus({ locale }: { locale: Locale }) {
   );
 
   return (
-    <section ref={root} id="focus" className="focus relative">
+    <section ref={root} id="focus" aria-labelledby="focus-title" className="focus relative">
       <CircuitTrace route="rail" padsAt="[data-pad]" />
 
-      <div ref={frame} className="focus-frame py-28">
+      <div ref={frame} className="focus-frame py-28 short:py-16">
         <div className="gutter flex items-end justify-between gap-10">
-          <SectionHeader label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
+          <SectionHeader id="focus-title" label={t(focus.label, locale)} heading={t(focus.heading, locale)} />
           <div className="focus-meter hidden shrink-0 items-center gap-4 pb-3" aria-hidden="true">
             <span className="label-mono text-paper">
               <span ref={count}>01</span>
@@ -117,27 +123,44 @@ export default function Focus({ locale }: { locale: Locale }) {
             return (
               <article
                 key={item.id}
+                aria-labelledby={`focus-${item.id}`}
                 data-reveal
-                className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2"
+                className="focus-panel group grid overflow-hidden rounded-[6px] border border-line bg-graphite transition-colors duration-500 hover:border-trace md:grid-cols-2 lg:max-w-[1100px]"
               >
-                <div className="relative aspect-square overflow-hidden border-b border-line md:aspect-auto md:border-b-0 md:border-r">
+                {/* square on phones, but never taller than most of a sideways phone's screen */}
+                <div className="relative aspect-square overflow-hidden border-b border-line max-md:max-h-[60svh] max-md:w-full md:aspect-auto md:border-b-0 md:border-r">
                   <div className="bg-grid absolute inset-0 opacity-30" />
-                  <div className="focus-art absolute inset-0 flex items-center justify-center p-6 md:p-10">
+                  <div className="focus-art absolute inset-0 flex items-center justify-center p-4 md:p-10">
                     <Art />
                   </div>
                 </div>
                 <div className="focus-body flex flex-col justify-between gap-10 p-8 md:p-12">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm text-copper">0{i + 1}</span>
-                    <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" />
+                    <span className="label-mono text-copper" aria-hidden="true">
+                      0{i + 1}
+                    </span>
+                    <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.045em] text-paper">
+                    <h3 id={`focus-${item.id}`} className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.04em] text-paper">
                       {t(item.title, locale)}
                     </h3>
                     <p className="mt-6 max-w-[38ch] text-lg leading-relaxed text-paper/70">{t(item.text, locale)}</p>
                   </div>
-                  <p className="label-mono text-mute">{t(item.keywords, locale)}</p>
+                  {/* lines only break between keywords */}
+                  <p className="label-mono leading-[1.7] text-mute">
+                    {t(item.keywords, locale)
+                      .split(" · ")
+                      .map((k, j, all) => (
+                        <span key={k}>
+                          <span className="whitespace-nowrap">
+                            {k}
+                            {j < all.length - 1 ? " ·" : ""}
+                          </span>
+                          {j < all.length - 1 ? " " : ""}
+                        </span>
+                      ))}
+                  </p>
                 </div>
               </article>
             );
