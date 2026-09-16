@@ -79,7 +79,7 @@ export default function Marquee({ words }: { words: string[] }) {
     <div ref={root} className="relative z-[2] overflow-hidden border-y border-line bg-ink py-5 md:py-6" aria-hidden="true">
       <div
         ref={row}
-        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.04em] motion-reduce:pl-[var(--gutter)]"
+        className="flex w-max whitespace-nowrap text-[clamp(2rem,5vw,4.5rem)] font-semibold uppercase leading-none tracking-[-0.02em] motion-reduce:pl-[var(--gutter)]"
       >
         {set("a")}
         {set("b")}

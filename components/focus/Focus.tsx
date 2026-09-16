@@ -139,7 +139,7 @@ export default function Focus({ locale }: { locale: Locale }) {
                     <span className="h-2 w-2 bg-line transition-colors duration-500 group-hover:bg-copper" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 id={`focus-${item.id}`} className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.045em] text-paper">
+                    <h3 id={`focus-${item.id}`} className="text-[clamp(2.6rem,5vw,5.2rem)] font-medium leading-none tracking-[-0.04em] text-paper">
                       {t(item.title, locale)}
                     </h3>
                     <p className="mt-6 max-w-[38ch] text-lg leading-relaxed text-paper/70">{t(item.text, locale)}</p>

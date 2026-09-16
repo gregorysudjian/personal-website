@@ -703,14 +703,15 @@ header.is-scrolled .header-solid {
   color: var(--color-ink);
   -webkit-text-stroke: 0.028em var(--color-mute); /* scales with the type, unlike a fixed 2px */
   paint-order: stroke fill;
-  letter-spacing: -0.01em; /* a hairline between outlined letters so they don't fuse */
+  letter-spacing: -0.015em; /* meets the solid words' rhythm halfway; they can't share a value (the stroke eats the gap) */
 }
 
 .chip {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.8rem 1.15rem;
+  /* a hair more below, so the caps sit on the pins' midline */
+  padding: 0.8rem 1.15rem 0.86rem;
   border: 1px solid var(--color-line);
   border-radius: 3px;
   background: var(--color-graphite);

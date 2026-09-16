@@ -26,7 +26,7 @@ export default function Footer({ locale }: { locale: Locale }) {
           </span>
         </p>
         <div className="lg:text-right">
-          <button type="button" onClick={backToTop} className="tap-area link-underline label-mono text-paper">
+          <button type="button" onClick={backToTop} className="tap-area link-underline label-mono -mr-[0.14em] text-paper">
             {t(footer.backToTop, locale)} <span aria-hidden="true">↑</span>
           </button>
         </div>
