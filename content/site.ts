@@ -67,8 +67,9 @@ export const ui = {
 
 export const hero = {
   eyebrow: {
-    en: "Computer Engineering — McGill University",
-    fr: "Génie informatique — Université McGill",
+    // the no-break space keeps the dash with the word before it when the line wraps
+    en: "Computer Engineering\u00a0— McGill University",
+    fr: "Génie informatique\u00a0— Université McGill",
   },
   tagline: {
     en: "I like building things, from AI agents to full websites, and I'm always up for learning something new.",

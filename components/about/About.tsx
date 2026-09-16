@@ -13,19 +13,19 @@ export default function About({ locale }: { locale: Locale }) {
       {/* Reading order and phones: heading, datasheet, then the text (a nav link to About lands on its heading).
           From lg the heading and text share the right column and the datasheet sits to the left of both.
           Two columns only from lg: at tablet width both would be too narrow. */}
-      <div className="grid gap-y-12 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-0">
-        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1">
+      <div className="grid gap-y-12 short:grid-cols-[minmax(0,320px)_1fr] short:gap-x-10 short:gap-y-6 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-0">
+        <div className="short:col-start-2 short:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-start-1">
           <SectionHeader id="about-title" label={t(about.label, locale)} heading={t(about.heading, locale)} />
         </div>
 
         {/* pinned beside the text only on screens tall enough to show the whole card */}
-        <div className="lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+        <div className="short:col-start-1 short:row-span-2 short:row-start-1 lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1">
           <div data-reveal className="lg:tall:sticky lg:tall:top-28">
             <Datasheet locale={locale} />
           </div>
         </div>
 
-        <div className="lg:col-span-6 lg:col-start-7 lg:row-start-2">
+        <div className="short:col-start-2 short:row-start-2 lg:col-span-6 lg:col-start-7 lg:row-start-2">
           <p data-reveal className="max-w-[62ch] text-pretty text-xl leading-relaxed text-paper md:text-2xl md:leading-[1.5] lg:mt-12">
             {t(first, locale)}
           </p>
@@ -39,9 +39,9 @@ export default function About({ locale }: { locale: Locale }) {
             {about.facts.map((fact) => (
               <div
                 key={t(fact.label, locale)}
-                className="fact-row group grid grid-cols-[6.5rem_1fr] items-center gap-4 border-b border-line py-5 sm:grid-cols-[8rem_1fr] sm:gap-6 md:grid-cols-[10rem_1fr]"
+                className="fact-row group grid grid-cols-[7.25rem_1fr] items-center gap-4 border-b border-line py-5 sm:grid-cols-[8rem_1fr] sm:gap-6 md:grid-cols-[10rem_1fr]"
               >
-                <dt className="label-mono flex items-center gap-2 text-mute">
+                <dt className="label-mono flex items-center gap-2 whitespace-nowrap text-mute">
                   <span className="h-px w-3 shrink-0 bg-line transition-all duration-500 group-hover:bg-copper motion-safe:group-hover:w-6" />
                   {t(fact.label, locale)}
                 </dt>

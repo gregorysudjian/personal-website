@@ -36,7 +36,7 @@ function Group({ id, title, items, locale }: { id: string; title: string; items:
             className="xp-row group relative grid gap-3 border-b border-line py-8 md:py-10 lg:grid-cols-12 lg:gap-8"
           >
             {/* the name comes first for screen readers (jumping by heading); the dates still show first */}
-            <div className="lg:col-span-4 lg:col-start-4 lg:row-start-1">
+            <div className="lg:col-span-4 lg:col-start-3 lg:row-start-1">
               <h4 className="xp-org text-2xl font-medium tracking-[-0.02em] md:text-3xl">{t(item.org, locale)}</h4>
               <p className="mt-2 text-paper/60">
                 {t(item.role, locale)}{" "}
@@ -49,10 +49,10 @@ function Group({ id, title, items, locale }: { id: string; title: string; items:
                 </span>
               </p>
             </div>
-            <span className="xp-dates label-mono order-first pt-1.5 leading-[1.45] text-mute lg:order-none lg:col-span-3 lg:col-start-1 lg:row-start-1">
+            <span className="xp-dates label-mono order-first pt-1.5 leading-[1.45] text-mute lg:order-none lg:col-span-2 lg:col-start-1 lg:row-start-1">
               {t(item.dates, locale)}
             </span>
-            <p className="max-w-2xl leading-relaxed text-paper/65 lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-w-[60ch]">{t(item.text, locale)}</p>
+            <p className="max-w-2xl leading-relaxed text-paper/65 lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:max-w-[62ch]">{t(item.text, locale)}</p>
           </li>
         ))}
       </ol>

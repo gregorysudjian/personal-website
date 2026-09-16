@@ -195,7 +195,7 @@ export default function Nav({ locale }: { locale: Locale }) {
                 // a new-tab click (⌘/Ctrl/shift/middle) leaves this page where it is
                 if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) saveAnchor(`/${other}`, true);
               }}
-              className="tap-area label-mono flex items-center gap-1.5 text-mute transition-colors hover:text-paper"
+              className="tap-area label-mono -mx-1 flex items-center gap-1.5 rounded-full px-1 text-mute transition-colors hover:text-paper"
             >
               <span className={locale === "en" ? "text-paper" : ""}>EN</span>
               <span className="text-line" aria-hidden="true">

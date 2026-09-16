@@ -40,7 +40,7 @@ export default function Cursor() {
       mode = next;
       if (next === "tag") g.textContent = label;
       gsap.to(r, {
-        scale: next === "link" ? 1.9 : next === "tag" ? 0 : 1,
+        scale: next === "link" ? 1.55 : next === "tag" ? 0 : 1,
         borderColor: next === "link" ? "rgb(232 130 58 / 0.9)" : "rgb(237 235 230 / 0.35)",
         duration: 0.45,
         ease: "power3.out",

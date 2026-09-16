@@ -136,7 +136,7 @@ function CopyEmail({ copy, copied, label, status }: { copy: string; copied: stri
         type="button"
         onClick={onCopy}
         aria-label={label}
-        className="tap-area label-mono grid rounded-full border border-line px-3 py-2 text-paper/80 transition-colors hover:border-copper hover:text-copper"
+        className="tap-area label-mono grid min-h-11 items-center rounded-full border border-line px-4 text-paper/80 transition-colors hover:border-copper hover:text-copper"
       >
         <span className={`col-start-1 row-start-1 text-center ${done ? "invisible" : ""}`}>{copy}</span>
         <span className={`col-start-1 row-start-1 text-center ${done ? "" : "invisible"}`}>
