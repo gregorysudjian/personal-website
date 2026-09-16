@@ -1950,9 +1950,20 @@
   },
   {
     "id": "UI-062",
-    "status": "open",
+    "status": "verified",
     "found": "2026-09-15T22:03",
-    "history": [],
+    "history": [
+      {
+        "at": "2026-09-16T00:38",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
     "source": "p1-top-a11y#17",
     "section": "hero",
     "viewport": "320x256 (1280x1024 @400%), 480x300, 640x310 (1280x620 @200%)",
@@ -1968,7 +1979,9 @@
     "suggested_fix": "Under the short variant, let the frame grow (min-h-svh instead of h-svh, and no overflow-hidden in reduced motion), or lower the h1 minimum (e.g. clamp(2.2rem, …) with short:) and add pt equal to the header height (4rem) so the eyebrow always clears the fixed header.",
     "confidence": 0.8,
     "lens": "a11y",
-    "note": "400% zoom reflow of the hero: needs a short-screen layout rework (pass 2)"
+    "note": "400% zoom reflow of the hero: needs a short-screen layout rework (pass 2)",
+    "verified_evidence": "vzoom 320x256/480x300/640x310: no name-vs-CTA or header-vs-eyebrow overlap, no horizontal overflow; shots/hero/p4-fix/320x256-en.png",
+    "verified_by": "vzoom 320x256/480x300/640x310: no name-vs-CTA or header-vs-eyebrow overlap, no horizontal overflow; shots/hero/p4-fix/320x256-en.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-063",
@@ -4392,9 +4405,20 @@
   },
   {
     "id": "UI-140",
-    "status": "open",
+    "status": "verified",
     "found": "2026-09-15T22:30",
-    "history": [],
+    "history": [
+      {
+        "at": "2026-09-16T00:38",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
     "source": "p1-middle-a11y#5",
     "section": "focus",
     "viewport": "1440, 1920 (horizontal mode; text-only zoom / large default font)",
@@ -4409,7 +4433,9 @@
     "suggested_fix": "When tooTight is still true after applying focus-compact, drop the horizontal layout (revert the matchMedia branch and use the stacked list), or give panels min-height instead of height. Re-run size() on a ResizeObserver of .focus-body so font-size changes are caught too, not just refreshInit.",
     "confidence": 0.7,
     "lens": "a11y",
-    "note": "200% text-only zoom in horizontal Focus: pass 2"
+    "note": "200% text-only zoom in horizontal Focus: pass 2",
+    "verified_evidence": "vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png",
+    "verified_by": "vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-141",
@@ -5188,9 +5214,20 @@
   },
   {
     "id": "UI-165",
-    "status": "open",
+    "status": "verified",
     "found": "2026-09-15T22:30",
-    "history": [],
+    "history": [
+      {
+        "at": "2026-09-16T00:38",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
     "source": "p1-middle-interaction#12",
     "section": "focus",
     "viewport": "768x900 desktop window, FR (the edge of the first horizontal query)",
@@ -5203,7 +5240,9 @@
     "suggested_fix": "After applying focus-compact, measure again. If it is still under 16px, add a second tighter class, or treat this size as stacked (tighten the first query to min-height 960px). Otherwise, keep the keywords on one line with ellipsis in compact mode.",
     "confidence": 0.7,
     "lens": "interaction",
-    "note": "compact mode re-check: pass 2"
+    "note": "compact mode re-check: pass 2",
+    "verified_evidence": "vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png",
+    "verified_by": "vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-166",
@@ -5432,9 +5471,15 @@
   },
   {
     "id": "UI-173",
-    "status": "open",
+    "status": "wontfix",
     "found": "2026-09-15T22:30",
-    "history": [],
+    "history": [
+      {
+        "at": "2026-09-16T00:40",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
     "source": "p1-middle-visual#4",
     "section": "projects",
     "viewport": "1280, 1366, 1440 (xl) and 768",
@@ -5449,7 +5494,7 @@
     "suggested_fix": "For stills, crop to the meaningful region at xl. Either add a per-slide 'focus' (e.g. object-position and a scale(1.25) origin on the main panel with fit:'cover'), or capture tighter 2x screens at a ~860px layout width so the scale is ~0.45+. The WhatsApp demo and Clarté scroll slide are fine.",
     "confidence": 0.7,
     "lens": "visual",
-    "note": "xl screenshots at ~0.33x: needs per-slide crops (product decision), pass 2"
+    "note": "needs recapturing the apps at a narrower viewport or per-slide crops (product decision; Lead Finder needs a sign-in) — recommended in the report"
   },
   {
     "id": "UI-174",
@@ -6197,9 +6242,20 @@
   },
   {
     "id": "UI-197",
-    "status": "open",
+    "status": "verified",
     "found": "2026-09-15T22:30",
-    "history": [],
+    "history": [
+      {
+        "at": "2026-09-16T00:40",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
     "source": "p1-middle-mobile#10",
     "section": "projects",
     "viewport": "768 touch (iPad), 320-430 touch",
@@ -6213,7 +6269,9 @@
     "suggested_fix": "Cut the tall captures into 2-3 stacked tiles (e.g. 2200x3200 each), or cap the phone capture at 1170x8000 and the tablet one at 1600 wide. Add will-change only while a slide is active and gliding. Only mount (or set src on) the active and next slide.",
     "confidence": 0.45,
     "lens": "mobile",
-    "note": "very tall captures on iOS: asset re-encoding, pass 2 / owner"
+    "note": "very tall captures on iOS: asset re-encoding, pass 2 / owner",
+    "verified_evidence": "decoded memory 82/86/73MB → 33/35/34MB (laptop) and 45/44/29 → 37/38/21MB (phone); sharpness checked at DPR2/DPR3, shots/projects/p4-fix/1440-clarte-scroll.png",
+    "verified_by": "decoded memory 82/86/73MB → 33/35/34MB (laptop) and 45/44/29 → 37/38/21MB (phone); sharpness checked at DPR2/DPR3, shots/projects/p4-fix/1440-clarte-scroll.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-198",
@@ -8616,13 +8674,18 @@
   },
   {
     "id": "UI-276",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-15T23:43",
     "history": [
       {
         "at": "2026-09-15T23:43",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "main-loop pass 3",
@@ -8637,17 +8700,23 @@
     "suggested_fix": "Use longhand animationName/Duration/TimingFunction/Delay/FillMode alongside animationPlayState.",
     "confidence": 1,
     "lens": "interaction",
-    "verified_evidence": "vwarn: no console errors over a full scroll + hover; vglide2: glide moves (-167→-771), holds on hover (-803→-803), resumes (-1498)"
+    "verified_evidence": "vwarn: no console errors over a full scroll + hover; vglide2: glide moves (-167→-771), holds on hover (-803→-803), resumes (-1498)",
+    "verified_by": "vwarn: no console errors over a full scroll + hover; vglide2: glide moves (-167→-771), holds on hover (-803→-803), resumes (-1498) + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-277",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#0",
@@ -8662,17 +8731,23 @@
     "suggested_fix": "Move .hero-circuit-mask off the scaled node and onto the outer, unscaled .hero-circuit-scroll wrapper (the vignette is a viewport effect and should stay put while the circuit zooms through it), so the scale becomes a pure composited transform over an already-rasterized texture. Same for .hero-floor: put the mask-image on .hero-floor-scroll rather than inside it. Then hide .grain for the duration of the gate (it is decorative and already switched off on touch). If any one of those is too invasive, killing the double mask alone takes long frames from 62% to 1% in these measurements.",
     "confidence": "high on the relative attribution (repeated three times, monotonic and consistent across 1440/1920 and throttled/unthrottled); medium on the absolute fps, since headless Chromium rasterizes on the CPU and a real GPU will do better",
     "lens": "motion",
-    "verified_evidence": "vfps 1440 hero gate: worst frame 83ms → 50ms, 46.8 → 48.3 fps (headless CPU raster; mask moved off the scaled layer)"
+    "verified_evidence": "vfps 1440 hero gate: worst frame 83ms → 50ms, 46.8 → 48.3 fps (headless CPU raster; mask moved off the scaled layer)",
+    "verified_by": "vfps 1440 hero gate: worst frame 83ms → 50ms, 46.8 → 48.3 fps (headless CPU raster; mask moved off the scaled layer) + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-278",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#1",
@@ -8688,17 +8763,23 @@
     "suggested_fix": "Drive the push-in from the slide's own clock instead of a fixed 5 s: set `transitionDuration: `${duration}ms`` inline on the active .slide alongside the existing animationDuration on the progress bar, so the zoom lands exactly when the slide hands over whether it is a 4.2 s still or a 9 s scroll slide. Reset the outgoing slide's transform without a transition (transition-duration: 0 on :not(.is-active)) so it cannot reverse under the crossfade, and use var(--ease-out-expo) or a gentle ease-out rather than linear.",
     "confidence": "high",
     "lens": "motion",
-    "note": "push-in runs on the slide clock"
+    "note": "push-in runs on the slide clock",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-279",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#2",
@@ -8713,17 +8794,23 @@
     "suggested_fix": "Give the power-on family one duration token (e.g. --dur-power: 0.9s) and use it for every property that answers the spark, keeping a deliberate offset only where one is meant to trail the other (the underline sweep can stay longer if it is also given a small transition-delay so it reads as a consequence of the pad rather than a parallel animation).",
     "confidence": "high",
     "lens": "motion",
-    "note": "--dur-power 0.9s for every property that answers the spark"
+    "note": "--dur-power 0.9s for every property that answers the spark",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-280",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#3",
@@ -8736,17 +8823,23 @@
     "suggested_fix": "Either shorten the reveals to ~0.8-0.9 s (still on-brand with the expo.out family and the 1.2 s gsap default) or lower the trigger to 'top 95%' so the element has a full 20-25% of viewport of runway before it is needed; for `stagger`, set the ScrollTrigger on the container but start it from the container's own top with a small negative offset so the tail children are not staggered off-screen.",
     "confidence": "high on the measurements; medium that the current timing is wrong rather than a deliberate choice",
     "lens": "motion",
-    "note": "reveals 0.9s (lines 1s, clip 1.1s)"
+    "note": "reveals 0.9s (lines 1s, clip 1.1s)",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-281",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#4",
@@ -8759,17 +8852,23 @@
     "suggested_fix": "Move `will-change: transform` out of the base .grain rule and into a `@media (prefers-reduced-motion: no-preference) and (hover: hover)` block so it is declared only where the animation actually runs — or drop it entirely, since the keyframes already use translate3d and will promote the layer on their own while playing.",
     "confidence": "high",
     "lens": "motion",
-    "note": "grain promoted only where it animates"
+    "note": "grain promoted only where it animates",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-282",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-motion#5",
@@ -8782,7 +8881,8 @@
     "suggested_fix": "Bring the open stagger down to roughly the panel fade (0.5-0.6 s total) so the first link has settled by the time focus lands on it — or move the .focus() into the tween's onStart of the first item's completion. For the close, run the items back out with the same stagger reversed over ~0.3 s so the two directions read as one gesture.",
     "confidence": "high on the measurements; medium on the severity, since a fast close is a common deliberate choice",
     "lens": "motion",
-    "note": "menu stagger 0.5s total"
+    "note": "menu stagger 0.5s total",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-283",
@@ -8812,13 +8912,18 @@
   },
   {
     "id": "UI-284",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-flows#1",
@@ -8834,17 +8939,23 @@
     "suggested_fix": "Write the session flag wherever the intro is declared over, not only when the timeline finishes: in the head script, `try{sessionStorage.setItem('gs-booted','1')}catch(e){}` on the same branch that adds the `booted` class, and in Boot's early return. Then a deep-link arrival counts as the visit it is.",
     "confidence": 0.95,
     "lens": "flows",
-    "verified_evidence": "vp3 introReplay: gs-booted written on a deep-link visit, boot display none after the language switch"
+    "verified_evidence": "vp3 introReplay: gs-booted written on a deep-link visit, boot display none after the language switch",
+    "verified_by": "vp3 introReplay: gs-booted written on a deep-link visit, boot display none after the language switch + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-285",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-flows#2",
@@ -8859,17 +8970,23 @@
     "suggested_fix": "Use pushState for the four header/menu section links (keep replaceState for the logo's #top and for anything the page does on its own), and add a popstate listener that scrolls to the hash without re-pushing. The reader's place is already restored on back_forward navigations, so the section anchors are the only missing piece.",
     "confidence": 0.9,
     "lens": "flows",
-    "verified_evidence": "vp3 history: nav pushes #about/#projects/#experience; Back walks them"
+    "verified_evidence": "vp3 history: nav pushes #about/#projects/#experience; Back walks them",
+    "verified_by": "vp3 history: nav pushes #about/#projects/#experience; Back walks them + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-286",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-flows#3",
@@ -8885,17 +9002,23 @@
     "suggested_fix": "Make the footer button call scrollToTarget('#top') like the logo does, or clear the hash in scrollToTarget when the target is the numeric 0 — either way the two 'back to top' controls should end on the same address.",
     "confidence": 0.9,
     "lens": "flows",
-    "verified_evidence": "vp3 backToTop: url /en, position top@0"
+    "verified_evidence": "vp3 backToTop: url /en, position top@0",
+    "verified_by": "vp3 backToTop: url /en, position top@0 + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-287",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-flows#4",
@@ -8912,17 +9035,23 @@
     "confidence": 0.85,
     "lens": "flows",
     "note": "progress meter now renders at every width, on the mirrored rail",
-    "verified_evidence": "vp3 meter: block, x377 at 390 wide"
+    "verified_evidence": "vp3 meter: block, x377 at 390 wide",
+    "verified_by": "vp3 meter: block, x377 at 390 wide + pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-288",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-flows#5",
@@ -8938,7 +9067,8 @@
     "suggested_fix": "Catch focusin at the document level and, when the newly focused element is outside the viewport, hand the move to Lenis with `scrollTo(el, { immediate: true })` (or `lenis.stop()` for the frame, set scrollY, `lenis.start()`), so keyboard focus moves the page the same way in both directions.",
     "confidence": 0.8,
     "lens": "flows",
-    "note": "focusin takes an off-screen focus target into view"
+    "note": "focusin takes an off-screen focus target into view",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-289",
@@ -8968,13 +9098,18 @@
   },
   {
     "id": "UI-290",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#0",
@@ -8991,17 +9126,23 @@
     "suggested_fix": "Make the viewBox match the ink the loop actually draws: compute the total advance (sum(widths)+gaps = 44 with the current array) and use viewBox={`0 0 ${total} 24`}, or drop the trailing gap and pad the array to fill 64. Keep w-16 so the drawn width is unchanged; only the empty right track disappears and the last bar lands on 535 with GS-26.",
     "confidence": "high",
     "lens": "visual",
-    "note": "barcode viewBox 44x24"
+    "note": "barcode viewBox 44x24",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-291",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#1",
@@ -9018,17 +9159,23 @@
     "suggested_fix": "Set the stroke in em so it tracks the optical size: `-webkit-text-stroke-width: 0.028em` on .marquee-outline and `0.004em` on .footer-mark (matching what they already look like at 1440/1920), or clamp() it per breakpoint. Then the outline reads the same weight at 32px and 72px, and the two outlined-word treatments agree.",
     "confidence": "high",
     "lens": "visual",
-    "note": "stroke 0.028em"
+    "note": "stroke 0.028em",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-292",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#2",
@@ -9044,7 +9191,8 @@
     "suggested_fix": "Swap items-center for a first-line alignment on the dash: `items-start` plus a top margin of (line-height - 1px)/2 on the dash (mt-[0.55em] at leading-[1.6]), or make the dash `self-start` with `mt-[calc(0.8em-0.5px)]`. Then it stays on the first line's cap midline whether the text wraps or not.",
     "confidence": "high",
     "lens": "visual",
-    "note": "dash aligns with the first line (items-start + mt-[0.8em])"
+    "note": "dash aligns with the first line (items-start + mt-[0.8em])",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-293",
@@ -9074,13 +9222,18 @@
   },
   {
     "id": "UI-294",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#4",
@@ -9096,7 +9249,8 @@
     "suggested_fix": "Place the meter on the mirrored rail: `right-[calc(var(--gutter)/2)]` instead of right-4 (and -mr-px so the 1px column straddles the same line the left rail does). It then lines up with the copper rail at every width and reads as the other end of the same board.",
     "confidence": "high",
     "lens": "visual",
-    "note": "meter moved to the mirrored gutter rail"
+    "note": "meter moved to the mirrored gutter rail",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-295",
@@ -9151,13 +9305,18 @@
   },
   {
     "id": "UI-297",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#7",
@@ -9173,17 +9332,23 @@
     "suggested_fix": "Move the Focus panel h3 to -0.04em so it sits on the same ramp as the section h2 above it (or make tracking a single clamp() expression driven by font-size across all display type: roughly -0.025em at 48px falling to -0.05em at 250px).",
     "confidence": "medium",
     "lens": "visual",
-    "note": "Focus panel h3 -0.04em, on the section ramp"
+    "note": "Focus panel h3 -0.04em, on the section ramp",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-298",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#8",
@@ -9199,7 +9364,8 @@
     "suggested_fix": "Either pull terminal punctuation into the accent run in Rich.tsx (match `\\*([^*]+)\\*([.,!?]?)` and wrap the trailing mark too) or replace padding-right with a margin-right that the following punctuation can sit inside. Simplest content-side fix: write the headings as '…*something.*'.",
     "confidence": "medium",
     "lens": "visual",
-    "note": "Rich pulls trailing punctuation into the accent"
+    "note": "Rich pulls trailing punctuation into the accent",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-299",
@@ -9229,13 +9395,18 @@
   },
   {
     "id": "UI-300",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#10",
@@ -9252,17 +9423,23 @@
     "suggested_fix": "Give the hero eyebrow and the mobile-menu dashes the same `section-index` class and w-8, so all three are 32px and share the powered glow (the menu can keep its own on/off rule). One dash component would stop this drifting again.",
     "confidence": "high",
     "lens": "visual",
-    "note": "hero and menu dashes use section-index at 32px"
+    "note": "hero and menu dashes use section-index at 32px",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-301",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#11",
@@ -9279,17 +9456,23 @@
     "suggested_fix": "Strip the trailing advance where the text is right-aligned or centred: `margin-right: -0.14em` on right-aligned .label-mono (footer back-to-top, GS-26, hero status) and `padding-right: calc(1.2rem - 0.12em)` on .btn / .btn-sm, or add a shared `.tracks-tight { margin-inline-end: -1em * tracking }` helper.",
     "confidence": "medium",
     "lens": "visual",
-    "note": "trailing letter-space trimmed on the right-aligned footer button"
+    "note": "trailing letter-space trimmed on the right-aligned footer button",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-302",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#12",
@@ -9305,17 +9488,23 @@
     "suggested_fix": "Centre on the cap band rather than the line box: add ~1px to the chip's padding-bottom (padding: 0.8rem 1.15rem 0.86rem) or set line-height: 1 and let the padding do the centring. Same one-pixel correction on the status pill (py-[7px_5px] instead of py-1.5).",
     "confidence": "medium",
     "lens": "visual",
-    "note": "chip padding-bottom 0.86rem"
+    "note": "chip padding-bottom 0.86rem",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
   },
   {
     "id": "UI-303",
-    "status": "fixed",
+    "status": "verified",
     "found": "2026-09-16T00:18",
     "history": [
       {
         "at": "2026-09-16T00:18",
         "from": "open",
         "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T03:33",
+        "from": "fixed",
+        "to": "verified"
       }
     ],
     "source": "p3-visual#13",
@@ -9331,6 +9520,1053 @@
     "suggested_fix": "Meet in the middle rather than at the ends: put the row at -0.02em and the outline at -0.015em, or keep the row tracking and open the outlined words with word-spacing instead of letter-spacing, so only the gaps between outlined words change and the internal rhythm stays common.",
     "confidence": "medium",
     "lens": "visual",
-    "note": "marquee row -0.02em, outline -0.015em"
+    "note": "marquee row -0.02em, outline -0.015em",
+    "verified_by": "pass-4 full re-capture shots/*/p4: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-304",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#0",
+    "section": "focus",
+    "viewport": "390 / 375 / 768 / 844l (FR)",
+    "severity": "P0",
+    "description": "In French, the body copy of focus cards 02 (IA) and 03 (Maths) is cut off mid-word at the card's right border. At 390 the Maths paragraph reads \"Des annees de tutorat en algebre, en / geometrie et en calcul ont fait des ma / ma facon d'aborder les problemes : / decomposer, trouver la logique, verifie / reponse.\" - every line is sliced at the card edge with zero right padding, and the sentence is unreadable. Same on the IA card. The text column inside these two cards is wider than the card itself (card 01 Logiciel is fine), so the overflow is hidden by the card's border radius.",
+    "evidence": [
+      "shots/focus/p2/390/fr-reduced-03.png",
+      "shots/focus/p2/375/fr-reduced-04.png",
+      "shots/focus/p2/375/fr-motion-03.png",
+      "shots/focus/p2/768/fr-reduced-01.png",
+      "shots/focus/p2/844l/fr-motion-04.png"
+    ],
+    "suggested_fix": "Make the card's inner text column width-constrained to the card (max-width:100%, box-sizing:border-box, no fixed px width carried over from the desktop 2-column layout) and give it the same left/right padding as card 01; verify with the longest FR strings.",
+    "confidence": 0.95,
+    "note": "the keyword/body overflow was the UI-180 regression, fixed in pass 2 (the cold reviewer read pass-2 shots)",
+    "verified_evidence": "vcold focus panels at 390 FR / 375 EN / 768 FR: 33-49px clearance inside the card",
+    "verified_by": "vcold focus panels at 390 FR / 375 EN / 768 FR: 33-49px clearance inside the card + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-305",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#1",
+    "section": "focus",
+    "viewport": "375 / 390 / 768 (EN)",
+    "severity": "P1",
+    "description": "Same overflow in English, milder but still visibly broken: the tag row under the Math card reads \"ALGEBRA · CALCULUS · PROBLEM SOLVI\" - the last word is chopped by the card border - and the sine-curve graphic and body text run flush into the right edge with no padding while card 01 has a proper gutter. Inconsistent padding between the three cards of the same component.",
+    "evidence": [
+      "shots/focus/p2/375/en-reduced-04.png",
+      "shots/focus/p2/768/en-reduced-01.png",
+      "shots/global/p2/375/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Let the tag row wrap (flex-wrap) or shrink, and apply one shared padding token to all three focus cards so 01/02/03 are identical.",
+    "confidence": 0.9,
+    "verified_evidence": "vcold: same measurement, EN and FR",
+    "verified_by": "vcold: same measurement, EN and FR + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-306",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#2",
+    "section": "global",
+    "viewport": "1440 / 375",
+    "severity": "P1",
+    "description": "The sticky header has no background/scrim in several states, so page text scrolls straight through the nav. On 1440 (footer/mark-hover) the sentence \"I'm looking for an internship or co-op where I can learn fast,\" is printed on top of ABOUT / PROJECTS / EXPERIENCE and collides with CONTACT; on the projects specs-open state \"Every demo site gets its own design 'genome': 10 art directions,\" overlaps CONTACT and the EN / FR switch. On 375 the logo chip sits on top of \"ROLE / Solo project, AI-assisted\". Two layers of text occupy the same pixels - unreadable for both.",
+    "evidence": [
+      "shots/footer/p2/1440/mark-hover.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png",
+      "shots/projects/p2/375/en-motion-specs-open.png",
+      "shots/projects/p2/375/fr-motion-specs-open.png"
+    ],
+    "suggested_fix": "Apply the scrolled header background (solid or blurred scrim + bottom hairline) whenever scrollY > 0 rather than only on scroll-direction events, so it can never be transparent over content; the nav/p2/1440 header-over-content shots show the correct treatment.",
+    "confidence": 0.9,
+    "note": "is-scrolled was only set on scroll, so a ScrollTrigger refresh could leave the backdrop off",
+    "verified_evidence": "dbg-scrim: backdrop on at every scroll position; now also set onRefresh",
+    "verified_by": "dbg-scrim: backdrop on at every scroll position; now also set onRefresh + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-307",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#3",
+    "section": "hero",
+    "viewport": "1920 / 1440 / 1280s / 844l",
+    "severity": "P1",
+    "description": "There is a full, completely empty screen between the hero and the \"IN ONE SENTENCE\" statement. At 1440 the whole 900px viewport after the hero contains nothing but a thin diagonal copper line; at 1920 the gap is ~950px of black; same at 1280s and 844l. A visitor scrolling past the hero gets one full screen of nothing and reasonably concludes the page has ended or failed to load.",
+    "evidence": [
+      "shots/hero/p2/1440/en-motion-01.png",
+      "shots/hero/p2/1280s/en-motion-01.png",
+      "shots/hero/p2/844l/en-motion-01.png",
+      "shots/global/p2/1920/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Cut the spacer that carries the trace between hero and statement to at most ~40vh, or pin the statement so it enters while the trace is still drawing; the trace can run behind the statement instead of occupying its own screen.",
+    "confidence": 0.85,
+    "verified_evidence": "vcold heroStatementGap = -7px (the statement now starts under the hero's faded end)",
+    "verified_by": "vcold heroStatementGap = -7px (the statement now starts under the hero's faded end) + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-308",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#4",
+    "section": "focus",
+    "viewport": "1280s",
+    "severity": "P1",
+    "description": "On the short laptop the horizontal focus carousel never lands: at the final state (counter reads 03 / 03, progress bar full) the Math/Maths card still runs off the right edge of the window - its right border and corner marker are cut, the last words (\"check the answer.\" / \"en geometrie\") sit hard against the viewport edge - and the faint vertical scroll-progress rail is drawn on top of the card text. The last of three cards is never fully visible.",
+    "evidence": [
+      "shots/focus/p2/1280s/en-motion-03.png",
+      "shots/focus/p2/1280s/fr-motion-03.png"
+    ],
+    "suggested_fix": "End the horizontal track with the last card aligned to the page's right gutter (account for the rail width), and clamp the scroll distance so 03/03 equals a fully visible card.",
+    "confidence": 0.65,
+    "note": "not reproducible in the current build",
+    "verified_evidence": "vcold focus-end: last panel right edge 1231/1386/1866 inside 1280/1440/1920",
+    "verified_by": "vcold focus-end: last panel right edge 1231/1386/1866 inside 1280/1440/1920 + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-309",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#5",
+    "section": "hero",
+    "viewport": "1280s",
+    "severity": "P2",
+    "description": "At 1280x620 the hero name breaks apart: \"GREGORY\" is parked in the top-left and \"SUTJIAN\" is flung to the far right edge with ~450px of empty black between them and a vertical offset, so it reads as two unrelated words rather than one name. The type is also much smaller relative to the viewport than at 1440, leaving a large dead band above the eyebrow line.",
+    "evidence": [
+      "shots/hero/p2/1280s/en-motion-atf.png",
+      "shots/hero/p2/1280s/fr-motion-atf.png",
+      "shots/hero/p2/1280s/en-motion-00.png"
+    ],
+    "suggested_fix": "Keep the two lines on the same optical grid at short heights (indent the second line by a fixed em amount instead of right-aligning it to the viewport), and scale the name by min(vw, vh) so it does not shrink while the gap grows.",
+    "confidence": 0.7,
+    "verified_evidence": "name capped to 5.8em under 760px tall; shots/hero/p4-fix/1280x620-en-name.png",
+    "verified_by": "name capped to 5.8em under 760px tall; shots/hero/p4-fix/1280x620-en-name.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-310",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#6",
+    "section": "hero",
+    "viewport": "844l",
+    "severity": "P2",
+    "description": "In phone landscape the hero drops the tagline entirely - \"I like building things, from AI agents to full websites...\" / \"J'aime construire des choses...\" is absent, so the first screen is just a name and two buttons with no explanation of who this is. The SCROLL/DEFILER cue is also gone. The circuit trace additionally runs straight through the \"TELECHARGER LE CV\" button.",
+    "evidence": [
+      "shots/hero/p2/844l/en-motion-atf.png",
+      "shots/hero/p2/844l/fr-motion-atf.png",
+      "shots/nav/p2/844l/fr-no-menu-button.png"
+    ],
+    "suggested_fix": "Keep the tagline in landscape (one line, smaller type) instead of display:none; if vertical space is tight, shrink the name rather than deleting copy.",
+    "confidence": 0.75,
+    "verified_evidence": "tagline as one clamped line from 360px tall; shots/hero/p4-fix/844x390-fr-name.png",
+    "verified_by": "tagline as one clamped line from 360px tall; shots/hero/p4-fix/844x390-fr-name.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-311",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#7",
+    "section": "statement",
+    "viewport": "375 / 390 / 844l / 1440",
+    "severity": "P2",
+    "description": "Section headings leave one-word widows on phones: \"Three things I / keep coming back / to.\" ends with \"to.\" alone on its own line; \"What I've done so / far.\" leaves \"far.\" alone; the FR contact heading breaks as \"Construisons quelque / chose.\". At 1440 the focus heading breaks as \"Three things I keep / coming back to.\" so the italic phrase splits across lines inconsistently with the other headings.",
+    "evidence": [
+      "shots/focus/p2/375/en-reduced-00.png",
+      "shots/global/p2/375/en-reduced-fullpage.jpg",
+      "shots/contact/p2/768/fr-motion-00.png",
+      "shots/focus/p2/1440/en-motion-00.png"
+    ],
+    "suggested_fix": "Add non-breaking spaces / text-wrap:balance to the display headings so the final punctuation word never lands alone, and check each locale's longest heading.",
+    "confidence": 0.6,
+    "note": "text-balance on section headings, text-pretty on the statement and paragraphs",
+    "verified_evidence": "vcold widows: last lines are multi-word in FR at 390",
+    "verified_by": "vcold widows: last lines are multi-word in FR at 390 + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-312",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#8",
+    "section": "footer",
+    "viewport": "375 / 390 / 768 / 1440",
+    "severity": "P2",
+    "description": "The giant outlined \"SUTJIAN\" wordmark at the bottom of the footer is sliced off by the end of the document on every viewport - roughly the bottom third of the letters is missing at 1440 and about half at 375/768 - so the page ends on a chopped word rather than a deliberate crop. Its outline is also barely distinguishable from the background (near-black on black).",
+    "evidence": [
+      "shots/footer/p2/1440/en-motion-00.png",
+      "shots/footer/p2/375/en-motion-00.png",
+      "shots/footer/p2/768/fr-motion-00.png",
+      "shots/global/p2/375/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Either show the wordmark whole with bottom padding, or crop it deliberately at a consistent fraction (e.g. exactly half the cap height) at every breakpoint, and lift its stroke opacity a step.",
+    "confidence": 0.6,
+    "note": "the cropped wordmark is a deliberate bleed (UI-119/120)"
+  },
+  {
+    "id": "UI-313",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#9",
+    "section": "projects",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "Keyboard focus and the expanded accordion are visually sloppy. Focusing a project slide tab (\"01 · LEADS\") draws an orange rectangle whose top edge cuts into the bottom of the app screenshot and whose bottom edge sits on the caption \"The dashboard: new leads ranked by priority...\". With \"HOW IT'S BUILT\" expanded, the focus rectangle around the trigger touches the \"PROBLEM\" label directly beneath it - the panel opens with no separation from its header. Focus styling is also inconsistent across the page: nav links and accordions get a square orange outline, pills get a cream rounded ring.",
+    "evidence": [
+      "shots/global/p2/1440/en-motion-tab10.png",
+      "shots/global/p2/1440/en-motion-tab08.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png",
+      "shots/global/p2/1440/en-motion-tab04.png"
+    ],
+    "suggested_fix": "Use one focus token (same color, width and offset, radius matching the element) everywhere, give it 3-4px outline-offset so it never touches neighbouring text, and add top padding to the expanded accordion panel.",
+    "confidence": 0.6,
+    "note": "slide steps draw their ring on the button box (outline-offset 0), not over the screenshot",
+    "verified_by": "final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-314",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#10",
+    "section": "skills",
+    "viewport": "1440 / 375",
+    "severity": "P3",
+    "description": "The toolkit grid wraps badly and wastes space: at 1440 \"Mathematics\" and \"Gemini\" each sit alone on a second row while the three columns end at 1384px and the rest of the row is empty; at 375 \"Bash\" drops alone under Python/Java/C. The decorative IC \"pins\" on the first chip of each row also stick out 4-5px to the left of the column rule, so the chips look misaligned with their LANGUAGES / FOUNDATIONS / AI headings.",
+    "evidence": [
+      "shots/skills/p2/1440/en-motion-00.png",
+      "shots/skills/p2/375/en-motion-01.png",
+      "shots/skills/p2/375/fr-reduced-01.png"
+    ],
+    "suggested_fix": "Widen the columns (or use auto-fit columns) so each group fits on one row, and inset the chips by the pin width so the chip bodies align to the column rule.",
+    "confidence": 0.55,
+    "note": "chip wrapping follows the copy; pins sit in the gutter by design (UI-044)"
+  },
+  {
+    "id": "UI-315",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#11",
+    "section": "statement",
+    "viewport": "1440 / 375",
+    "severity": "P3",
+    "description": "The scroll-linked word-by-word reveal leaves most of the sentence at roughly 2.5:1 contrast (mid-grey on near-black) whenever the reader stops scrolling mid-section - in en-motion-00 more than half of \"I chase that feeling everywhere: in code, in math, and in whatever I haven't tried yet.\" is barely legible. The reduced-motion version shows the whole sentence in full white, which is what the screen should look like when it is stationary.",
+    "evidence": [
+      "shots/statement/p2/1440/en-motion-00.png",
+      "shots/statement/p2/375/fr-motion-00.png",
+      "shots/statement/p2/1440/en-reduced-00.png"
+    ],
+    "suggested_fix": "Raise the un-revealed state to at least 4.5:1 (or animate weight/opacity between 0.55 and 1 instead of 0.25 and 1) so a paused reader always has readable text.",
+    "confidence": 0.5,
+    "note": "dim words are a transient scroll-linked state, raised to 0.2 and fully lit before the pin ends (UI-069)"
+  },
+  {
+    "id": "UI-316",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#12",
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "The custom cursor sits on top of labels instead of beside them: on the skills chip hover its dot lands inside the word \"Python\" (\"Pyt·hon\"), and on the contact copied state its ring encircles the \"COPIE\" pill, producing a double outline around a component that already has a border.",
+    "evidence": [
+      "shots/skills/p2/1440/chip-hover.png",
+      "shots/contact/p2/1440/fr-motion-copied.png",
+      "shots/projects/p2/1440/en-motion-specs-open.png"
+    ],
+    "suggested_fix": "Use mix-blend-mode/difference or shrink the cursor to a ring only (no centre dot) over text, and suppress the ring expansion over elements that already have a visible border.",
+    "confidence": 0.5,
+    "note": "the custom cursor is the site's pointer treatment; it hides entirely with reduced motion or contrast settings"
+  },
+  {
+    "id": "UI-317",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#13",
+    "section": "projects",
+    "viewport": "375 / 768 / 1440 (FR)",
+    "severity": "P3",
+    "description": "On the French page the embedded product screenshots are still fully English - the Lead Finder dashboard shows \"Hair and beauty businesses in Montreal\", \"Next up\", \"Your leads (12)\", \"80/100 · High\" - right under French copy that promises a bilingual product. The WhatsApp demo header also truncates to \"Commerce demo · Assista...\" on phones.",
+    "evidence": [
+      "shots/global/p2/375/fr-reduced-fullpage.jpg",
+      "shots/nav/p2/375/fr-reduced-header-over-content.png",
+      "shots/global/p2/768/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Ship a French capture of each app screenshot (or at least of the Lead Finder dashboard), and let the WhatsApp demo header shrink its type rather than ellipsing the business name.",
+    "confidence": 0.55,
+    "note": "OWNER ACTION: the Lead Finder captures are English-only; a French capture of the app is content work"
+  },
+  {
+    "id": "UI-318",
+    "status": "wontfix",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-1#14",
+    "section": "about",
+    "viewport": "1440 / 375 (FR)",
+    "severity": "P3",
+    "description": "French spec-sheet copy reads awkwardly: \"JE CHERCHE - Des stages et des stages coop\" repeats the word \"stages\" twice in five words (EN reads cleanly: \"Internships and co-op roles\"), and on 375 the label \"JE CHERCHE\" wraps onto two lines while every other label in the same list stays on one, breaking the row rhythm.",
+    "evidence": [
+      "shots/about/p2/1440/fr-motion-01.png",
+      "shots/global/p2/375/fr-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Rewrite as \"Stages et alternances\" (or \"Stages et stages coop\" -> \"Stages, dont coop\") and keep the label column wide enough for the longest FR label so none of them wrap.",
+    "confidence": 0.5,
+    "note": "OWNER ACTION: French copy wording (\"Des stages et des stages coop\") — copy meaning is out of scope for this loop"
+  },
+  {
+    "id": "UI-319",
+    "status": "verified",
+    "found": "2026-09-16T00:46",
+    "history": [
+      {
+        "at": "2026-09-16T00:46",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-1#15",
+    "section": "experience",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "In motion mode rows of the timeline stay dimmed after they are fully in view - in en-motion-01 \"College Mariste Champville\" and its description are rendered in mid-grey while the McGill row above them is white, so the last entry looks disabled or unfinished. The reduced-motion capture shows every row at full white, confirming the dim state is the reveal not completing.",
+    "evidence": [
+      "shots/experience/p2/1440/en-motion-01.png",
+      "shots/experience/p2/1440/fr-motion-00.png",
+      "shots/experience/p2/1440/fr-reduced-00.png"
+    ],
+    "suggested_fix": "Trigger the row reveal on a threshold near the bottom of the viewport (or force-complete it when the section's bottom is reached) so no visible row is left at reduced opacity.",
+    "confidence": 0.45,
+    "note": "rows power on as the trace passes",
+    "verified_evidence": "vcold lastRow: last three rows is-powered with paper text",
+    "verified_by": "vcold lastRow: last three rows is-powered with paper text + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-320",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#0",
+    "section": "nav",
+    "viewport": "1440, 1920, 375, 390",
+    "severity": "P1",
+    "description": "The sticky header has no opaque background or backdrop blur, so page content scrolls straight underneath it and prints on top of the nav. At 1440 (projects specs-open) the word CONTACT sits directly on the sentence 'Every demo site gets its own design \"genome\": 10 art directions,' and EN / FR overprints the end of that same line - two layers of text in the same pixels, unreadable. Same thing in FR at 1920 where 'A PROPOS PROJETS PARCOURS CONTACT' and EN/FR land on top of 'Plus de 2 800 commerces extraits d'Overture Maps... stockes dans Supabase'. At 375 the MENU button collides with the word 'built.' of the 'Things I've built.' heading and the logo mark sits on top of the same heading. In footer/mark-hover the nav sits on top of 'I'm looking for an internship or co-op where I can learn fast,'. In about/datasheet-tilt the ghost of 'Hi, I'm Gregory.' bleeds through the header bar. A recruiter will hit this within two scrolls.",
+    "evidence": [
+      "shots/projects/p3/1440/en-motion-specs-open.png",
+      "shots/projects/p3/1920/fr-motion-specs-open.png",
+      "shots/nav/p3/375/en-motion-header-over-content.png",
+      "shots/footer/p3/1440/mark-hover.png",
+      "shots/about/p3/1440/datasheet-tilt.png",
+      "shots/projects/p3/375/en-motion-specs-open.png"
+    ],
+    "suggested_fix": "Give the header a real surface once scrolled past the hero: background rgba(13,13,13,0.85) plus backdrop-filter: blur(12px) and a 1px bottom hairline, applied on a .is-scrolled class. The existing top gradient is not enough - it fades to transparent exactly where the nav labels sit. Alternatively hide the header on scroll-down / reveal on scroll-up, which is already what happens at 768.",
+    "confidence": 0.95,
+    "note": "already fixed in pass 4 (the reviewer read pass-3 shots): is-scrolled is now also set on refresh",
+    "verified_evidence": "dbg-scrim",
+    "verified_by": "dbg-scrim + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-321",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#1",
+    "section": "hero",
+    "viewport": "844l",
+    "severity": "P1",
+    "description": "In landscape (844x390) the hero tagline is gone entirely. On every other viewport the hero reads eyebrow -> GREGORY SUTJIAN -> 'I like building things, from AI agents to full websites, and I'm always up for learning something new.' -> buttons. At 844l it jumps straight from SUTJIAN (ends y=265) to the buttons (y=305) with a 40px void where the sentence should be, and the SCROLL cue is missing too. The single line that tells a visitor what this person actually does has been dropped on the one device orientation where the hero is the whole screen. Identical in FR.",
+    "evidence": [
+      "shots/hero/p3/844l/en-motion-atf.png",
+      "shots/hero/p3/844l/en-motion-00.png",
+      "shots/nav/p3/844l/fr-no-menu-button.png",
+      "shots/hero/p3/1440/en-reduced-atf.png"
+    ],
+    "suggested_fix": "Do not display:none the tagline at short heights. Shrink the name (clamp on the 844l breakpoint), drop the eyebrow rule to one line, and keep the tagline at 14-15px - it is one sentence and it is the point of the hero. If something must go, cut the SCROLL cue and the OPEN TO INTERNSHIPS chip, not the pitch.",
+    "confidence": 0.85,
+    "note": "fixed in pass 4",
+    "verified_evidence": "shots/hero/p4-fix/844x390-fr-name.png (tagline as one clamped line)",
+    "verified_by": "shots/hero/p4-fix/844x390-fr-name.png (tagline as one clamped line) + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-322",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#2",
+    "section": "footer",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P1",
+    "description": "The giant outlined SUTJIAN wordmark at the very bottom of the page is sliced off mid-glyph by the end of the document on every single viewport. At 1440 the letters are cut roughly at their waist - you see the top ~60% of S U T J I A N and nothing else, with the page simply ending. It does not read as a deliberate bleed because there is no continuation and no bottom padding; it reads as a container that ran out of height. Hovering it makes it worse: mark-hover lights the outline bright orange, so the amputated letterforms become the loudest thing on the screen. It is also the last impression a recruiter takes away.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/375/en-motion-00.png",
+      "shots/footer/p3/1440/mark-hover.png",
+      "shots/contact/p3/1440/en-reduced-01.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Either let the full wordmark sit inside the footer with 32-48px of breathing room below it, or commit to the bleed properly by cropping at a deliberate fraction (e.g. exactly 50% of cap height) and adding overflow:hidden on a sized footer so it is obviously intentional. Right now it is an accident of document height.",
+    "confidence": 0.9,
+    "note": "the cropped wordmark is a deliberate bleed (UI-119/120/312)"
+  },
+  {
+    "id": "UI-323",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#3",
+    "section": "global",
+    "viewport": "844l",
+    "severity": "P2",
+    "description": "In landscape the entire page renders in the narrow mobile single column, pinned to the left, so roughly 45-55% of every screen is dead black. about/844l/en-motion-01: the datasheet card occupies x=36-392 and x=392-844 is completely empty. projects/844l: the Lead Finder window is 423px wide (x=36-459) while the paragraph describing it runs to x=703 - the media is half the width of its own caption, and both float in the left half of an 844-wide screen. nav/844l/header-over-content shows the same. A landscape phone is not a narrow phone; the layout never notices the extra width.",
+    "evidence": [
+      "shots/about/p3/844l/en-motion-01.png",
+      "shots/projects/p3/844l/en-motion-02.png",
+      "shots/nav/p3/844l/en-motion-header-over-content.png",
+      "shots/experience/p3/844l/en-motion-02.png"
+    ],
+    "suggested_fix": "Base the layout breakpoints on width, not on a phone/tablet guess. At >=768px wide (which 844l is) use the tablet two-column treatment, or at minimum let media panels and text share one max-width and centre the column so the empty space is split evenly instead of dumped on the right.",
+    "confidence": 0.85,
+    "verified_evidence": "vcold2 aboutLandscape: card 34-354, heading at x=394; shots/about/p5-fix/844l-two-column.png",
+    "verified_by": "vcold2 aboutLandscape: card 34-354, heading at x=394; shots/about/p5-fix/844l-two-column.png + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-324",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#4",
+    "section": "skills",
+    "viewport": "768",
+    "severity": "P2",
+    "description": "The toolkit grid is two columns wide with three groups, so AI wraps onto a second row under LANGUAGES and leaves a ~360x210px empty rectangle in the bottom-right of the block where FOUNDATIONS' second row would be. On top of that the vertical rhythm breaks: the gap from the intro paragraph down to the LANGUAGES label is ~100px, but the gap from the 'Bash' chip down to the AI label is only ~42px, so AI is crammed against the group above it while a hole sits next to it. The block reads as a grid that gave up.",
+    "evidence": [
+      "shots/skills/p3/768/en-motion-00.png",
+      "shots/skills/p3/768/fr-reduced-00.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "At 768 use a single full-width column with three stacked groups (chips have room to breathe), or three equal columns with smaller chips. Either way make the group-to-group gap a single token so AI is not 58px tighter than LANGUAGES.",
+    "confidence": 0.85,
+    "note": "two columns at 768 keeps the chips readable; three would crowd them (UI-108)"
+  },
+  {
+    "id": "UI-325",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#5",
+    "section": "contact",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P2",
+    "description": "The COPY button next to the email is 33px tall while DOWNLOAD CV, LINKEDIN and GITHUB directly beneath it are all 54px tall - measured on footer/1440 (COPY border rows 230-262 vs LINKEDIN 306-359) and identical 33px at 375. It sits in the same card, uses the same pill shape and the same faint border, but is visibly a different size class, so the row reads as a mistake rather than a hierarchy. On touch viewports 33px is also under the 44px minimum tap target, and 'copy my email address' is the single action a recruiter is most likely to take on a phone.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/375/en-motion-00.png",
+      "shots/contact/p3/375/en-reduced-01.png",
+      "shots/contact/p3/768/en-reduced-00.png"
+    ],
+    "suggested_fix": "Either make COPY the same 54px pill as its siblings, or if it is meant to be a quiet utility give it a min-height of 44px with a 44px hit area on touch and deliberately differentiate it (icon-only, or text link with an icon) so the size difference reads as intent.",
+    "confidence": 0.85,
+    "verified_evidence": "vcold2 contact: Copy 44px tall",
+    "verified_by": "vcold2 contact: Copy 44px tall + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-326",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#6",
+    "section": "contact",
+    "viewport": "375, 390, 768, 1440, 1920",
+    "severity": "P2",
+    "description": "The outlined buttons (LINKEDIN, GITHUB, COPY, DOWNLOAD CV in its hero variant) have a border of rgb(47,50,55) on a rgb(17,17,19) card - a contrast ratio of about 1.45:1, well under the 3:1 minimum for a UI component boundary. At DPR 1 on any screen that is not a calibrated monitor the pills effectively vanish and the labels look like floating text. Sampled directly at footer/1440 x=524,y=306 and x=853,y=230.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/contact/p3/1920/en-reduced-00.png",
+      "shots/contact/p3/768/en-reduced-00.png",
+      "shots/hero/p3/1440/en-reduced-atf.png"
+    ],
+    "suggested_fix": "Raise the idle border to at least rgba(255,255,255,0.28) (~#4e4e52 on this background, ~3.1:1) and keep the current value for the hover/rest delta. The orange primary already carries the emphasis - the secondaries just need to be visible.",
+    "confidence": 0.8,
+    "verified_evidence": "vcold2: .btn border rgba(237,235,230,0.28) ≈ 3:1 on the page",
+    "verified_by": "vcold2: .btn border rgba(237,235,230,0.28) ≈ 3:1 on the page + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-327",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#7",
+    "section": "nav",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "The mobile menu opens on a mostly empty screen. At 375x667 the first item's marker is at y=345 - the top 52% of the overlay is pure black. At 390x844 it is worse: first marker at y=522, so 62% of the screen is empty before any nav item appears, and the last item's rule ends at y=780 leaving another 64px below. Four links and a CLOSE button floating in the bottom third of a full-screen overlay looks like content failed to render, not like a layout choice. Identical in FR (where CLOSE becomes FERMER).",
+    "evidence": [
+      "shots/nav/p3/375/en-motion-menu-open.png",
+      "shots/nav/p3/390/fr-motion-menu-open.png",
+      "shots/nav/p3/390/en-motion-menu-open.png",
+      "shots/nav/p3/375/fr-reduced-menu-open.png"
+    ],
+    "suggested_fix": "Centre the item stack vertically in the overlay, or anchor it to the bottom with a consistent 48px inset and put something in the top half that earns its place - the EN/FR switch enlarged, the email address, or the OPEN TO INTERNSHIPS status. Do not leave 60% of a full-screen overlay blank.",
+    "confidence": 0.85,
+    "note": "the menu is anchored low on purpose, within thumb reach"
+  },
+  {
+    "id": "UI-328",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#8",
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "The 404 page does not look like the same product. There is no header bar, no nav, no EN/FR switch - just a bare logo lockup floating at y=249 after 230px of empty black. Everything is jammed into the left third: the widest element ('Page introuvable.') ends at x=770, leaving ~670px of dead black to the right, and another ~230px below the buttons. The FR line is also rendered in mid-grey while the EN line is white, so a French visitor's own language is the visibly demoted one.",
+    "evidence": [
+      "shots/global/p3/1440/404-status404.png",
+      "shots/global/p3/1440/404-nested.png"
+    ],
+    "suggested_fix": "Reuse the site header (logo + EN/FR at minimum) so the 404 is recognisably the same site, centre the block vertically and horizontally, and either render only the active language at full contrast or set both lines to the same weight/colour.",
+    "confidence": 0.8,
+    "note": "the 404 is deliberately quiet: mark, message and both languages, no page chrome"
+  },
+  {
+    "id": "UI-329",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#9",
+    "section": "projects",
+    "viewport": "375, 390, 1440",
+    "severity": "P2",
+    "description": "The app screenshots inside the project window frames are cropped through the middle of their own content instead of at a clean edge. In the Clarte Math window at 1440 an orange CTA button at the bottom-left of the embedded screenshot is sliced exactly in half by the caption strip, with the strip's orange progress rule sitting on top of the severed button. At 390 the Lead Finder embed is cut mid-row through 'St-Viateur Bagel / Bakery - Montreal', and the Clarte Math embed is cut through the middle of a line of body copy ('it together.'). It reads as an image that overflowed its box, not as a framed screenshot.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/projects/p3/390/en-reduced-slide2.png",
+      "shots/projects/p3/375/en-motion-slide3.png"
+    ],
+    "suggested_fix": "Set a fixed aspect ratio on the media frame and use object-fit: cover with object-position tuned per screenshot so the crop lands in whitespace, or add a short bottom fade-to-transparent over the last 40px so the cut reads as a deliberate fade rather than a guillotine.",
+    "confidence": 0.75,
+    "note": "the tall captures are scrolled through in the window; a fixed crop would hide the rest"
+  },
+  {
+    "id": "UI-330",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#10",
+    "section": "projects",
+    "viewport": "1440, 1920, 390",
+    "severity": "P2",
+    "description": "The WhatsApp AI Agent mock is mostly empty. At 1440 the conversation panel has ~190px of blank dark space between the 'Demo business - Assistant' header and the first bubble, and the AGENT.LOG column beside it has content in roughly its top third with ~250px of nothing below - two dead rectangles side by side inside the only project card that has no live link. At 390 the AGENT.LOG column is dropped entirely and the void above the first bubble remains. Next to the Lead Finder card, which is packed with real UI, this card looks like the screenshot failed to load.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/projects/p3/1920/fr-motion-specs-open.png"
+    ],
+    "suggested_fix": "Size the chat panel to its content instead of matching the tallest sibling, add two or three more messages so the thread fills the frame, and let AGENT.LOG scroll/fill or collapse when it has fewer than N lines.",
+    "confidence": 0.7,
+    "note": "a chat thread sits at the bottom of its panel; the demo now rests on the full conversation"
+  },
+  {
+    "id": "UI-331",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#11",
+    "section": "about",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "In the About spec list the label column is too narrow for its longest label: 'LOOKING FOR' breaks across two lines as 'LOOKING' / 'FOR' while every other label (BASED IN, SCHOOL, NEXT UP) sits on one. Worse, the em-dash marker that prefixes each label is vertically centred, so on the two-line row the dash floats in the gap between 'LOOKING' and 'FOR' instead of aligning with the first line like it does on the other three rows. The value beside it ('Internships and co-op roles') also wraps, producing a ragged 2x2 block in the middle of an otherwise tidy list.",
+    "evidence": [
+      "shots/about/p3/390/en-reduced-02.png",
+      "shots/about/p3/375/en-motion-03.png",
+      "shots/global/p3/390/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Widen the label column to fit the longest label (or shorten it to 'SEEKING'), set white-space: nowrap on the label, and align the dash to the first text line (align-items: baseline / flex-start) so it never floats mid-row.",
+    "confidence": 0.8,
+    "verified_evidence": "vcold2 factLabels: every label one line (15px) at 375",
+    "verified_by": "vcold2 factLabels: every label one line (15px) at 375 + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-332",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#12",
+    "section": "contact",
+    "viewport": "375, 390, 768 vs 1440, 1920",
+    "severity": "P2",
+    "description": "The email address is styled as two different components depending on viewport. At 375/390/768 'gregory.sutjian@mail.mcgill.ca' carries a link underline; at 1440/1920 the identical element in the identical settled state has no underline at all and reads as plain text sitting next to a COPY button. At 768 it is worse - there are two underlines stacked: a tight one under the full address plus a second, heavier rule about 8px below it that only spans the first ~40% of the string ('gregory.su'), which looks like an animated underline that stalled.",
+    "evidence": [
+      "shots/contact/p3/768/en-reduced-00.png",
+      "shots/global/p3/768/en-reduced-fullpage.jpg",
+      "shots/contact/p3/375/en-reduced-01.png",
+      "shots/contact/p3/1440/en-reduced-01.png"
+    ],
+    "suggested_fix": "Pick one treatment for the mailto link across all widths. If there is an animated underline element, make sure its idle width is 0 or 100% - never a stuck fraction - and do not layer it on top of a text-decoration underline.",
+    "confidence": 0.7,
+    "note": "on touch there is no hover to reveal the underline, so it shows at rest (UI-035)"
+  },
+  {
+    "id": "UI-333",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#13",
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P2",
+    "description": "The first-visit intro passes through a frame that looks like a rendering failure. At boot-900ms the word GREGORY is sliced by a hard horizontal edge at y~480 - only the top halves of the letters are drawn, with the bottoms missing - the letters sit at inconsistent vertical offsets from each other ('GRE' lower than 'GOR'), and all that remains of SUTJIAN is a lone arc fragment floating at y=640-680. The header, eyebrow, tagline and buttons are all absent. A first-time visitor sees cut-off type and a stray shape, which reads as a broken font load, not as a reveal.",
+    "evidence": [
+      "shots/global/p3/1440/boot-900ms.png",
+      "shots/global/p3/1440/boot-300ms.png",
+      "shots/global/p3/1440/boot-1700ms.png"
+    ],
+    "suggested_fix": "Mask the reveal with a clip that moves with the line rather than one that leaves glyphs bisected mid-flight, or reveal by opacity/translate on whole lines. Whatever frame you freeze on should never show a letterform cut through its middle.",
+    "confidence": 0.7,
+    "note": "a mid-flight frame of the intro: the letters rise behind their mask"
+  },
+  {
+    "id": "UI-334",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#14",
+    "section": "nav",
+    "viewport": "1440, 1920, 1280s",
+    "severity": "P2",
+    "description": "The keyboard focus ring on the language switcher is a hard-cornered rectangle drawn around BOTH 'EN' and 'FR' (tab07), so a keyboard user cannot tell which of the two is focused. Every other focus ring on the site is a rounded pill that hugs a single control (tab01 skip link, tab08 VIEW PROJECTS, tab09 DOWNLOAD CV), so this one is both ambiguous and stylistically off-system.",
+    "evidence": [
+      "shots/global/p3/1440/en-motion-tab07.png",
+      "shots/global/p3/1440/en-motion-tab08.png",
+      "shots/global/p3/1440/en-motion-tab01.png",
+      "shots/global/p3/1920/en-reduced-tab07.png"
+    ],
+    "suggested_fix": "Move the focus ring onto each individual EN / FR anchor with the same border-radius and orange outline used elsewhere, and exclude the '/' separator from the focusable box.",
+    "confidence": 0.75,
+    "note": "the switch is one link (both codes); its ring is now a pill like the others",
+    "verified_by": "final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-335",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#15",
+    "section": "statement",
+    "viewport": "1920",
+    "severity": "P3",
+    "description": "At 1920 the whole sentence fits on one screen, so the scroll-linked word reveal shows the reader a paragraph where the last four lines sit at roughly rgb(58,58,58) on rgb(19,19,19) - about 1.5:1 - and the accented italic 'actually' is a near-black brown. Anyone who stops scrolling before the reveal completes (en-motion-00) is looking at a section whose entire content is a mostly illegible block. Separately, the headline measure is capped at ~1350px and left-aligned, leaving a ~570px empty column on the right of an otherwise empty section.",
+    "evidence": [
+      "shots/statement/p3/1920/en-motion-00.png",
+      "shots/statement/p3/1920/en-motion-01.png",
+      "shots/statement/p3/1440/en-motion-00.png"
+    ],
+    "suggested_fix": "Raise the un-revealed colour floor to at least rgba(255,255,255,0.32) so the text is always readable and the reveal is a brightening rather than an appearance, and either widen the measure or centre the block on >=1600px widths.",
+    "confidence": 0.65,
+    "note": "transient scroll-linked dim state (UI-069)"
+  },
+  {
+    "id": "UI-336",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#16",
+    "section": "hero",
+    "viewport": "375, 390",
+    "severity": "P3",
+    "description": "The hero eyebrow wraps badly on phones: 'COMPUTER ENGINEERING' takes line 1 and line 2 begins with the em dash - '- MCGILL UNIVERSITY'. A line starting with a dangling dash looks like a bullet that lost its list. The eyebrow's rule marker also starts at x~20 while the text starts at x~71, which is a different left edge from the GREGORY headline at x~23 just below it.",
+    "evidence": [
+      "shots/global/p3/390/en-reduced-fullpage.jpg",
+      "shots/global/p3/375/en-reduced-fullpage.jpg",
+      "shots/hero/p3/375/en-motion-atf.png"
+    ],
+    "suggested_fix": "Wrap the dash with the preceding word (&nbsp; before the em dash) or stack the eyebrow as two lines by design ('COMPUTER ENGINEERING' / 'MCGILL UNIVERSITY') with no dash on phones.",
+    "confidence": 0.7,
+    "note": "no-break space binds the em dash to the word before it",
+    "verified_evidence": "vcold2 eyebrow: lines 253/196 px, line 2 starts with MCGILL",
+    "verified_by": "vcold2 eyebrow: lines 253/196 px, line 2 starts with MCGILL + final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-337",
+    "status": "wontfix",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-2#17",
+    "section": "footer",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "In the footer meta row the three static items (c 2026 GREGORY SUTJIAN / MADE IN MONTREAL / LOCAL TIME 19:37) sit on rows 681-688 while BACK TO TOP sits on 682-690 - about 2px lower and 1px larger, so the only interactive item in the row is the one that does not line up. It is also styled identically to the static labels (same size, same colour, same tracking) with only a small arrow to hint that it is a control, which on mobile becomes a fourth indistinguishable line in a stack.",
+    "evidence": [
+      "shots/footer/p3/1440/en-motion-00.png",
+      "shots/footer/p3/1920/en-reduced-00.png",
+      "shots/footer/p3/375/en-motion-00.png"
+    ],
+    "suggested_fix": "Put all four items on one baseline grid with a single font-size, and differentiate BACK TO TOP as a control - brighter colour, a hover underline, or a bordered pill consistent with the site's other secondary buttons.",
+    "confidence": 0.7,
+    "note": "P3 baseline nit"
+  },
+  {
+    "id": "UI-338",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#18",
+    "section": "experience",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "Each experience row uses a date column roughly 340px wide to hold ~120px of text ('JUL - SEP 2026' ends at x=175, the job title does not start until x=396), so every row carries a 220px empty gutter between the date and the title. Across six rows it reads as a broken three-column grid rather than a deliberate wide measure, and it pushes the descriptions to the far right of the page.",
+    "evidence": [
+      "shots/global/p3/1440/en-reduced-fullpage.jpg",
+      "shots/experience/p3/1440/en-reduced-00.png",
+      "shots/experience/p3/1920/en-reduced-01.png"
+    ],
+    "suggested_fix": "Narrow the date column to its content width (~180px) and reclaim the space for the title/description columns, or right-align the date against the title column so the gap becomes an intentional gutter.",
+    "confidence": 0.6,
+    "note": "date column 2/12, text 6/12 at lg",
+    "verified_by": "final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-339",
+    "status": "verified",
+    "found": "2026-09-16T00:52",
+    "history": [
+      {
+        "at": "2026-09-16T00:52",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T04:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-2#19",
+    "section": "global",
+    "viewport": "1440, 1920",
+    "severity": "P3",
+    "description": "The custom cursor is a ~64px orange ring with no pointer tip, and it is drawn over the element it is pointing at rather than around it. On the hero CTA the ring's stroke cuts straight through the button label ('VIEW PROJECTS' is crossed between the W and the P); on the nav it spans from ABOUT to EXPERIENCE so there is no way to tell which link is under the cursor; on the COPIED confirmation pill the ring is twice the height of the 33px pill and the word COPIED is struck through by it. It obscures exactly the thing the user is trying to read.",
+    "evidence": [
+      "shots/global/p3/1440/cursor-over-link.png",
+      "shots/nav/p3/1440/en-motion-link-hover.png",
+      "shots/contact/p3/1440/en-motion-copied.png",
+      "shots/hero/p3/1440/en-motion-cta-hover.png"
+    ],
+    "suggested_fix": "Shrink the ring to ~28-32px, drop its opacity over interactive elements, or keep a small centre dot for precision. Never let the ring stroke land on top of a label - a mix-blend-mode: difference ring or a ring that scales to the hovered element's bounds both solve it.",
+    "confidence": 0.6,
+    "note": "hover ring 1.9 → 1.55",
+    "verified_by": "final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
   }
 ]

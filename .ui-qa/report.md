@@ -6,23 +6,41 @@ Branch `ui-qa-loop`, 2026-09-16. It's a single-page portfolio (EN/FR) checked at
 
 | | P0 | P1 | P2 | P3 | all |
 |---|---|---|---|---|---|
-| verified | 1 | 24 | 95 | 91 | 211 |
-| fixed | 0 | 0 | 0 | 1 | 1 |
-| open | 0 | 0 | 4 | 1 | 5 |
-| wontfix | 0 | 1 | 6 | 52 | 59 |
+| verified | 2 | 32 | 114 | 109 | 257 |
+| fixed | 0 | 0 | 0 | 0 | 0 |
+| open | 0 | 0 | 0 | 0 | 0 |
+| wontfix | 0 | 3 | 15 | 64 | 82 |
 | regressed | 0 | 0 | 0 | 0 | 0 |
-| **found** | 1 | 25 | 105 | 145 | 276 |
+| **found** | 2 | 35 | 129 | 173 | 339 |
 
-The screenshots live in `.ui-qa/shots/`. They're kept out of git and exist only on this machine. "Before" is pass 1, before any fix. "After" is pass 3.
+## What this covered
 
-## Before and after, by section
+6 passes over 11 sections. Each pass: capture every section at 7 viewports x EN/FR x motion/reduced-motion, run 4 review agents (visual design, mobile UX, accessibility, interaction/state — plus motion and end-to-end flows in later passes), fix, re-capture, then a "cold" reviewer that sees only the new screenshots and is told to find at least 5 defects. Automated checks ran on every capture: axe-core (fresh load and reduced motion), horizontal overflow, tap-target sizes, keyboard traversal order and focus visibility, and console/page errors.
+
+The final capture is clean: no console errors, no axe violations, no horizontal overflow at any viewport, and keyboard traversal reaches every control with a visible ring.
+
+## Needs your decision
+
+Five things I did not change, because they are content or product calls:
+
+| what | where | why it matters |
+|---|---|---|
+| **The GitHub link 404s.** `github.com/gregorysudjian-ui` does not exist (checked: profile and API both 404). | `content/site.ts` `person.socials` | A recruiter clicking GitHub from the contact section lands on a GitHub 404. |
+| **"View website" on Lead Finder leads to a sign-in.** | `content/site.ts`, Lead Finder `links` | The card sells "real app screens", and the CTA is a dead end for anyone without an account. A demo route, or different link copy, would fix it. |
+| **The Lead Finder screenshots are English-only.** | `public/projects/lf-*.webp` | On the French page, French copy sits above an English dashboard. Clarté already ships FR captures. |
+| **French wording in the datasheet.** "Des stages et des stages coop" repeats itself. | `content/site.ts` `about.facts` | Reads awkwardly next to the clean English ("Internships and co-op roles"). |
+| **App screenshots are small at 1280-1440.** The captures are 2048-2400px wide shots of a 1024-1200px layout, drawn at about a third size, so their UI text lands near 7-8px. | `public/projects/` | Recapturing the apps at ~1100px wide, or cropping each slide to its meaningful region, would make them readable. Both need a decision about what each screen should show. |
+
+## Before and after
+
+The screenshots live in `.ui-qa/shots/`. They're kept out of git and exist only on this machine. "Before" is pass 1, before any fix. "After" is pass 6.
 
 ### global
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-reduced-fullpage | <img src="shots/global/p1/390/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p3/390/en-reduced-fullpage.jpg" width="220"> |
-| 1440 · en-reduced-fullpage | <img src="shots/global/p1/1440/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p3/1440/en-reduced-fullpage.jpg" width="220"> |
+| 390 · en-reduced-fullpage | <img src="shots/global/p1/390/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p6/390/en-reduced-fullpage.jpg" width="220"> |
+| 1440 · en-reduced-fullpage | <img src="shots/global/p1/1440/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p6/1440/en-reduced-fullpage.jpg" width="220"> |
 
 Targeted proof shots: [1440-404-focus.png](shots/global/p1-fix/1440-404-focus.png) · [1440-404.png](shots/global/p1-fix/1440-404.png) · [390-404-focus.png](shots/global/p1-fix/390-404-focus.png) · [390-404.png](shots/global/p1-fix/390-404.png) · [boot-skip-on-tab.png](shots/global/p1-fix/boot-skip-on-tab.png) · [deeplink-contact-390.png](shots/global/p1-fix/deeplink-contact-390.png) · [404-fr.png](shots/global/p2-fix/404-fr.png) · [404_de.png](shots/global/p2-fix/404_de.png) · [404_en_nope.png](shots/global/p2-fix/404_en_nope.png) · [404_fr_nope.png](shots/global/p2-fix/404_fr_nope.png) · [boot-normal-1600ms.png](shots/global/p2-fix/boot-normal-1600ms.png) · [boot-normal-3000ms.png](shots/global/p2-fix/boot-normal-3000ms.png)
 
@@ -30,9 +48,9 @@ Targeted proof shots: [1440-404-focus.png](shots/global/p1-fix/1440-404-focus.pn
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-menu-open | <img src="shots/nav/p1/390/en-motion-menu-open.png" width="220"> | <img src="shots/nav/p3/390/en-motion-menu-open.png" width="220"> |
-| 390 · en-motion-header-over-content | <img src="shots/nav/p1/390/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p3/390/en-motion-header-over-content.png" width="220"> |
-| 1440 · en-motion-header-over-content | <img src="shots/nav/p1/1440/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p3/1440/en-motion-header-over-content.png" width="220"> |
+| 390 · en-motion-menu-open | <img src="shots/nav/p1/390/en-motion-menu-open.png" width="220"> | <img src="shots/nav/p6/390/en-motion-menu-open.png" width="220"> |
+| 390 · en-motion-header-over-content | <img src="shots/nav/p1/390/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p6/390/en-motion-header-over-content.png" width="220"> |
+| 1440 · en-motion-header-over-content | <img src="shots/nav/p1/1440/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p6/1440/en-motion-header-over-content.png" width="220"> |
 
 Targeted proof shots: [390-menu-focus-ring.png](shots/nav/p1-fix/390-menu-focus-ring.png) · [568x320-fr-menu.png](shots/nav/p1-fix/568x320-fr-menu.png) · [667x375-fr-menu.png](shots/nav/p1-fix/667x375-fr-menu.png) · [focus-into-hidden-header.png](shots/nav/p1-fix/1440/focus-into-hidden-header.png) · [header-at-top.png](shots/nav/p1-fix/1440/header-at-top.png) · [header-over-content.png](shots/nav/p1-fix/1440/header-over-content.png)
 
@@ -40,10 +58,10 @@ Targeted proof shots: [390-menu-focus-ring.png](shots/nav/p1-fix/390-menu-focus-
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-atf | <img src="shots/hero/p1/390/en-motion-atf.png" width="220"> | <img src="shots/hero/p3/390/en-motion-atf.png" width="220"> |
-| 390 · fr-motion-atf | <img src="shots/hero/p1/390/fr-motion-atf.png" width="220"> | <img src="shots/hero/p3/390/fr-motion-atf.png" width="220"> |
-| 1440 · en-motion-atf | <img src="shots/hero/p1/1440/en-motion-atf.png" width="220"> | <img src="shots/hero/p3/1440/en-motion-atf.png" width="220"> |
-| 1440 · fr-motion-atf | <img src="shots/hero/p1/1440/fr-motion-atf.png" width="220"> | <img src="shots/hero/p3/1440/fr-motion-atf.png" width="220"> |
+| 390 · en-motion-atf | <img src="shots/hero/p1/390/en-motion-atf.png" width="220"> | <img src="shots/hero/p6/390/en-motion-atf.png" width="220"> |
+| 390 · fr-motion-atf | <img src="shots/hero/p1/390/fr-motion-atf.png" width="220"> | <img src="shots/hero/p6/390/fr-motion-atf.png" width="220"> |
+| 1440 · en-motion-atf | <img src="shots/hero/p1/1440/en-motion-atf.png" width="220"> | <img src="shots/hero/p6/1440/en-motion-atf.png" width="220"> |
+| 1440 · fr-motion-atf | <img src="shots/hero/p1/1440/fr-motion-atf.png" width="220"> | <img src="shots/hero/p6/1440/fr-motion-atf.png" width="220"> |
 
 Targeted proof shots: [1024x640-fr-atf.png](shots/hero/p1-fix/1024x640-fr-atf.png) · [1024x768-fr-hint.png](shots/hero/p1-fix/1024x768-fr-hint.png) · [1280x620-en-atf.png](shots/hero/p1-fix/1280x620-en-atf.png) · [1280x620-fr-atf.png](shots/hero/p1-fix/1280x620-fr-atf.png) · [1280x800-fr-hint.png](shots/hero/p1-fix/1280x800-fr-hint.png) · [1366x650-en-atf.png](shots/hero/p1-fix/1366x650-en-atf.png) · [568x320-fr.png](shots/hero/p2-fix/568x320-fr.png) · [667x375-en.png](shots/hero/p2-fix/667x375-en.png) · [720x450-en.png](shots/hero/p2-fix/720x450-en.png) · [740x360-fr.png](shots/hero/p2-fix/740x360-fr.png) · [844x390-fr.png](shots/hero/p2-fix/844x390-fr.png) · [932x430-en.png](shots/hero/p2-fix/932x430-en.png)
 
@@ -51,10 +69,10 @@ Targeted proof shots: [1024x640-fr-atf.png](shots/hero/p1-fix/1024x640-fr-atf.pn
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/statement/p1/390/en-motion-00.png" width="220"> | <img src="shots/statement/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/statement/p1/390/fr-motion-01.png" width="220"> | <img src="shots/statement/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/statement/p1/1440/en-motion-00.png" width="220"> | <img src="shots/statement/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/statement/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/statement/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/statement/p1/390/en-motion-00.png" width="220"> | <img src="shots/statement/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/statement/p1/390/fr-motion-01.png" width="220"> | <img src="shots/statement/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/statement/p1/1440/en-motion-00.png" width="220"> | <img src="shots/statement/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/statement/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/statement/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [375x667-en-reduced-pinned.png](shots/statement/p1-fix/375x667-en-reduced-pinned.png) · [740x360-fr-pinned.png](shots/statement/p1-fix/740x360-fr-pinned.png) · [844l-fr-pinned.png](shots/statement/p1-fix/844l-fr-pinned.png) · [844x390-fr-pinned.png](shots/statement/p1-fix/844x390-fr-pinned.png) · [932x430-fr-pinned.png](shots/statement/p1-fix/932x430-fr-pinned.png) · [1440-enter.png](shots/statement/p2-fix/1440-enter.png) · [1440-leave.png](shots/statement/p2-fix/1440-leave.png) · [1440-mid.png](shots/statement/p2-fix/1440-mid.png) · [390-enter.png](shots/statement/p2-fix/390-enter.png) · [390-leave.png](shots/statement/p2-fix/390-leave.png) · [390-mid.png](shots/statement/p2-fix/390-mid.png)
 
@@ -62,10 +80,10 @@ Targeted proof shots: [375x667-en-reduced-pinned.png](shots/statement/p1-fix/375
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/about/p1/390/en-motion-00.png" width="220"> | <img src="shots/about/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/about/p1/390/fr-motion-01.png" width="220"> | <img src="shots/about/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/about/p1/1440/en-motion-00.png" width="220"> | <img src="shots/about/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/about/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/about/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/about/p1/390/en-motion-00.png" width="220"> | <img src="shots/about/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/about/p1/390/fr-motion-01.png" width="220"> | <img src="shots/about/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/about/p1/1440/en-motion-00.png" width="220"> | <img src="shots/about/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/about/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/about/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-after-nav-about.png](shots/about/p2-fix/1440-after-nav-about.png) · [390-after-nav-about.png](shots/about/p2-fix/390-after-nav-about.png) · [768-after-nav-about.png](shots/about/p2-fix/768-after-nav-about.png)
 
@@ -73,10 +91,10 @@ Targeted proof shots: [1440-after-nav-about.png](shots/about/p2-fix/1440-after-n
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/focus/p1/390/en-motion-00.png" width="220"> | <img src="shots/focus/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/focus/p1/390/fr-motion-01.png" width="220"> | <img src="shots/focus/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/focus/p1/1440/en-motion-00.png" width="220"> | <img src="shots/focus/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/focus/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/focus/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/focus/p1/390/en-motion-00.png" width="220"> | <img src="shots/focus/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/focus/p1/390/fr-motion-01.png" width="220"> | <img src="shots/focus/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/focus/p1/1440/en-motion-00.png" width="220"> | <img src="shots/focus/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/focus/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/focus/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [320-code-window.png](shots/focus/p1-fix/320-code-window.png) · [390-code-window.png](shots/focus/p1-fix/390-code-window.png) · [1024x768.png](shots/focus/p2-fix/1024x768.png) · [1440x900.png](shots/focus/p2-fix/1440x900.png) · [768x1024.png](shots/focus/p2-fix/768x1024.png)
 
@@ -84,10 +102,10 @@ Targeted proof shots: [320-code-window.png](shots/focus/p1-fix/320-code-window.p
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/projects/p1/390/en-motion-00.png" width="220"> | <img src="shots/projects/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/projects/p1/390/fr-motion-01.png" width="220"> | <img src="shots/projects/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/projects/p1/1440/en-motion-00.png" width="220"> | <img src="shots/projects/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/projects/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/projects/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/projects/p1/390/en-motion-00.png" width="220"> | <img src="shots/projects/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/projects/p1/390/fr-motion-01.png" width="220"> | <img src="shots/projects/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/projects/p1/1440/en-motion-00.png" width="220"> | <img src="shots/projects/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/projects/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/projects/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-broken-image-fallback.png](shots/projects/p1-fix/1440-broken-image-fallback.png) · [fr-card2-titlebar.png](shots/projects/p1-fix/1440/fr-card2-titlebar.png) · [slides-held-on-hover.png](shots/projects/p1-fix/1440/slides-held-on-hover.png) · [fr-card2-titlebar.png](shots/projects/p1-fix/375/fr-card2-titlebar.png) · [1440-card1.png](shots/projects/p2-fix/1440-card1.png) · [1440-card2.png](shots/projects/p2-fix/1440-card2.png) · [1440-order.png](shots/projects/p2-fix/1440-order.png) · [1440r-card1.png](shots/projects/p2-fix/1440r-card1.png) · [1440r-card2.png](shots/projects/p2-fix/1440r-card2.png) · [390-card1.png](shots/projects/p2-fix/390-card1.png)
 
@@ -95,10 +113,10 @@ Targeted proof shots: [1440-broken-image-fallback.png](shots/projects/p1-fix/144
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/experience/p1/390/en-motion-00.png" width="220"> | <img src="shots/experience/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/experience/p1/390/fr-motion-01.png" width="220"> | <img src="shots/experience/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/experience/p1/1440/en-motion-00.png" width="220"> | <img src="shots/experience/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/experience/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/experience/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/experience/p1/390/en-motion-00.png" width="220"> | <img src="shots/experience/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/experience/p1/390/fr-motion-01.png" width="220"> | <img src="shots/experience/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/experience/p1/1440/en-motion-00.png" width="220"> | <img src="shots/experience/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/experience/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/experience/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [768-fr-rows.png](shots/experience/p1-fix/768-fr-rows.png) · [844l-experience.png](shots/experience/p1-fix/844l-experience.png)
 
@@ -106,9 +124,9 @@ Targeted proof shots: [768-fr-rows.png](shots/experience/p1-fix/768-fr-rows.png)
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/skills/p1/390/en-motion-00.png" width="220"> | <img src="shots/skills/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/skills/p1/390/fr-motion-01.png" width="220"> | <img src="shots/skills/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/skills/p1/1440/en-motion-00.png" width="220"> | <img src="shots/skills/p3/1440/en-motion-00.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/skills/p1/390/en-motion-00.png" width="220"> | <img src="shots/skills/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/skills/p1/390/fr-motion-01.png" width="220"> | <img src="shots/skills/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/skills/p1/1440/en-motion-00.png" width="220"> | <img src="shots/skills/p6/1440/en-motion-00.png" width="220"> |
 
 Targeted proof shots: [768-fr-chip-tapped.png](shots/skills/p1-fix/768-fr-chip-tapped.png) · [844l-skills.png](shots/skills/p1-fix/844l-skills.png)
 
@@ -116,10 +134,10 @@ Targeted proof shots: [768-fr-chip-tapped.png](shots/skills/p1-fix/768-fr-chip-t
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/contact/p1/390/en-motion-00.png" width="220"> | <img src="shots/contact/p3/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/contact/p1/390/fr-motion-01.png" width="220"> | <img src="shots/contact/p3/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/contact/p1/1440/en-motion-00.png" width="220"> | <img src="shots/contact/p3/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/contact/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/contact/p3/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/contact/p1/390/en-motion-00.png" width="220"> | <img src="shots/contact/p6/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/contact/p1/390/fr-motion-01.png" width="220"> | <img src="shots/contact/p6/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/contact/p1/1440/en-motion-00.png" width="220"> | <img src="shots/contact/p6/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/contact/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/contact/p6/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-copy-focus-copied.png](shots/contact/p1-fix/1440-copy-focus-copied.png) · [1440-tab-to-email-fresh-load.png](shots/contact/p1-fix/1440-tab-to-email-fresh-load.png) · [375-tab-to-email-fresh-load.png](shots/contact/p1-fix/375-tab-to-email-fresh-load.png) · [844l-contact.png](shots/contact/p1-fix/844l-contact.png) · [fr-320-email.png](shots/contact/p1-fix/fr-320-email.png) · [fr-320-heading.png](shots/contact/p1-fix/fr-320-heading.png)
 
@@ -127,8 +145,8 @@ Targeted proof shots: [1440-copy-focus-copied.png](shots/contact/p1-fix/1440-cop
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/footer/p1/390/en-motion-00.png" width="220"> | <img src="shots/footer/p3/390/en-motion-00.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/footer/p1/1440/en-motion-00.png" width="220"> | <img src="shots/footer/p3/1440/en-motion-00.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/footer/p1/390/en-motion-00.png" width="220"> | <img src="shots/footer/p6/390/en-motion-00.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/footer/p1/1440/en-motion-00.png" width="220"> | <img src="shots/footer/p6/1440/en-motion-00.png" width="220"> |
 
 Targeted proof shots: [768-fr.png](shots/footer/p1-fix/768-fr.png)
 
@@ -139,6 +157,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | id | sev | section | status | issue | resolution / evidence |
 |---|---|---|---|---|---|
 | UI-010 | P0 | contact | verified | In full-motion mode (prefers-reduced-motion: no-preference, which is what most keyboard and screen-reader users have), none of the Contact controls can be reached with Tab until the visitor has scrolled the section into … | shots/contact/p1-fix/1440-tab-to-email-fresh-load.png; verify-reveal: fresh-load Tab reaches email/Copy/CV/LinkedIn/GitHub, 0 visibility:hidden controls |
+| UI-304 | P0 | focus | verified | In French, the body copy of focus cards 02 (IA) and 03 (Maths) is cut off mid-word at the card's right border. At 390 the Maths paragraph reads "Des annees de tutorat en algebre, en / geometrie et en calcul ont fait des … | vcold focus panels at 390 FR / 375 EN / 768 FR: 33-49px clearance inside the card |
 | UI-001 | P1 | nav | verified | Keyboard focus lands on header links (logo, nav, EN/FR, Menu) while the header is translated off-screen (yPercent -110) after scrolling down; focused element is invisible (audit: inView false, y=-55). | shots/nav/p1-fix/1440/focus-into-hidden-header.png; verify-a header-focus pass |
 | UI-003 | P1 | projects | verified | Auto-advancing slides (every 4–8s, indefinitely) have no pause mechanism and their caption is aria-live=polite, so screen readers announce a new caption every few seconds while the user reads elsewhere (WCAG 2.2.2, 4.1.3… | shots/projects/p1-fix/1440/slides-held-on-hover.png; verify-a slides-hold pass |
 | UI-006 | P1 | nav | verified | With the mobile menu open, the page behind is not inert: Tab moves past the 4 menu links into hidden page content under the full-screen overlay. | verify-a menu-tab-seq pass (no MAIN/FOOTER focus) |
@@ -164,6 +183,16 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-205 | P1 | nav | verified | Tapping Menu quickly (3 taps, 60 to 250 ms apart, the way people tap when the first tap seems not to register) leaves the page frozen. The button says 'Close' and aria-expanded is true, the page stays scroll-locked and #… | verify-c menu-triple-tap: consistent open state (expanded, flex, opacity 1, locked) |
 | UI-206 | P1 | global | verified | Tapping to skip the boot intro also taps whatever is under your finger. The skip listens for window 'pointerdown' and hides the overlay right away, so the browser then sends the tap's click to the page underneath. Repro:… | verify-c boot-tap: no download, booted |
 | UI-223 | P1 | projects | verified | With reduced motion, Tab lands on an invisible slide that screen readers are told to ignore. The Lead Finder '03 · Demo' slide is a scroll slide, so without motion it gets `overflow-y-auto` (manual = slide.scroll && !aut… | vcards 1440 reduced: 30 Tabs, no invisible focus; inactive slides inert, scroller only on the active one |
+| UI-277 | P1 | hero | verified | The hero gate — the page's signature motion and the first thing anyone sees — runs well under 30 fps on desktop, and the cost is rasterization, not JS. Method: scroll #top from 0 to its full height at a steady 260 px/s w… | vfps 1440 hero gate: worst frame 83ms → 50ms, 46.8 → 48.3 fps (headless CPU raster; mask moved off the scaled layer) |
+| UI-283 | P1 | projects | wontfix | Flow 1 (recruiter, laptop), step 'clicks View website' on the first project card: the flagship CTA is a dead end. Expected: the Lead Finder app, the thing the whole card is selling ('Real app screens', 'View website ↗').… | OWNER ACTION: the Lead Finder deployment asks for a sign-in, so View website is a dead end for a recruiter. Fixing it means a demo route or different copy — both product decisions. Flagged in the repo |
+| UI-284 | P1 | global | verified | Flows 4 and 5 (French visitor / returning visitor): the first-visit intro replays in the middle of a reading session. The head script marks the session 'booted' when `location.hash` is present (app/[locale]/layout.tsx:70… | vp3 introReplay: gs-booted written on a deep-link visit, boot display none after the language switch |
+| UI-305 | P1 | focus | verified | Same overflow in English, milder but still visibly broken: the tag row under the Math card reads "ALGEBRA · CALCULUS · PROBLEM SOLVI" - the last word is chopped by the card border - and the sine-curve graphic and body te… | vcold: same measurement, EN and FR |
+| UI-306 | P1 | global | verified | The sticky header has no background/scrim in several states, so page text scrolls straight through the nav. On 1440 (footer/mark-hover) the sentence "I'm looking for an internship or co-op where I can learn fast," is pri… | dbg-scrim: backdrop on at every scroll position; now also set onRefresh |
+| UI-307 | P1 | hero | verified | There is a full, completely empty screen between the hero and the "IN ONE SENTENCE" statement. At 1440 the whole 900px viewport after the hero contains nothing but a thin diagonal copper line; at 1920 the gap is ~950px o… | vcold heroStatementGap = -7px (the statement now starts under the hero's faded end) |
+| UI-308 | P1 | focus | verified | On the short laptop the horizontal focus carousel never lands: at the final state (counter reads 03 / 03, progress bar full) the Math/Maths card still runs off the right edge of the window - its right border and corner m… | vcold focus-end: last panel right edge 1231/1386/1866 inside 1280/1440/1920 |
+| UI-320 | P1 | nav | verified | The sticky header has no opaque background or backdrop blur, so page content scrolls straight underneath it and prints on top of the nav. At 1440 (projects specs-open) the word CONTACT sits directly on the sentence 'Ever… | dbg-scrim |
+| UI-321 | P1 | hero | verified | In landscape (844x390) the hero tagline is gone entirely. On every other viewport the hero reads eyebrow -> GREGORY SUTJIAN -> 'I like building things, from AI agents to full websites, and I'm always up for learning some… | shots/hero/p4-fix/844x390-fr-name.png (tagline as one clamped line) |
+| UI-322 | P1 | footer | wontfix | The giant outlined SUTJIAN wordmark at the very bottom of the page is sliced off mid-glyph by the end of the document on every single viewport. At 1440 the letters are cut roughly at their waist - you see the top ~60% of… | the cropped wordmark is a deliberate bleed (UI-119/120/312) |
 | UI-002 | P2 | nav | verified | When the header slides back in mid-page (scroll up), its gradient backdrop is too transparent: body copy runs straight through the logo and EN/FR/Menu, looking cluttered. | shots/nav/p1-fix/390/header-over-content.png,shots/nav/p1-fix/1440/header-over-content.png |
 | UI-004 | P2 | projects | verified | Inactive slide tab labels (text-paper/45, 0.6rem ≈ 9.6px) fail contrast (axe color-contrast serious). | axe 375/1440 reduced: 0 violations |
 | UI-005 | P2 | projects | verified | Preview window title bar truncates the slug ('WHATSAPP-AI-AGE…') because the traffic-light dots + badge leave too little room on phones. | shots/projects/p1-fix/375/fr-card2-titlebar.png |
@@ -190,7 +219,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-052 | P2 | nav | verified | The focus ring on mobile menu links is clipped. Each <li> is overflow-hidden (it masks the rise-in animation), and it cuts off the 2px copper outline (offset 4px) on the top, left and right. Measured: a=[24,512,366,560],… | shots/nav/p1-fix/390-menu-focus-ring.png (mask moved inside the link) |
 | UI-056 | P2 | global | verified | During the ~2.8s boot overlay, keyboard focus goes behind the opaque overlay, and the page is left scrolled mid-way. Tab presses at t=700ms: 'Skip to content', then '01 · Leads', '02 · Designs', '03 · Demo', all covered … | verify-top boot-tab-700ms: Tab skips the intro, booted=true, page inert during boot |
 | UI-057 | P2 | global | verified | The custom cursor hides the OS pointer for everyone with a fine pointer, with no opt-out. html.has-cursor *{cursor:none!important} removes the user's enlarged or high-contrast system pointer and replaces it with a 6px pa… | custom cursor disabled with forced-colors or prefers-contrast |
-| UI-062 | P2 | hero | open | Reflow/zoom: on short viewports the hero's text overlaps. 320x256: the 'View projects' button covers 'SUTJIAN' (82x59px overlap), and the header's Logo, EN/FR and MENU sit on top of the eyebrow (overlaps 24x24, 55x12, 34… | 400% zoom reflow of the hero: needs a short-screen layout rework (pass 2) |
+| UI-062 | P2 | hero | verified | Reflow/zoom: on short viewports the hero's text overlaps. 320x256: the 'View projects' button covers 'SUTJIAN' (82x59px overlap), and the header's Logo, EN/FR and MENU sit on top of the eyebrow (overlaps 24x24, 55x12, 34… | vzoom 320x256/480x300/640x310: no name-vs-CTA or header-vs-eyebrow overlap, no horizontal overflow; shots/hero/p4-fix/320x256-en.png |
 | UI-063 | P2 | hero | verified | The tagline ('I like building things, from AI agents to full websites…') is display:none on every viewport 500px tall or less. That covers landscape phones and desktop users zoomed to 200% on a 1440x900 screen (720x450),… | vshort: 720x450 + 932x430 tagline visible, name/hud gap 18-36px; 568x320 FR gap 4px; shots/hero/p2-fix/*.png |
 | UI-064 | P2 | hero | verified | Text spacing (WCAG 1.4.12, AA): with the standard overrides (letter-spacing .12em, word-spacing .16em, line-height 1.5), the name is clipped. At 375, 'Gregory' has scrollWidth 382 vs clientWidth 327 and renders 'GREGOR',… | line mask only set from JS when the intro plays |
 | UI-069 | P2 | statement | wontfix | Unlit words sit at opacity 0.13, which is 1.34:1 against ink (paper #edebe6 at 13% over #0b0c0e). The large-text minimum of 3:1 needs opacity 0.37 or more (0.40 gives 3.37:1). The words light in reading order across the … | dim state is transient and scroll-controlled; raised 0.13→0.2 and the sentence now rests fully lit before the pin ends (end bottom 130%) |
@@ -217,7 +246,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-126 | P2 | contact | verified | Loading is indistinguishable from nothing. Steps: booted session, throttle, open /en#contact. Observed: from about 3s to 22s the viewport shows an empty chip box (border and corners only). Heading, text, email, Copy, CV … | 8s no-JS failsafe; dev build exaggerates |
 | UI-127 | P2 | experience | verified | If the JS bundles fail to load (flaky network, CDN error, content blocker, old browser that fails to parse them), Experience, Skills and Contact stay invisible forever. The inline head script has already added html.js, s… | head-script failsafe drops html.js after 8s without the app |
 | UI-128 | P2 | contact | verified | Rotating or resizing loses the reader's place, even when it doesn't jump to the top. The absolute scrollY is kept while the content above reflows. Steps (phone): at 390x844 scroll to #contact, rotate to landscape (it cla… | section anchor restore after resize/rotation |
-| UI-140 | P2 | focus | open | At 200% text size (Firefox 'Zoom text only' or a large default font in Chrome, simulated with html font-size 200%, FR), the horizontal panels keep their fixed height, min(54vh,560px), and overflow-hidden, so the body tex… | 200% text-only zoom in horizontal Focus: pass 2 |
+| UI-140 | P2 | focus | verified | At 200% text size (Firefox 'Zoom text only' or a large default font in Chrome, simulated with html font-size 200%, FR), the horizontal panels keep their fixed height, min(54vh,560px), and overflow-hidden, so the body tex… | vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png |
 | UI-141 | P2 | focus | verified | Panel 1's CodeWindow illustration is plain HTML and isn't aria-hidden, unlike the NeuralNet and MathPlot SVGs. Screen readers read it out before the 'Software' heading: 'agent.py 1 def run_agent(task): 2 context = memory… | CodeWindow + index + square aria-hidden |
 | UI-142 | P2 | focus | verified | Endless decorative motion with no user control: all three Focus illustrations run GSAP timelines with repeat:-1 (code typing plus a blinking .caret, the network pulses, the sine readout), and the copper status-dot 'ping'… | illustrations play 3 rounds then rest |
 | UI-143 | P2 | projects | verified | Remaining problem after the opacity-only reveal fix: keyboard focus now lands on controls that are still at opacity 0, so the copper focus ring can't be seen at first (2.4.7 Focus Visible). Measured effective opacity of … | focusin completes the reveal of its [data-reveal] host |
@@ -232,7 +261,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-160 | P2 | projects | verified | With reduced motion the scroll slides can't be read past the first screen. Steps: enable reduced motion, go to Lead Finder, click '03 · DEMO', or look at Clarté's '01 · WEBSITE'. Observed: the screenshot stays at transla… | scroll slides scroll by hand with reduced motion |
 | UI-171 | P2 | projects | verified | Both desktop captures of this site (site-en.webp and site-fr.webp) have an empty scrollbar gutter on the right: a flat #0c0b0e strip 30px wide at 2x (about 13-15 CSS px in the frame). The circuit lines and the grid stop … | recapture without scrollbar gutter |
 | UI-172 | P2 | projects | verified | Between md and xl, the stacked preview frame is full width at aspect 16/11, so it nearly fills the screen. At 1024x768 the frame is 942x683 (89% of the viewport height); at 1180x820 it's 1086x782 (95%). Title, summary an… | stacked preview max-w calc(75svh*16/11) between md and xl |
-| UI-173 | P2 | projects | open | In the side-by-side xl layout the 'real app screens' are too small to read. The Lead Finder and Clarté HQ captures are 2048/2400px-wide 2x shots of a 1024-1200px layout, drawn at scale 0.325 (1280), 0.368 (1440) and 0.34… | xl screenshots at ~0.33x: needs per-slide crops (product decision), pass 2 |
+| UI-173 | P2 | projects | wontfix | In the side-by-side xl layout the 'real app screens' are too small to read. The Lead Finder and Clarté HQ captures are 2048/2400px-wide 2x shots of a 1024-1200px layout, drawn at scale 0.325 (1280), 0.368 (1440) and 0.34… | needs recapturing the apps at a narrower viewport or per-slide crops (product decision; Lead Finder needs a sign-in) — recommended in the report |
 | UI-174 | P2 | projects | verified | Two label/value lists sit on top of each other in the same card but don't share a value column. The Role/Stack <dl> uses grid-cols-[auto_1fr], so its values start at the width of the longest label, while the 'How it's bu… | shared 8.5rem label column |
 | UI-175 | P2 | about | verified | The datasheet's Status dot gets squashed and pushed away from its text. The dd is a flex row and the 6px .status-dot has no shrink-0, so when 'Always learning' / 'Toujours en apprentissage' wraps, the text node takes all… | status-dot flex-shrink 0, value in its own span |
 | UI-176 | P2 | about | verified | The two-column About grid kicks in at md (768), where both columns are too narrow. The datasheet card is only 271px wide, so its values wrap ('Lebanon → / Montreal', 'Always / learning', 'Bâtisseur / curieux') because th… | About two columns from lg |
@@ -242,7 +271,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-180 | P2 | focus | verified | The keywords line under each Focus panel uses .label-mono, which forces line-height:1. When it wraps, the uppercase lines nearly collide: the pitch is 12px for 11.5px caps, and the accents on 'RÉSOLUTION / DE PROBLÈMES' … | vp2b keywords inside panels at 375/390/768 EN+FR (38-123px clearance) |
 | UI-181 | P2 | focus | verified | Portrait tablets (768x1024) match '(min-width:768px) and (min-height:900px)', so they get horizontal panels that are only 553x553. Each column is 274px, so the drawings shrink to SVG scale 0.49 and their mono labels ('IN… | vfocus: 768x1024 static/column; shots/focus/p2-fix/768x1024.png |
 | UI-193 | P2 | projects | verified | Mono micro-labels in the project frame are below a readable size on phones: slide tab labels 9.6px (0.6rem, uppercase, 0.14em tracking), the title-bar slug 9.92px (0.62rem), and the 'Real app screens' / 'Illustrative dem… | frame micro-labels 0.66rem with tighter tracking on phones |
-| UI-197 | P2 | projects | open | Scroll slides load very large images into permanently promoted layers, which risks jank or blank frames and tab reloads on iOS. On tablets (768 and up, the laptop source), the Clarté page is 2200x9782 (EN) or 2200x10200 … | very tall captures on iOS: asset re-encoding, pass 2 / owner |
+| UI-197 | P2 | projects | verified | Scroll slides load very large images into permanently promoted layers, which risks jank or blank frames and tab reloads on iOS. On tablets (768 and up, the laptop source), the Clarté page is 2200x9782 (EN) or 2200x10200 … | decoded memory 82/86/73MB → 33/35/34MB (laptop) and 45/44/29 → 37/38/21MB (phone); sharpness checked at DPR2/DPR3, shots/projects/p4-fix/1440-clarte-scroll.png |
 | UI-199 | P2 | focus | verified | On a phone held sideways, each Focus drawing fills the screen before the text starts. Below md the art box is aspect-square at full width: 612x612 at 667x375 (1.6 screens) and 679x679 at 740x360 (1.9 screens). Panels are… | art max 60svh below md |
 | UI-202 | P2 | about | verified | At 320 the About facts give most of the row to a mostly empty label column. grid-cols-[8rem_1fr] with gap-6 leaves the values only 120px (EN) or 127px (FR) at text-lg. 'Internships and co-op roles', 'Whatever I haven't l… | facts 6.5rem label column below sm |
 | UI-204 | P2 | about | verified | Sideways, the portrait alone is taller than the screen, and the About heading is almost 3 screens down. Below md the datasheet is max-w-[500px], so at 667x375 and 740x360 the card is 500x726 and its 5:4 photo is 398px ta… | vabout: h2 in view after nav at 390/768/1440; shots/about/p2-fix/*-after-nav-about.png |
@@ -269,6 +298,30 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-265 | P2 | nav | verified | After a language switch (and after any reload) mid-page, the header lands hidden, so the control the visitor just used is gone. The restore jump reads as a downward scroll, and the hide-on-scroll-down rule fires with no … | jumpTo flags an automatic scroll, so the header stays put |
 | UI-266 | P2 | global | verified | On touch, only the pill buttons answer a press. An audit of every CSS rule the page ships finds exactly one `:active` rule — `.btn:active {opacity:.75}` inside `@media (hover: none)` — while Tailwind's preflight sets `-w… | press state for links and buttons on touch |
 | UI-267 | P2 | projects | verified | In the JS-failed fallback (the 8s failsafe correctly turns the page into plain content) three controls stay on screen but are dead, and one of them hides real content for good. Steps: block /_next/static/chunks/*.js, wai… | plain-content CSS opens the specs panel and hides the controls that need JS; inert only after mount |
+| UI-278 | P2 | projects | verified | The slideshow's push-in is on a 5 s clock that matches no slide's length, so it never lands, and at the handover it visibly reverses. .slide animates transform with `transform 5s linear` from scale(1.04) to scale(1). Mea… | push-in runs on the slide clock |
+| UI-285 | P2 | nav | verified | Flow 5 (returning visitor), step 'Back/Forward between sections': the address bar walks the page but Back does not. Clicking About, Projects, Experience, Contact in the header takes the address through /en#about -> /en#p… | vp3 history: nav pushes #about/#projects/#experience; Back walks them |
+| UI-286 | P2 | footer | verified | Flows 3 and 5, step 'Back to top': the address is left pointing at the section the visitor just left. The footer button calls scrollToTarget(0) with a number, and the `history.replaceState` branch in lib/scroll.ts only r… | vp3 backToTop: url /en, position top@0 |
+| UI-287 | P2 | global | verified | All six flows, the whole scroll-through: below lg the page gives no sense of where you are or how much is left, on a document that is 22.6 screens long (measured 19067px at 390x844; 15958px / 17.7 screens at 1440x900). T… | vp3 meter: block, x377 at 390 wide |
+| UI-290 | P2 | about | verified | The datasheet's barcode has 20px of empty track baked into its own box, so the card's footer row does not end on the card's right padding edge. The <svg> is viewBox='0 0 64 24' drawn at h-6 w-16 (exactly 1:1, 64x24 CSS p… | barcode viewBox 44x24 |
+| UI-291 | P2 | skills | verified | The outlined marquee words use a fixed 2px -webkit-text-stroke while the type scales from 32px to 72px, so the optical weight of the outline more than doubles between phone and desktop. Measured: font-size 32px at 375 ->… | stroke 0.028em |
+| UI-292 | P2 | hero | verified | When the hero eyebrow wraps to two lines the copper dash sits between them instead of introducing the first line. The <p> is `flex items-center`, so the 1px dash is centred on the whole two-line block. Measured at 375 EN… | dash aligns with the first line (items-start + mt-[0.8em]) |
+| UI-309 | P2 | hero | verified | At 1280x620 the hero name breaks apart: "GREGORY" is parked in the top-left and "SUTJIAN" is flung to the far right edge with ~450px of empty black between them and a vertical offset, so it reads as two unrelated words r… | name capped to 5.8em under 760px tall; shots/hero/p4-fix/1280x620-en-name.png |
+| UI-310 | P2 | hero | verified | In phone landscape the hero drops the tagline entirely - "I like building things, from AI agents to full websites..." / "J'aime construire des choses..." is absent, so the first screen is just a name and two buttons with… | tagline as one clamped line from 360px tall; shots/hero/p4-fix/844x390-fr-name.png |
+| UI-311 | P2 | statement | verified | Section headings leave one-word widows on phones: "Three things I / keep coming back / to." ends with "to." alone on its own line; "What I've done so / far." leaves "far." alone; the FR contact heading breaks as "Constru… | vcold widows: last lines are multi-word in FR at 390 |
+| UI-312 | P2 | footer | wontfix | The giant outlined "SUTJIAN" wordmark at the bottom of the footer is sliced off by the end of the document on every viewport - roughly the bottom third of the letters is missing at 1440 and about half at 375/768 - so the… | the cropped wordmark is a deliberate bleed (UI-119/120) |
+| UI-313 | P2 | projects | verified | Keyboard focus and the expanded accordion are visually sloppy. Focusing a project slide tab ("01 · LEADS") draws an orange rectangle whose top edge cuts into the bottom of the app screenshot and whose bottom edge sits on… | slide steps draw their ring on the button box (outline-offset 0), not over the screenshot |
+| UI-323 | P2 | global | verified | In landscape the entire page renders in the narrow mobile single column, pinned to the left, so roughly 45-55% of every screen is dead black. about/844l/en-motion-01: the datasheet card occupies x=36-392 and x=392-844 is… | vcold2 aboutLandscape: card 34-354, heading at x=394; shots/about/p5-fix/844l-two-column.png |
+| UI-324 | P2 | skills | wontfix | The toolkit grid is two columns wide with three groups, so AI wraps onto a second row under LANGUAGES and leaves a ~360x210px empty rectangle in the bottom-right of the block where FOUNDATIONS' second row would be. On to… | two columns at 768 keeps the chips readable; three would crowd them (UI-108) |
+| UI-325 | P2 | contact | verified | The COPY button next to the email is 33px tall while DOWNLOAD CV, LINKEDIN and GITHUB directly beneath it are all 54px tall - measured on footer/1440 (COPY border rows 230-262 vs LINKEDIN 306-359) and identical 33px at 3… | vcold2 contact: Copy 44px tall |
+| UI-326 | P2 | contact | verified | The outlined buttons (LINKEDIN, GITHUB, COPY, DOWNLOAD CV in its hero variant) have a border of rgb(47,50,55) on a rgb(17,17,19) card - a contrast ratio of about 1.45:1, well under the 3:1 minimum for a UI component boun… | vcold2: .btn border rgba(237,235,230,0.28) ≈ 3:1 on the page |
+| UI-327 | P2 | nav | wontfix | The mobile menu opens on a mostly empty screen. At 375x667 the first item's marker is at y=345 - the top 52% of the overlay is pure black. At 390x844 it is worse: first marker at y=522, so 62% of the screen is empty befo… | the menu is anchored low on purpose, within thumb reach |
+| UI-328 | P2 | global | wontfix | The 404 page does not look like the same product. There is no header bar, no nav, no EN/FR switch - just a bare logo lockup floating at y=249 after 230px of empty black. Everything is jammed into the left third: the wide… | the 404 is deliberately quiet: mark, message and both languages, no page chrome |
+| UI-329 | P2 | projects | wontfix | The app screenshots inside the project window frames are cropped through the middle of their own content instead of at a clean edge. In the Clarte Math window at 1440 an orange CTA button at the bottom-left of the embedd… | the tall captures are scrolled through in the window; a fixed crop would hide the rest |
+| UI-330 | P2 | projects | wontfix | The WhatsApp AI Agent mock is mostly empty. At 1440 the conversation panel has ~190px of blank dark space between the 'Demo business - Assistant' header and the first bubble, and the AGENT.LOG column beside it has conten… | a chat thread sits at the bottom of its panel; the demo now rests on the full conversation |
+| UI-331 | P2 | about | verified | In the About spec list the label column is too narrow for its longest label: 'LOOKING FOR' breaks across two lines as 'LOOKING' / 'FOR' while every other label (BASED IN, SCHOOL, NEXT UP) sits on one. Worse, the em-dash … | vcold2 factLabels: every label one line (15px) at 375 |
+| UI-332 | P2 | contact | wontfix | The email address is styled as two different components depending on viewport. At 375/390/768 'gregory.sutjian@mail.mcgill.ca' carries a link underline; at 1440/1920 the identical element in the identical settled state h… | on touch there is no hover to reveal the underline, so it shows at rest (UI-035) |
+| UI-333 | P2 | global | wontfix | The first-visit intro passes through a frame that looks like a rendering failure. At boot-900ms the word GREGORY is sliced by a hard horizontal edge at y~480 - only the top halves of the letters are drawn, with the botto… | a mid-flight frame of the intro: the letters rise behind their mask |
+| UI-334 | P2 | nav | verified | The keyboard focus ring on the language switcher is a hard-cornered rectangle drawn around BOTH 'EN' and 'FR' (tab07), so a keyboard user cannot tell which of the two is focused. Every other focus ring on the site is a r… | the switch is one link (both codes); its ring is now a pill like the others |
 | UI-008 | P3 | hero | verified | Hero eyebrow wraps to a lone 'UNIVERSITY' on the second line at 375px (orphan). | shots/hero/p1-fix/375/fr-reduced-atf.png |
 | UI-022 | P3 | contact | verified | The Copy pill changes shape on keyboard focus. The global `:focus-visible { border-radius: 2px }` is unlayered CSS, so it beats Tailwind v4's `rounded-full`, which lives in @layer utilities. The measured computed radius … | verify-bottom copy radius stays pill on focus |
 | UI-023 | P3 | footer | verified | The '↑' in 'Back to top ↑' / 'Haut de page ↑' is part of the button's accessible name (ariaSnapshot: `button "Back to top ↑"`), so screen readers say 'Back to top, upwards arrow'. This is inconsistent with Contact and He… | `{t(footer.backToTop, locale)} <span aria-hidden="true">↑</span>` |
@@ -346,7 +399,7 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-162 | P3 | projects | verified | On phones the Clarté website slide stays up for about 25 s (measured animationDuration 25433 ms at 390). The 300 px/s speed is applied to the much taller phone capture (clarte-web-en-m.webp), so a visitor scrolling at a … | glide capped at 12s and scaled to frame height |
 | UI-163 | P3 | projects | verified | The chat demo shows an empty chat window at the start and at every loop. When the card first comes fully into view, the chat column is blank (header only) for about 1.5 s before the first bubble: measured frames 4068-509… | first bubble shows immediately |
 | UI-164 | P3 | focus | verified | The Focus counter runs ahead of the panels. It divides progress into thirds, but the track only travels two panel-widths, since panel 1 starts in view and panel 3 ends in view. Jumping to 70% progress shows '03 / 03' whi… | counter rounds progress*(n-1) |
-| UI-165 | P3 | focus | open | Compact mode doesn't guarantee a fit. After Focus switches to focus-compact, it never checks again. In FR at 768x900, panel 3's keyword line ('ALGÈBRE · CALCUL · RÉSOLUTION DE PROBLÈMES', which wraps to 3 lines) ends 1px… | compact mode re-check: pass 2 |
+| UI-165 | P3 | focus | verified | Compact mode doesn't guarantee a fit. After Focus switches to focus-compact, it never checks again. In FR at 768x900, panel 3's keyword line ('ALGÈBRE · CALCUL · RÉSOLUTION DE PROBLÈMES', which wraps to 3 lines) ends 1px… | vzoom text-zoom 200% EN+FR: focus-compact + focus-tight, panel body overflow-y auto; shots/focus/p4-fix/1440-textzoom-fr.png |
 | UI-166 | P3 | about | verified | The datasheet portrait has no loading or error state. While /_next/image?url=/images/gregory.webp is loading, the 5:4 photo area is an empty grid (img complete=false, transparent background), so the card reads as a datas… | chip drawing behind the portrait |
 | UI-167 | P3 | about | verified | The datasheet glare doesn't reset when the pointer leaves. Steps: move the pointer to the card's top-right corner, then off the card. Observed: the tilt eases back to 0, but --gx/--gy stay at 99%/2%, so the copper glare … | glare eases back on leave |
 | UI-168 | P3 | projects | wontfix | A latent bug in the media type:'scroll' path that no current project uses. The touch auto-scroll timeline evaluates y: () => -distance() and duration once, the first time it plays. The <img> is loading='lazy', so offsetH… | unused media type path |
@@ -413,4 +466,32 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-273 | P3 | global | wontfix | Hover feedback is a different length and a different kind on almost every control type, and keyboard focus only reproduces the hover state on one of them. Measured from the shipped CSS/classes: pill buttons 0.5s expo col… | P3 hover-timing tokens: a design-system pass, not a defect |
 | UI-274 | P3 | skills | wontfix | Pause-to-read is a mouse-only privilege, and which loops accept it differs per section. The marquee band eases to a stop only for `pointerType === 'mouse'`, the WhatsApp chat demo holds only for mouse hover, and the proj… | a touch hold would leave the band paused with no way to resume (no pointerleave on touch) |
 | UI-275 | P3 | about | verified | The About fact rows still use the 'this row is a link' hover that was deliberately removed from the Experience rows (UI-132, fixed in f0e2b0f): hovering a row widens the copper dash from 12px to 24px and slides the value… | About facts no longer slide on hover |
-| UI-276 | P3 | projects | fixed | React console warning on every page with slides: the glide mixed the `animation` shorthand with `animationPlayState` in the same style object ('Updating animation animationPlayState'). Introduced by the pausable-glide fi… | vwarn: no console errors over a full scroll + hover; vglide2: glide moves (-167→-771), holds on hover (-803→-803), resumes (-1498) |
+| UI-276 | P3 | projects | verified | React console warning on every page with slides: the glide mixed the `animation` shorthand with `animationPlayState` in the same style object ('Updating animation animationPlayState'). Introduced by the pausable-glide fi… | vwarn: no console errors over a full scroll + hover; vglide2: glide moves (-167→-771), holds on hover (-803→-803), resumes (-1498) |
+| UI-279 | P3 | global | verified | One event, four different speeds. When the copper spark reaches an anchor, everything that is supposed to 'power on' from that single moment runs on a different clock: .trace-pad 0.5 s, .section-index box-shadow 0.9 s, .… | --dur-power 0.9s for every property that answers the spark |
+| UI-280 | P3 | global | verified | Scroll reveals are on a fixed 1.2-1.4 s clock with only 12% of a viewport of runway, so at a brisk scroll they finish long after the element has arrived — and on `stagger` groups the last child lands after the group has … | reveals 0.9s (lines 1s, clip 1.1s) |
+| UI-281 | P3 | global | verified | The grain layer keeps a permanently promoted compositor layer where its animation is switched off. .grain declares `will-change: transform` unconditionally, but the `grain` keyframes are cancelled under both `prefers-red… | grain promoted only where it animates |
+| UI-282 | P3 | nav | verified | Opening the mobile menu puts the focus ring on an item that is still moving, and closing has no counterpart to the staged open. Measured at 390 by sampling the panel's opacity and each .menu-item's translateY every frame… | menu stagger 0.5s total |
+| UI-288 | P3 | global | verified | Flow 3 (keyboard-only), the Shift+Tab return trip: the focus ring goes missing for about half a second every time focus moves up a long distance, while the same move downward is instant. Measured from the Lead Finder sli… | focusin takes an off-screen focus target into view |
+| UI-289 | P3 | projects | wontfix | Flow 2 (phone), step 'rotating to landscape mid-way': turning the phone sideways makes the project screenshots smaller and less readable, not bigger, and leaves almost half the screen empty. In portrait 390x844 the frame… | landscape phones now get the laptop capture (UI-256); choosing by frame width needs JS art direction |
+| UI-293 | P3 | global | wontfix | The lit copper rail — the page's signature 1px line — never renders crisp, because a 1.5px stroke is centred on an integer x. railX() returns Math.round(gutter/2) = 28 at 1440, and CircuitTrace draws the core path at str… | P3: moving the rail off the integer grid risks blurring the pads that sit on it |
+| UI-294 | P3 | global | verified | The page has two vertical copper hairlines and they do not mirror each other. The copper trace rail runs at x=28 (gutter/2 = 56/2) from the left, while the scroll-progress meter is `fixed right-4`, i.e. its 1px column si… | meter moved to the mirrored gutter rail |
+| UI-295 | P3 | global | wontfix | One mono label size, five leadings. .label-mono is defined at 0.72rem / line-height 1.3, but four places override it at the same 11.52px: hero eyebrow leading-[1.6] (18.432px), Focus keywords leading-[1.7] (19.584px), Sh… | design-system decision (label leading ramp) |
+| UI-296 | P3 | global | wontfix | The uppercase mono tracking does not step monotonically with size — it zig-zags, so smaller labels are sometimes set tighter than larger ones. Measured computed values on the page: 9.60px/1.344px = 0.14em; 9.92px/1.389px… | design-system decision (mono tracking ramp) |
+| UI-297 | P3 | focus | verified | The display tracking ramp inverts in the middle. Measured computed letter-spacing against size: 48px h2 -0.025em, 48.96px project h3 -0.035em, 72px Focus panel h3 -0.045em (-3.24px), 76.5px statement -0.035em, 86.4px sec… | Focus panel h3 -0.04em, on the section ramp |
+| UI-298 | P3 | contact | verified | The full stop that ends an accented sentence is left outside the accent, so it renders in a different face, weight and colour from the word it closes. In 'Let's build *something*.' the word is Instrument Serif italic in … | Rich pulls trailing punctuation into the accent |
+| UI-299 | P3 | projects | wontfix | The 16:9 project stills are pillarboxed inside their own frame, so a dark hairline gutter runs down each side of the screenshot instead of the capture meeting the frame border. Measured at 1440: lf-overview.webp is 2048x… | capture aspect ratios differ per project; a per-slide frame ratio is asset work |
+| UI-300 | P3 | global | verified | The copper dash that introduces a label comes in three different treatments. SectionHeader uses `section-index h-px w-8 bg-copper` — 32px wide, and when powered it gets a copper glow (box-shadow 0 0 10px 1px rgb(232 130 … | hero and menu dashes use section-index at 32px |
+| UI-301 | P3 | global | verified | Tracked uppercase leaves a trailing letter-space after the last glyph, so right-aligned and centred mono labels sit ~1.3-1.6px inside the edge they are meant to touch, while left-aligned ones are flush. .label-mono's 0.1… | trailing letter-space trimmed on the right-aligned footer button |
+| UI-302 | P3 | skills | verified | The chip's label and its pin strips do not share a midline. The .chip box is 46.78px tall (0.8rem padding x2 + 19.2px line-height + 2px border); the text's cap band leaves 19.81px above the cap top and 17.88px below the … | chip padding-bottom 0.86rem |
+| UI-303 | P3 | skills | verified | Fixing UI-106 left the two word styles in the same marquee line set at different tracking, so the band's letter rhythm changes word to word. Measured at 1440: solid words letter-spacing -2.88px on 72px = -0.04em; outline… | marquee row -0.02em, outline -0.015em |
+| UI-314 | P3 | skills | wontfix | The toolkit grid wraps badly and wastes space: at 1440 "Mathematics" and "Gemini" each sit alone on a second row while the three columns end at 1384px and the rest of the row is empty; at 375 "Bash" drops alone under Pyt… | chip wrapping follows the copy; pins sit in the gutter by design (UI-044) |
+| UI-315 | P3 | statement | wontfix | The scroll-linked word-by-word reveal leaves most of the sentence at roughly 2.5:1 contrast (mid-grey on near-black) whenever the reader stops scrolling mid-section - in en-motion-00 more than half of "I chase that feeli… | dim words are a transient scroll-linked state, raised to 0.2 and fully lit before the pin ends (UI-069) |
+| UI-316 | P3 | global | wontfix | The custom cursor sits on top of labels instead of beside them: on the skills chip hover its dot lands inside the word "Python" ("Pyt·hon"), and on the contact copied state its ring encircles the "COPIE" pill, producing … | the custom cursor is the site's pointer treatment; it hides entirely with reduced motion or contrast settings |
+| UI-317 | P3 | projects | wontfix | On the French page the embedded product screenshots are still fully English - the Lead Finder dashboard shows "Hair and beauty businesses in Montreal", "Next up", "Your leads (12)", "80/100 · High" - right under French c… | OWNER ACTION: the Lead Finder captures are English-only; a French capture of the app is content work |
+| UI-318 | P3 | about | wontfix | French spec-sheet copy reads awkwardly: "JE CHERCHE - Des stages et des stages coop" repeats the word "stages" twice in five words (EN reads cleanly: "Internships and co-op roles"), and on 375 the label "JE CHERCHE" wrap… | OWNER ACTION: French copy wording ("Des stages et des stages coop") — copy meaning is out of scope for this loop |
+| UI-319 | P3 | experience | verified | In motion mode rows of the timeline stay dimmed after they are fully in view - in en-motion-01 "College Mariste Champville" and its description are rendered in mid-grey while the McGill row above them is white, so the la… | vcold lastRow: last three rows is-powered with paper text |
+| UI-335 | P3 | statement | wontfix | At 1920 the whole sentence fits on one screen, so the scroll-linked word reveal shows the reader a paragraph where the last four lines sit at roughly rgb(58,58,58) on rgb(19,19,19) - about 1.5:1 - and the accented italic… | transient scroll-linked dim state (UI-069) |
+| UI-336 | P3 | hero | verified | The hero eyebrow wraps badly on phones: 'COMPUTER ENGINEERING' takes line 1 and line 2 begins with the em dash - '- MCGILL UNIVERSITY'. A line starting with a dangling dash looks like a bullet that lost its list. The eye… | vcold2 eyebrow: lines 253/196 px, line 2 starts with MCGILL |
+| UI-337 | P3 | footer | wontfix | In the footer meta row the three static items (c 2026 GREGORY SUTJIAN / MADE IN MONTREAL / LOCAL TIME 19:37) sit on rows 681-688 while BACK TO TOP sits on 682-690 - about 2px lower and 1px larger, so the only interactive… | P3 baseline nit |
+| UI-338 | P3 | experience | verified | Each experience row uses a date column roughly 340px wide to hold ~120px of text ('JUL - SEP 2026' ends at x=175, the job title does not start until x=396), so every row carries a 220px empty gutter between the date and … | date column 2/12, text 6/12 at lg |
+| UI-339 | P3 | global | verified | The custom cursor is a ~64px orange ring with no pointer tip, and it is drawn over the element it is pointing at rather than around it. On the hero CTA the ring's stroke cuts straight through the button label ('VIEW PROJ… | hover ring 1.9 → 1.55 |
