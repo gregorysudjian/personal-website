@@ -46,12 +46,16 @@ export default function Nav({ locale }: { locale: Locale }) {
         gsap.to(el, { yPercent: visible ? 0 : -110, duration: reduce ? 0 : 0.6, ease: "power3.out", overwrite: "auto" });
       };
 
+      // Away from the top the header gets a solid backdrop, so page text doesn't run through it.
+      // (also on refresh: a re-measure can otherwise leave the class stale after the page height changes)
+      const backdrop = (self: { scroll: () => number }) => el.classList.toggle("is-scrolled", self.scroll() > 120);
+
       ScrollTrigger.create({
         start: 0,
         end: "max",
+        onRefresh: backdrop,
         onUpdate: (self) => {
-          // Away from the top the header gets a solid backdrop, so page text doesn't run through it.
-          el.classList.toggle("is-scrolled", self.scroll() > 120);
+          backdrop(self);
           // stays in view while a nav link's own scroll runs, so the next section is one click away
           if (openRef.current || el.querySelector(":focus-visible") || isAutoScrolling()) return;
           if (self.scroll() < 120) show(true);

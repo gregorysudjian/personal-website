@@ -208,7 +208,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
                 setStopped(true);
               }}
               aria-pressed={i === active}
-              className="group relative pb-1.5 pt-3 text-left before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-['']"
+              className="group relative pb-1.5 pt-3 text-left before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] focus-visible:outline-offset-0"
             >
               {/* only the current step is copper; steps already shown stay as a faint trail */}
               <span className="relative block h-[2px] overflow-hidden bg-paper/15">
