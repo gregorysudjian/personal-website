@@ -36,7 +36,7 @@ export default function Reveals() {
                   gsap.set(el, { opacity: 1 });
                   return gsap.from(self.lines, {
                     yPercent: 110,
-                    duration: 1.4,
+                    duration: 1,
                     stagger: 0.09,
                     delay,
                     scrollTrigger,
@@ -49,17 +49,17 @@ export default function Reveals() {
             break;
           case "stagger":
             gsap.set(el, { opacity: 1 });
-            gsap.from(el.children, { opacity: 0, y: 32, duration: 1.2, stagger: 0.08, delay, scrollTrigger });
+            gsap.from(el.children, { opacity: 0, y: 32, duration: 0.9, stagger: 0.06, delay, scrollTrigger });
             break;
           case "clip":
             gsap.fromTo(
               el,
               { opacity: 1, clipPath: "inset(0% 0% 100% 0%)" },
-              { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "expo.inOut", delay, scrollTrigger },
+              { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "expo.inOut", delay, scrollTrigger },
             );
             break;
           default:
-            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.3, delay, scrollTrigger });
+            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9, delay, scrollTrigger });
         }
       });
 

@@ -29,6 +29,8 @@
 :root {
   color-scheme: dark;
   --gutter: clamp(1.5rem, 4vw, 3.5rem);
+  /* everything that lights up when the copper spark arrives shares this clock */
+  --dur-power: 0.9s;
 }
 
 /* ------------------------------------------------------------------- base */
@@ -198,9 +200,14 @@ html.booted .boot {
   z-index: 80;
   pointer-events: none;
   opacity: 0.06;
+  /* promoted only where it actually animates (see the media query below) */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain 0.9s steps(5) infinite;
-  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .grain {
+    will-change: transform;
+  }
 }
 
 @keyframes grain {
@@ -262,9 +269,9 @@ html.booted .boot {
   border: 1px solid var(--color-trace);
   background: var(--color-ink);
   transition:
-    background-color 0.5s var(--ease-out-expo),
-    border-color 0.5s var(--ease-out-expo),
-    box-shadow 0.5s var(--ease-out-expo);
+    background-color var(--dur-power) var(--ease-out-expo),
+    border-color var(--dur-power) var(--ease-out-expo),
+    box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .trace-pad.is-on {
   background: var(--color-copper);
@@ -508,7 +515,7 @@ header.is-scrolled .header-solid {
 
 .section-index {
   flex-shrink: 0;
-  transition: box-shadow 0.9s var(--ease-out-expo);
+  transition: box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .section-label.is-powered .section-index {
   box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
@@ -676,12 +683,10 @@ header.is-scrolled .header-solid {
 }
 .xp-org {
   color: var(--color-mute);
-  transition:
-    color 0.9s var(--ease-out-expo),
-    transform 0.6s var(--ease-out-expo);
+  transition: color var(--dur-power) var(--ease-out-expo);
 }
 .xp-dates {
-  transition: color 0.9s var(--ease-out-expo);
+  transition: color var(--dur-power) var(--ease-out-expo);
 }
 .xp-row.is-powered .xp-org {
   color: var(--color-paper);
@@ -696,7 +701,7 @@ header.is-scrolled .header-solid {
    stroke, so the overlapping shapes inside letters like H don't show through. */
 .marquee-outline {
   color: var(--color-ink);
-  -webkit-text-stroke: 2px var(--color-mute);
+  -webkit-text-stroke: 0.028em var(--color-mute); /* scales with the type, unlike a fixed 2px */
   paint-order: stroke fill;
   letter-spacing: -0.01em; /* a hairline between outlined letters so they don't fuse */
 }
@@ -750,8 +755,8 @@ header.is-scrolled .header-solid {
 
 .chip-box {
   transition:
-    border-color 1.2s var(--ease-out-expo),
-    box-shadow 1.4s var(--ease-out-expo);
+    border-color var(--dur-power) var(--ease-out-expo),
+    box-shadow var(--dur-power) var(--ease-out-expo);
 }
 .chip-corner {
   position: absolute;
@@ -759,7 +764,7 @@ header.is-scrolled .header-solid {
   height: 14px;
   margin: -1px;
   border-color: var(--color-mute);
-  transition: border-color 1s var(--ease-out-expo);
+  transition: border-color var(--dur-power) var(--ease-out-expo);
 }
 .contact.is-powered .chip-box {
   border-color: rgb(232 130 58 / 0.55);
@@ -774,7 +779,7 @@ header.is-scrolled .header-solid {
   box-shadow: 0 0 10px 1px rgb(232 130 58 / 0.8);
 }
 .contact .accent {
-  transition: text-shadow 1.4s var(--ease-out-expo);
+  transition: text-shadow var(--dur-power) var(--ease-out-expo);
 }
 .contact.is-powered .accent {
   text-shadow: 0 0 34px rgb(232 130 58 / 0.55);

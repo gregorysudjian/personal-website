@@ -102,7 +102,8 @@ export default function Nav({ locale }: { locale: Locale }) {
       gsap.fromTo(
         el.querySelectorAll(".menu-item"),
         { yPercent: 100 },
-        { yPercent: 0, duration: reduce ? 0 : 0.9, stagger: 0.06, ease: "expo.out" },
+        // settled by the time focus lands on the first link
+        { yPercent: 0, duration: reduce ? 0 : 0.5, stagger: 0.045, ease: "expo.out" },
       );
       el.querySelector<HTMLElement>("a")?.focus();
 
@@ -140,8 +141,8 @@ export default function Nav({ locale }: { locale: Locale }) {
     e.preventDefault();
     const wasOpen = openRef.current;
     setOpen(false);
-    if (wasOpen) requestAnimationFrame(() => scrollToTarget(`#${id}`));
-    else scrollToTarget(`#${id}`);
+    if (wasOpen) requestAnimationFrame(() => scrollToTarget(`#${id}`, true));
+    else scrollToTarget(`#${id}`, true);
   };
 
   return (
@@ -232,7 +233,7 @@ export default function Nav({ locale }: { locale: Locale }) {
             <li key={item.id} className="border-b border-line pb-3">
               {/* the mask for the rise-in sits inside the link, so the focus ring isn't clipped */}
               <a href={`#${item.id}`} onClick={go(item.id)} className="flex min-h-11 items-center gap-4 text-paper">
-                <span className="h-px w-6 shrink-0 bg-copper" aria-hidden="true" />
+                <span className="section-index h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
                 <span className="overflow-hidden pb-1">
                   <span className="menu-item block text-5xl font-medium tracking-tight short:text-3xl">
                     {t(item.label, locale)}

@@ -190,11 +190,14 @@ export default function Hero({ locale }: { locale: Locale }) {
           </div>
         </div>
 
-        {/* Layer 2 — circuit traces */}
-        <div ref={circuit} className="hero-circuit-scroll pointer-events-none absolute inset-0">
-          <div className="hero-circuit-mouse absolute inset-[-3%]">
-            <div data-intro className="hero-circuit-mask absolute inset-0 opacity-75">
-              <HeroCircuit />
+        {/* Layer 2 — circuit traces. The vignette mask sits on the still wrapper, not on the layer the scroll
+            scales: a mask on a scaling element is re-rasterized every frame. */}
+        <div className="hero-circuit-mask pointer-events-none absolute inset-0">
+          <div ref={circuit} className="hero-circuit-scroll absolute inset-0">
+            <div className="hero-circuit-mouse absolute inset-[-3%]">
+              <div data-intro className="absolute inset-0 opacity-75">
+                <HeroCircuit />
+              </div>
             </div>
           </div>
         </div>
@@ -205,8 +208,8 @@ export default function Hero({ locale }: { locale: Locale }) {
           <div className="hero-name-mouse gutter w-full">
             {/* wrapper fades on scroll; inner line is revealed by the intro (never both on one element) */}
             <div className="hero-eyebrow mb-6 md:mb-9 short:mb-3!">
-              <p data-intro className="hero-hud label-mono flex items-center gap-3 leading-[1.6] text-mute">
-                <span className="h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
+              <p data-intro className="hero-hud label-mono flex items-start gap-3 leading-[1.6] text-mute">
+                <span className="section-index mt-[0.8em] h-px w-8 shrink-0 bg-copper" aria-hidden="true" />
                 <span className="text-balance">{t(hero.eyebrow, locale)}</span>
               </p>
             </div>

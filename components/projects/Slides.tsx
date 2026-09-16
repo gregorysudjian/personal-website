@@ -143,6 +143,7 @@ export default function Slides({ slides, name, locale }: { slides: Slide[]; name
           return (
             <div
               key={i}
+              style={on && auto ? { transitionDuration: `0.8s, ${duration}ms` } : undefined}
               className={`slide absolute inset-0 ${manual && on ? "overflow-y-auto overscroll-contain focus-visible:outline-offset-[-3px]" : "overflow-hidden"} ${on ? "is-active" : ""} ${loaded[i] ? "bg-white" : ""}`}
               aria-hidden={!on}
               inert={!on}
