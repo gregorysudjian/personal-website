@@ -226,7 +226,7 @@ export default function Hero({ locale }: { locale: Locale }) {
               id="hero-title"
               data-intro
               aria-label={person.name}
-              className="hero-name relative font-semibold uppercase leading-[0.8] [@media(max-height:760px)]:max-w-[5.8em] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_15.5rem)*1.25)),17.5rem)] short:text-[clamp(3rem,min(16.4vw,21svh),17.5rem)]! [@media(max-height:340px)]:text-[clamp(2.6rem,16svh,17.5rem)]!"
+              className="hero-name relative font-semibold uppercase leading-[0.8] [@media(max-height:760px)]:max-w-[5.8em] tracking-[-0.045em] text-paper [font-kerning:none] text-[clamp(3.4rem,min(18vw,15svh),17.5rem)] md:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_15.5rem)*1.25)),17.5rem)] [@media(min-width:768px)_and_(min-height:501px)_and_(max-height:700px)]:text-[clamp(3.4rem,min(16.4vw,calc((50svh_-_14rem)*1.25)),17.5rem)]! short:text-[clamp(2.8rem,min(16.4vw,18.5svh),17.5rem)]! [@media(max-height:340px)]:text-[clamp(2.6rem,16svh,17.5rem)]!"
             >
               <span aria-hidden="true" className="hero-name-line block pb-[0.03em]">
                 {person.firstName}
@@ -246,10 +246,10 @@ export default function Hero({ locale }: { locale: Locale }) {
             <div data-intro className="hero-hud pointer-events-auto">
               {/* on short screens (a 200%-zoomed laptop, a big phone held sideways) it stays, just smaller: it's
                   the hero's only sentence; only under 420px tall is there no room for it next to the name */}
-              <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg short:max-w-[46ch] short:text-sm! short:leading-snug! [@media(max-height:419px)]:line-clamp-1 [@media(max-height:360px)]:hidden">
+              <p className="max-w-[36ch] text-base leading-relaxed text-paper/80 md:text-lg short:max-w-[46ch] short:text-sm! short:leading-snug! [@media(max-height:700px)]:text-sm! [@media(max-height:419px)]:line-clamp-2 [@media(max-height:360px)]:hidden">
                 {t(hero.tagline, locale)}
               </p>
-              <div className="mt-5 flex flex-wrap gap-3 short:mt-3! [@media(max-height:419px)]:mt-0!">
+              <div className="mt-5 flex flex-wrap gap-3 [@media(max-height:700px)]:mt-3! [@media(max-height:419px)]:mt-2!">
                 <a href="#projects" onClick={toProjects} className="btn btn-primary btn-sm">
                   {t(hero.ctaProjects, locale)} <span aria-hidden="true">↓</span>
                 </a>

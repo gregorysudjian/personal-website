@@ -13,11 +13,15 @@ const COPY = {
  *  switches it to French first once it's in the browser. */
 export default function NotFoundBody() {
   const [lang, setLang] = useState<"en" | "fr">("en");
+  // An address like /fr/… or /en/… names its language; anything else (say /de) speaks both.
+  const [known, setKnown] = useState(false);
   useEffect(() => {
-    if (/^\/fr(\/|$)/.test(location.pathname)) {
+    const fr = /^\/fr(\/|$)/.test(location.pathname);
+    if (fr) {
       setLang("fr");
       document.documentElement.lang = "fr-CA";
     }
+    setKnown(fr || /^\/en(\/|$)/.test(location.pathname));
   }, []);
   const other = lang === "en" ? "fr" : "en";
 
@@ -33,9 +37,11 @@ export default function NotFoundBody() {
       </p>
       <h1 className="mt-6 text-[clamp(2.6rem,7vw,6rem)] font-medium leading-[1.02] tracking-[-0.04em] text-paper">
         {COPY[lang].title}
-        <span lang={other} className="block text-mute">
-          {COPY[other].title}
-        </span>
+        {!known && (
+          <span lang={other} className="block text-mute">
+            {COPY[other].title}
+          </span>
+        )}
       </h1>
       <div className="mt-12 flex flex-wrap gap-3">
         <a href={`/${lang}`} hrefLang={lang} className="btn btn-primary">

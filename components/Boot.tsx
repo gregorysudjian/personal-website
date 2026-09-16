@@ -57,8 +57,8 @@ export default function Boot() {
 
       tl.to(mark, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.1)
         .to(".boot-bar", { scaleX: 1, duration: 1.1, ease: "power3.inOut" }, 0.2)
-        .to(".boot-mark", { autoAlpha: 0, y: -8, duration: 0.35, ease: "power2.in" }, "+=0.1")
-        .addLabel("split")
+        .addLabel("split", "+=0.45")
+        .to(mark, { autoAlpha: 0, y: -8, duration: 0.35, ease: "power2.in" }, "split")
         .add(() => markIntroReady(), "split+=0.3")
         .to(".boot-half--top", { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "split")
         .to(".boot-half--bottom", { yPercent: 100, duration: 1.1, ease: "expo.inOut" }, "split")

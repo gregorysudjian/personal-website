@@ -555,6 +555,8 @@ header.is-scrolled .header-solid {
     height: 100svh;
     /* clip, not hidden: find-in-page or a screen reader can't scroll the pinned frame sideways */
     overflow: clip;
+    /* the card entering at the edge fades instead of being cut mid-word */
+    mask-image: linear-gradient(to right, transparent, black 2.5rem, black calc(100% - 2.5rem), transparent);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -796,7 +798,7 @@ header.is-scrolled .header-solid {
 }
 
 .footer-mark {
-  margin-bottom: -2.4vw;
+  margin-bottom: -0.5vw;
   color: transparent;
   -webkit-text-stroke: 1px var(--color-trace);
   transition: -webkit-text-stroke-color 0.8s var(--ease-out-expo);
