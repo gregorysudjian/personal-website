@@ -140,7 +140,7 @@ function Barcode() {
   const bars = [2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3];
   let x = 0;
   return (
-    <svg viewBox="0 0 64 24" className="h-6 w-16 shrink-0" aria-hidden="true">
+    <svg viewBox="0 0 44 24" className="h-6 w-11 shrink-0" aria-hidden="true">
       {bars.map((w, i) => {
         const rect = i % 2 === 0 ? <rect key={i} x={x} y="0" width={w} height="24" fill="var(--color-mute)" /> : null;
         x += w + 1;
