@@ -10,3 +10,4 @@ elapsed | pass | sections done | issues found | fixed | verified | open
 2:42 | 3 | pass-2 agents merged (4 lenses); pass-3 re-capture clean (no errors/axe/overflow) | 276 | 213 | 212 | 5 (4 P2, 1 P3); 59 wontfix
 3:20 | 3 | micro-polish + motion + flows agents merged; cold review still running | 303 | 233 | 211 | 5 (4 P2, 1 P3); 65 wontfix
 4:08 | 6 | all sections; 2 cold reviews merged; final capture clean (no errors, no axe violations, no overflow) | 339 | 257 | 257 | 0 open; 82 wontfix
+5:00 | 7 | all sections; 3 cold reviews; final capture clean across 7 viewports x EN/FR x motion+reduced | 358 | 264 | 264 | 0 open; 94 wontfix (incl. 5 owner decisions)

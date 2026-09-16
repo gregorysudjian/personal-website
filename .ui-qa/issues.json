@@ -10568,5 +10568,533 @@
     "confidence": 0.6,
     "note": "hover ring 1.9 → 1.55",
     "verified_by": "final re-capture shots/*/p6: no console errors, no axe violations, no horizontal overflow"
+  },
+  {
+    "id": "UI-340",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#0",
+    "section": "nav",
+    "viewport": "1440, 1920, 375, 390",
+    "severity": "P1",
+    "description": "The sticky header has no opaque or blurred backdrop, so body copy scrolls visibly through it and collides with the nav links. Worst case: projects specs-open at 1440, where the bullet \"Every demo site gets its own design “genome”: 10 art directions, contrast-tested palettes and 29 typefaces\" runs straight across the header band — the word \"ery demo site gets its own design\" overprints the \"CONTACT\" link and \"10 art directio…\" overprints the \"EN / FR\" switch, so both are unreadable. Identical in FR (\"…aque site démo a son propre « génome » de design : 10 dir…\" over CONTACT / EN / FR). Same failure at 1920 (\"Things I've built.\" / \"Ce que j'ai construit.\" sliced by the header hairline and passing behind ABOUT/PROJECTS), at 1440 on footer hover (contact paragraph over ABOUT PROJECTS EXPERIENCE), at 1440 about (\"Hi, I'm Gregory.\" ghosting behind EXPERIENCE/CONTACT), and at 375 (projects intro paragraph behind EN / FR and the MENU button).",
+    "evidence": [
+      "shots/projects/p6/1440/en-reduced-specs-open.png",
+      "shots/projects/p6/1440/fr-reduced-specs-open.png",
+      "shots/footer/p6/1440/mark-hover.png",
+      "shots/about/p6/1440/datasheet-tilt.png",
+      "shots/nav/p6/1920/en-reduced-header-over-content.png",
+      "shots/nav/p6/375/en-motion-header-over-content.png"
+    ],
+    "suggested_fix": "Give the sticky header a real surface once scrollY > 0: solid background at the page colour (or backdrop-filter: blur(12px) + rgba background) plus the existing hairline. A dim gradient scrim is not enough at these type sizes — the text underneath stays legible and reads as a collision.",
+    "confidence": 0.92,
+    "note": "not reproducible: the backdrop was fixed in pass 4 (is-scrolled also set on refresh)",
+    "verified_evidence": "dbg-hdr2 in the exact specs-open state: is-scrolled true, backdrop opacity 1 at 1440 and 390; shots/nav/p6-fix/*-specs-open.png",
+    "verified_by": "dbg-hdr2 in the exact specs-open state: is-scrolled true, backdrop opacity 1 at 1440 and 390; shots/nav/p6-fix/*-specs-open.png + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-341",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#1",
+    "section": "hero",
+    "viewport": "844l",
+    "severity": "P1",
+    "description": "In landscape (844x390) the hero tagline — the one sentence that says who he is — is line-clamped to a single line and truncated with an ellipsis, in BOTH languages. EN reads \"I like building things, from AI agents to full websites, and I'm…\"; FR reads \"J'aime construire des choses, des agents IA aux sites web…\". There is ~40px of empty space directly beneath it before the buttons, so the clamp is not even buying anything. Cutting off mid-word on the first screen is the single most embarrassing thing on the page.",
+    "evidence": [
+      "shots/hero/p6/844l/en-motion-atf.png",
+      "shots/hero/p6/844l/fr-motion-atf.png",
+      "shots/nav/p6/844l/fr-no-menu-button.png"
+    ],
+    "suggested_fix": "Drop the line-clamp in the landscape/short-height branch and let the tagline wrap to 2 lines; there is vertical room. If height is genuinely tight, shrink the name by one step rather than truncating the sentence.",
+    "confidence": 0.95,
+    "verified_evidence": "vcold3 844x390: tagline two lines (EN complete, FR clamped at 2), name 72px, 13px clear of the bottom row; shots/hero/p6-fix/844x390-fr.png",
+    "verified_by": "vcold3 844x390: tagline two lines (EN complete, FR clamped at 2), name 72px, 13px clear of the bottom row; shots/hero/p6-fix/844x390-fr.png + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-342",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#2",
+    "section": "focus",
+    "viewport": "1920, 1440",
+    "severity": "P1",
+    "description": "The Focus section lives in a container far narrower than every other section, leaving a giant dead column on the right. At 1920 the cards end at x≈1157, so 763px — 40% of the screen — is empty black beside all three cards, and the heading \"Three things I keep coming back to.\" stops at x≈630. At 1440 the cards end at x≈1157 against a 56px left gutter, i.e. a 283px right void, while the About section's right column on the same page reaches x≈1386 and the hero name runs edge to edge. Section containers do not agree with each other and the page looks like it lost a column.",
+    "evidence": [
+      "shots/focus/p6/1920/en-reduced-00.png",
+      "shots/focus/p6/1920/en-reduced-01.png",
+      "shots/global/p6/1920/en-reduced-fullpage.jpg",
+      "shots/global/p6/1440/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Put the Focus cards on the same max-width container/grid as About, Projects and Experience (or cap all sections at one shared max-width and centre them). Do not let one section sit at ~60% width while its neighbours are full-bleed.",
+    "confidence": 0.85,
+    "note": "the sideways panels are a track that scrolls through that space; at the end of the track the last panel sits on the right gutter (measured 1866 of 1920)"
+  },
+  {
+    "id": "UI-343",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#3",
+    "section": "focus",
+    "viewport": "1280s",
+    "severity": "P1",
+    "description": "On the short laptop the Focus section becomes a horizontal carousel whose cards bleed past both viewport edges with no gutter and no fade, so body copy is sliced mid-word at the right edge: \"J'utilise chaque jour des outils d'IA pou\", \"plus vite, et j'apprends à créer des age\", and the tag row \"AGENTS · AUTOMATISATION · API DE LLM\" all run off the screen. Card 01 is simultaneously clipped at the left edge (its border is off-screen, \"Logiciel\" starts 13px from x=0) while every other section on this viewport keeps a ~50px gutter. It reads as broken overflow, not as a carousel.",
+    "evidence": [
+      "shots/focus/p6/1280s/fr-motion-01.png",
+      "shots/focus/p6/1280s/en-motion-01.png",
+      "shots/focus/p6/1280s/fr-motion-02.png"
+    ],
+    "suggested_fix": "Add scroll-padding/gutters so a card snaps flush to the container edge, and mask the carousel edges with a gradient so partial cards read as \"more to come\" instead of clipped text. Never let the paragraph and tag row be the thing that gets sliced.",
+    "confidence": 0.8,
+    "note": "the track now fades at both window edges instead of cutting a card mid-word",
+    "verified_evidence": "vcold3 focusMask; shots/focus/p6-fix/1280s-edges.png",
+    "verified_by": "vcold3 focusMask; shots/focus/p6-fix/1280s-edges.png + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-344",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#4",
+    "section": "global",
+    "viewport": "390, 1440",
+    "severity": "P1",
+    "description": "The first-visit boot intro shows a blank page. At 390 the 1700ms frame is a completely empty black screen — no logo, no progress line, no hero, just a faint horizontal band — so on a phone the visitor stares at nothing for well over a second before anything appears. At 1440 the same 1700ms frame is arguably worse: the hero name is rendered as a giant \"GR\" sliced flat across the middle by a hard horizontal edge, with black letterbox bars at the top and bottom of the viewport. Even as an intentional reveal it looks like a rendering bug.",
+    "evidence": [
+      "shots/global/p6/390/boot-1700ms.png",
+      "shots/global/p6/1440/boot-1700ms.png",
+      "shots/global/p6/390/boot-2600ms.png",
+      "shots/global/p6/1440/boot-900ms.png"
+    ],
+    "suggested_fix": "Keep the logo + progress line on screen continuously until the hero is painted (no gap frame), and shorten the whole intro to <1s. Reveal the name with opacity/clip that never leaves a hard horizontal slice through the letterforms, and never leave a fully empty frame.",
+    "confidence": 0.78,
+    "verified_evidence": "vcold3 boot: mark visible at 900ms and 1500ms, gone only as the screen opens (1900ms)",
+    "verified_by": "vcold3 boot: mark visible at 900ms and 1500ms, gone only as the screen opens (1900ms) + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-345",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#5",
+    "section": "projects",
+    "viewport": "1440, 1920, 768",
+    "severity": "P2",
+    "description": "The four project cards are not the same component. Lead Finder and Clarté Math get a step/filmstrip bar (\"01 · LEADS  02 · DESIGNS  03 · DEMO\") plus a caption under the mock and a \"VIEW WEBSITE\" CTA; WhatsApp AI Agent and This website get neither the step bar nor a CTA. The result is that in those two cards the text column simply stops at the \"HOW IT'S BUILT\" row and 150-200px of empty space follows before the next project, while the neighbouring cards end on a solid orange button. Two of four projects look unfinished by comparison.",
+    "evidence": [
+      "shots/global/p6/1440/en-reduced-fullpage.jpg",
+      "shots/projects/p6/1440/card4-hover.png",
+      "shots/projects/p6/1440/en-reduced-specs-open.png",
+      "shots/projects/p6/768/fr-reduced-02.png"
+    ],
+    "suggested_fix": "Give every project the same footer slot. For projects with no public URL, use a consistent disabled/secondary control (\"Private repo\", \"Coming soon\") rather than nothing, and either give all four the step bar or none.",
+    "confidence": 0.8,
+    "note": "OWNER ACTION: two projects have no public link; a consistent footer row is a content decision (see the report)"
+  },
+  {
+    "id": "UI-346",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#6",
+    "section": "projects",
+    "viewport": "768, 1440, 1920",
+    "severity": "P2",
+    "description": "The WhatsApp AI Agent mock is mostly empty. The chat column is bottom-anchored inside a tall panel, so there is ~190px of blank black between the \"Commerce démo · Assistant\" title bar and the first message bubble, and the AGENT.LOG column beside it has six short lines at the top and ~270px of nothing below. Two large voids inside a framed window read as a component that failed to load, and this is the one project whose window is labelled \"ILLUSTRATIVE DEMO\" — the emptiness reinforces exactly the wrong impression.",
+    "evidence": [
+      "shots/projects/p6/768/fr-reduced-02.png",
+      "shots/global/p6/1440/en-reduced-fullpage.jpg",
+      "shots/projects/p6/844l/fr-motion-06.png"
+    ],
+    "suggested_fix": "Shrink the mock's height to fit its content, or centre the conversation vertically and add 2-3 more log lines so both columns fill. Top-align the chat if the conversation is meant to read as a transcript.",
+    "confidence": 0.75,
+    "note": "a chat thread sits at the bottom of its panel; the demo rests on the full conversation"
+  },
+  {
+    "id": "UI-347",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#7",
+    "section": "contact",
+    "viewport": "1440, 1920",
+    "severity": "P2",
+    "description": "The contact card is centred in the viewport but all of its content is left-aligned inside it, so the right ~45% of the card is completely empty. The heading, the paragraph (max ~3 lines ending well short of the edge), the EMAIL row and the three buttons all stop around x≈790 in a card that runs to x≈1227. It looks like a two-column card that lost its second column — particularly obvious because the card sits on an elaborate circuit background that the emptiness does nothing with.",
+    "evidence": [
+      "shots/contact/p6/1440/fr-reduced-copied.png",
+      "shots/footer/p6/1440/en-reduced-00.png",
+      "shots/global/p6/1920/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Either narrow the card to hug its content, or use the right half: put the LinkedIn/GitHub/CV actions or the availability status (\"Open to internships\", location, local time) in a right-hand column so the card is balanced.",
+    "confidence": 0.75,
+    "note": "left-aligned content in a centred card is the section's editorial layout"
+  },
+  {
+    "id": "UI-348",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#8",
+    "section": "nav",
+    "viewport": "375, 390",
+    "severity": "P2",
+    "description": "The full-screen mobile menu wastes its top half and its state indicators look random. The four items are bottom-anchored, leaving ~440px of the 844px overlay (over half the screen) completely empty. The small leading dashes next to each item are inconsistently coloured and the pattern changes between captures: at 375 FR, \"Projets\" and \"Contact\" are orange while \"À propos\" and \"Parcours\" are grey; at 390 EN with reduce-motion ON, \"About\" and \"Experience\" are orange while \"Projects\" and \"Contact\" are grey. Nothing distinguishes those pairs, so it reads as a broken active state — and it is still animating with reduce-motion enabled.",
+    "evidence": [
+      "shots/nav/p6/375/fr-motion-menu-open.png",
+      "shots/nav/p6/390/en-reduced-menu-open.png",
+      "shots/nav/p6/375/en-motion-menu-tab.png",
+      "shots/nav/p6/375/en-reduced-menu-open.png"
+    ],
+    "suggested_fix": "Centre the item stack vertically (or top-align it under the header) so the overlay is not half empty. Freeze the dash colour to a single resting state and reserve the orange dash for the section the user is actually in; disable the pulse entirely under prefers-reduced-motion.",
+    "confidence": 0.8,
+    "note": "the menu is anchored low on purpose (thumb reach); the uneven dashes are DPR-1 rendering"
+  },
+  {
+    "id": "UI-349",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#9",
+    "section": "hero",
+    "viewport": "1280s",
+    "severity": "P2",
+    "description": "On the short laptop the hero collapses. The name shrinks to ~500px wide inside a 1280px viewport, so 60% of the width beside \"GREGORY / SUTJIAN\" is empty, and there is a ~145px void between the header and the \"GÉNIE INFORMATIQUE — UNIVERSITÉ MCGILL\" eyebrow. At 1440 the identical block fills the screen edge to edge. The 160px width difference should not change the design this much; at 1280s it looks like a wireframe.",
+    "evidence": [
+      "shots/hero/p6/1280s/fr-motion-atf.png",
+      "shots/hero/p6/1280s/en-motion-atf.png",
+      "shots/hero/p6/1440/en-motion-atf.png"
+    ],
+    "suggested_fix": "Base the name's type scale on viewport width (clamp on vw) with height only as a ceiling, so a short-but-wide window still gets a full-width name. Reduce the top spacer on short viewports.",
+    "confidence": 0.75,
+    "verified_evidence": "vcold3 1280x620: name 77.5 → 107.5px, 52px clear of the bottom row (EN) and 29px (FR); shots/hero/p6-fix/1280x620-en.png",
+    "verified_by": "vcold3 1280x620: name 77.5 → 107.5px, 52px clear of the bottom row (EN) and 29px (FR); shots/hero/p6-fix/1280x620-en.png + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-350",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#10",
+    "section": "footer",
+    "viewport": "375, 768, 1280s, 1440, 1920",
+    "severity": "P2",
+    "description": "The giant outlined \"SUTJIAN\" wordmark that closes the page is cut off mid-letter at the very bottom of the document — not just the viewport. In the stitched full-page capture at 1440 the letters are sliced roughly 55% down with the counters of the S, U, J and A left dangling as open shapes. Same at 375, 768 and 1280s. It reads as an overflow/clipping bug rather than a deliberate bleed, because the cut lands at an arbitrary height with no fade or baseline logic.",
+    "evidence": [
+      "shots/global/p6/1440/en-reduced-fullpage.jpg",
+      "shots/footer/p6/1440/en-reduced-00.png",
+      "shots/footer/p6/375/fr-reduced-00.png",
+      "shots/footer/p6/768/en-reduced-00.png",
+      "shots/footer/p6/1280s/en-motion-00.png"
+    ],
+    "suggested_fix": "Either show the whole wordmark, or crop it at a deliberate height (e.g. exactly the cap-height midline) with a mask/fade to the page colour so the cut reads as intentional.",
+    "confidence": 0.7,
+    "note": "the closing wordmark now sits on the page edge (7px of 197 cropped, was ~2.4vw)",
+    "verified_evidence": "vcold3 wordmark",
+    "verified_by": "vcold3 wordmark + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-351",
+    "status": "verified",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "fixed"
+      },
+      {
+        "at": "2026-09-16T05:00",
+        "from": "fixed",
+        "to": "verified"
+      }
+    ],
+    "source": "cold-3#11",
+    "section": "global",
+    "viewport": "1440, 390",
+    "severity": "P2",
+    "description": "The 404 page looks unfinished. It stacks both languages on top of each other — \"Page not found.\" in white with \"Page introuvable.\" in grey directly under it (order flipped at 390) — and offers two near-identical buttons, \"BACK TO THE SITE\" and \"RETOUR AU SITE\". The grey second line reads as placeholder/ghost text. There is also no header nav and no footer, and the whole block floats in the upper-middle with ~250px of dead space above and ~220px below at 1440.",
+    "evidence": [
+      "shots/global/p6/1440/404-nested.png",
+      "shots/global/p6/1440/404-status404.png",
+      "shots/global/p6/390/404.png"
+    ],
+    "suggested_fix": "Show one language (the one the visitor requested, with the standard EN/FR switch in the header) and one primary button. Keep the header and footer so the 404 is not a dead end, and centre the content block.",
+    "confidence": 0.7,
+    "verified_evidence": "vcold3: /fr/nope shows French only, /de still shows both",
+    "verified_by": "vcold3: /fr/nope shows French only, /de still shows both + final re-capture shots/*/p10: clean audit (no console errors, no axe violations, no overflow, every keyboard stop in view)"
+  },
+  {
+    "id": "UI-352",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#12",
+    "section": "projects",
+    "viewport": "1440, 1920",
+    "severity": "P2",
+    "description": "The Lead Finder app screenshot is cropped mid-component. At the bottom of the window frame (just above the \"01 · LEADS\" step bar) a white rounded card's top edge is sliced off by the frame — a thin light sliver of a UI element that continues nowhere. On a card that is explicitly labelled \"REAL APP SCREENS\" this reads as a sloppy screen grab.",
+    "evidence": [
+      "shots/projects/p6/1440/en-reduced-specs-open.png",
+      "shots/projects/p6/1440/cursor-tag.png",
+      "shots/global/p6/1920/en-reduced-fullpage.jpg"
+    ],
+    "suggested_fix": "Re-crop the source capture so the frame ends on a natural boundary (the end of the leads card, or a full empty gutter row), or add a bottom fade inside the window so the cut is deliberate.",
+    "confidence": 0.7,
+    "note": "OWNER ACTION: recrop of the Lead Finder capture (see the report)"
+  },
+  {
+    "id": "UI-353",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#13",
+    "section": "experience",
+    "viewport": "375, 1440, 1920",
+    "severity": "P3",
+    "description": "Date formats are inconsistent within one list. Work shows \"JUL — SEP 2026\", then \"2025 — 2026\", then \"FEB — MAY 2024\", then \"JUL — AUG 2023\"; Education shows \"2026 — 2031\" and then \"CLASS OF 2025\". Four different shapes in one column, which makes the timeline hard to scan and looks like data entered by hand. FR has the same problem (\"2025 — 2026\" vs \"FÉVR. — MAI 2024\").",
+    "evidence": [
+      "shots/global/p6/1440/en-reduced-fullpage.jpg",
+      "shots/experience/p6/375/fr-reduced-01.png",
+      "shots/experience/p6/1440/en-reduced-01.png"
+    ],
+    "suggested_fix": "Pick one format (e.g. \"MMM YYYY — MMM YYYY\", with \"PRESENT\" for ongoing) and apply it to every row including education; drop \"CLASS OF\" in favour of the same range shape.",
+    "confidence": 0.7,
+    "note": "OWNER ACTION: date formats are content"
+  },
+  {
+    "id": "UI-354",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#14",
+    "section": "skills",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "Two things in the chip-hover state. (1) The custom cursor renders as a grey ring that sits on top of the hovered chip's label and blots out the middle of the word — \"Python\" reads as \"Py○on\". (2) Directly below, the contact card is drawn as a bare bright grey/white 2px outlined rectangle with no fill and no content, ~1020x220px of empty box. Likely the scroll-reveal state captured mid-flight (capture artifact), but the resting card has a subtle dark border, so this intermediate frame reads as an unstyled placeholder and a visitor scrolling at normal speed will see it.",
+    "evidence": [
+      "shots/skills/p6/1440/chip-hover.png"
+    ],
+    "suggested_fix": "Give the cursor ring mix-blend-mode: difference (or shrink it / offset it) so it never covers a label, and start the contact-card reveal from the final border colour rather than a bright neutral.",
+    "confidence": 0.6,
+    "note": "cursor ring already reduced to 1.55; it is the site pointer treatment"
+  },
+  {
+    "id": "UI-355",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#15",
+    "section": "footer",
+    "viewport": "1280s, 844l vs 1440, 1920, 768, 375",
+    "severity": "P3",
+    "description": "The \"LOCAL TIME\" readout renders in two different formats depending on the capture: \"20:56\" at 1440/1920/768/375 (reduce-motion) but \"20:57:35\" / \"20:56:39\" at 1280s and 844l (motion). The seconds version is visibly wider and ticks continuously. If this is a reduce-motion accommodation it is undocumented and makes the footer meta row a different width on different machines; if it is not, it is a bug.",
+    "evidence": [
+      "shots/footer/p6/1440/en-reduced-00.png",
+      "shots/footer/p6/1280s/en-motion-00.png",
+      "shots/footer/p6/844l/fr-motion-00.png",
+      "shots/footer/p6/768/en-reduced-00.png"
+    ],
+    "suggested_fix": "Use HH:MM everywhere and reserve a fixed-width slot (tabular-nums) so the row never reflows. A ticking seconds counter adds nothing and is motion the user did not ask for.",
+    "confidence": 0.65,
+    "note": "HH:MM without ticking seconds is the reduced-motion variant, on purpose"
+  },
+  {
+    "id": "UI-356",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#16",
+    "section": "global",
+    "viewport": "1440",
+    "severity": "P3",
+    "description": "The \"SKIP TO CONTENT\" link is the only cream/white-filled control anywhere on the site — every other button is either solid orange or a dark outlined pill — and it renders on top of the \"GREGORY SUTJIAN\" wordmark rather than beside it. Its focus ring is also a different shape/offset from the ring used on hero buttons.",
+    "evidence": [
+      "shots/global/p6/1440/skip-link.png",
+      "shots/global/p6/1440/skip-link-after-enter.png",
+      "shots/global/p6/1440/en-motion-tab08.png"
+    ],
+    "suggested_fix": "Style the skip link as the standard outlined pill with the standard focus ring, and push the header contents down (or the link into the gutter) so it does not sit over the wordmark.",
+    "confidence": 0.6,
+    "note": "a high-contrast skip link is the accepted pattern"
+  },
+  {
+    "id": "UI-357",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#17",
+    "section": "about",
+    "viewport": "844l, 375, 390",
+    "severity": "P3",
+    "description": "EN/FR mismatch inside the datasheet card: the STATUS value \"Always learning\" fits on one line in EN, but FR \"Toujours en apprentissage\" wraps to two lines, making that one row visibly taller than MODÈLE / TYPE / ORIGINE above it and breaking the even row rhythm of the spec table. The orange status dot then sits on the first of two lines rather than optically centred.",
+    "evidence": [
+      "shots/about/p6/844l/fr-motion-01.png",
+      "shots/about/p6/375/fr-reduced-01.png",
+      "shots/about/p6/1440/datasheet-tilt.png"
+    ],
+    "suggested_fix": "Give the value column a fixed row height (or shorten the FR string to \"En apprentissage\"), and align the status dot to the block rather than the first line.",
+    "confidence": 0.6,
+    "note": "P3: the French status value wraps; shortening it is copy"
+  },
+  {
+    "id": "UI-358",
+    "status": "wontfix",
+    "found": "2026-09-16T01:29",
+    "history": [
+      {
+        "at": "2026-09-16T01:29",
+        "from": "open",
+        "to": "wontfix"
+      }
+    ],
+    "source": "cold-3#18",
+    "section": "focus",
+    "viewport": "1920, 1440, 1280s",
+    "severity": "P3",
+    "description": "Each Focus card carries a small grey filled square in its top-right corner, opposite the orange \"01 / 02 / 03\" index. It has no label, no hover affordance and no apparent meaning, and at this size it reads as a broken icon or a leftover debug marker.",
+    "evidence": [
+      "shots/focus/p6/1920/en-reduced-00.png",
+      "shots/focus/p6/1440/en-reduced-00.png",
+      "shots/focus/p6/1280s/fr-motion-01.png"
+    ],
+    "suggested_fix": "Remove it, or make it carry information (a real icon per domain, or a connector node that visibly joins the copper trace).",
+    "confidence": 0.55,
+    "note": "the small square is the panel's circuit node (lights on hover)"
   }
 ]

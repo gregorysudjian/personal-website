@@ -6,12 +6,12 @@ Branch `ui-qa-loop`, 2026-09-16. It's a single-page portfolio (EN/FR) checked at
 
 | | P0 | P1 | P2 | P3 | all |
 |---|---|---|---|---|---|
-| verified | 2 | 32 | 114 | 109 | 257 |
+| verified | 2 | 36 | 117 | 109 | 264 |
 | fixed | 0 | 0 | 0 | 0 | 0 |
 | open | 0 | 0 | 0 | 0 | 0 |
-| wontfix | 0 | 3 | 15 | 64 | 82 |
+| wontfix | 0 | 4 | 20 | 70 | 94 |
 | regressed | 0 | 0 | 0 | 0 | 0 |
-| **found** | 2 | 35 | 129 | 173 | 339 |
+| **found** | 2 | 40 | 137 | 179 | 358 |
 
 ## What this covered
 
@@ -33,14 +33,14 @@ Five things I did not change, because they are content or product calls:
 
 ## Before and after
 
-The screenshots live in `.ui-qa/shots/`. They're kept out of git and exist only on this machine. "Before" is pass 1, before any fix. "After" is pass 6.
+The screenshots live in `.ui-qa/shots/`. They're kept out of git and exist only on this machine. "Before" is pass 1, before any fix. "After" is pass 10.
 
 ### global
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-reduced-fullpage | <img src="shots/global/p1/390/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p6/390/en-reduced-fullpage.jpg" width="220"> |
-| 1440 · en-reduced-fullpage | <img src="shots/global/p1/1440/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p6/1440/en-reduced-fullpage.jpg" width="220"> |
+| 390 · en-reduced-fullpage | <img src="shots/global/p1/390/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p10/390/en-reduced-fullpage.jpg" width="220"> |
+| 1440 · en-reduced-fullpage | <img src="shots/global/p1/1440/en-reduced-fullpage.jpg" width="220"> | <img src="shots/global/p10/1440/en-reduced-fullpage.jpg" width="220"> |
 
 Targeted proof shots: [1440-404-focus.png](shots/global/p1-fix/1440-404-focus.png) · [1440-404.png](shots/global/p1-fix/1440-404.png) · [390-404-focus.png](shots/global/p1-fix/390-404-focus.png) · [390-404.png](shots/global/p1-fix/390-404.png) · [boot-skip-on-tab.png](shots/global/p1-fix/boot-skip-on-tab.png) · [deeplink-contact-390.png](shots/global/p1-fix/deeplink-contact-390.png) · [404-fr.png](shots/global/p2-fix/404-fr.png) · [404_de.png](shots/global/p2-fix/404_de.png) · [404_en_nope.png](shots/global/p2-fix/404_en_nope.png) · [404_fr_nope.png](shots/global/p2-fix/404_fr_nope.png) · [boot-normal-1600ms.png](shots/global/p2-fix/boot-normal-1600ms.png) · [boot-normal-3000ms.png](shots/global/p2-fix/boot-normal-3000ms.png)
 
@@ -48,9 +48,9 @@ Targeted proof shots: [1440-404-focus.png](shots/global/p1-fix/1440-404-focus.pn
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-menu-open | <img src="shots/nav/p1/390/en-motion-menu-open.png" width="220"> | <img src="shots/nav/p6/390/en-motion-menu-open.png" width="220"> |
-| 390 · en-motion-header-over-content | <img src="shots/nav/p1/390/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p6/390/en-motion-header-over-content.png" width="220"> |
-| 1440 · en-motion-header-over-content | <img src="shots/nav/p1/1440/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p6/1440/en-motion-header-over-content.png" width="220"> |
+| 390 · en-motion-menu-open | <img src="shots/nav/p1/390/en-motion-menu-open.png" width="220"> | <img src="shots/nav/p10/390/en-motion-menu-open.png" width="220"> |
+| 390 · en-motion-header-over-content | <img src="shots/nav/p1/390/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p10/390/en-motion-header-over-content.png" width="220"> |
+| 1440 · en-motion-header-over-content | <img src="shots/nav/p1/1440/en-motion-header-over-content.png" width="220"> | <img src="shots/nav/p10/1440/en-motion-header-over-content.png" width="220"> |
 
 Targeted proof shots: [390-menu-focus-ring.png](shots/nav/p1-fix/390-menu-focus-ring.png) · [568x320-fr-menu.png](shots/nav/p1-fix/568x320-fr-menu.png) · [667x375-fr-menu.png](shots/nav/p1-fix/667x375-fr-menu.png) · [focus-into-hidden-header.png](shots/nav/p1-fix/1440/focus-into-hidden-header.png) · [header-at-top.png](shots/nav/p1-fix/1440/header-at-top.png) · [header-over-content.png](shots/nav/p1-fix/1440/header-over-content.png)
 
@@ -58,10 +58,10 @@ Targeted proof shots: [390-menu-focus-ring.png](shots/nav/p1-fix/390-menu-focus-
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-atf | <img src="shots/hero/p1/390/en-motion-atf.png" width="220"> | <img src="shots/hero/p6/390/en-motion-atf.png" width="220"> |
-| 390 · fr-motion-atf | <img src="shots/hero/p1/390/fr-motion-atf.png" width="220"> | <img src="shots/hero/p6/390/fr-motion-atf.png" width="220"> |
-| 1440 · en-motion-atf | <img src="shots/hero/p1/1440/en-motion-atf.png" width="220"> | <img src="shots/hero/p6/1440/en-motion-atf.png" width="220"> |
-| 1440 · fr-motion-atf | <img src="shots/hero/p1/1440/fr-motion-atf.png" width="220"> | <img src="shots/hero/p6/1440/fr-motion-atf.png" width="220"> |
+| 390 · en-motion-atf | <img src="shots/hero/p1/390/en-motion-atf.png" width="220"> | <img src="shots/hero/p10/390/en-motion-atf.png" width="220"> |
+| 390 · fr-motion-atf | <img src="shots/hero/p1/390/fr-motion-atf.png" width="220"> | <img src="shots/hero/p10/390/fr-motion-atf.png" width="220"> |
+| 1440 · en-motion-atf | <img src="shots/hero/p1/1440/en-motion-atf.png" width="220"> | <img src="shots/hero/p10/1440/en-motion-atf.png" width="220"> |
+| 1440 · fr-motion-atf | <img src="shots/hero/p1/1440/fr-motion-atf.png" width="220"> | <img src="shots/hero/p10/1440/fr-motion-atf.png" width="220"> |
 
 Targeted proof shots: [1024x640-fr-atf.png](shots/hero/p1-fix/1024x640-fr-atf.png) · [1024x768-fr-hint.png](shots/hero/p1-fix/1024x768-fr-hint.png) · [1280x620-en-atf.png](shots/hero/p1-fix/1280x620-en-atf.png) · [1280x620-fr-atf.png](shots/hero/p1-fix/1280x620-fr-atf.png) · [1280x800-fr-hint.png](shots/hero/p1-fix/1280x800-fr-hint.png) · [1366x650-en-atf.png](shots/hero/p1-fix/1366x650-en-atf.png) · [568x320-fr.png](shots/hero/p2-fix/568x320-fr.png) · [667x375-en.png](shots/hero/p2-fix/667x375-en.png) · [720x450-en.png](shots/hero/p2-fix/720x450-en.png) · [740x360-fr.png](shots/hero/p2-fix/740x360-fr.png) · [844x390-fr.png](shots/hero/p2-fix/844x390-fr.png) · [932x430-en.png](shots/hero/p2-fix/932x430-en.png)
 
@@ -69,10 +69,10 @@ Targeted proof shots: [1024x640-fr-atf.png](shots/hero/p1-fix/1024x640-fr-atf.pn
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/statement/p1/390/en-motion-00.png" width="220"> | <img src="shots/statement/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/statement/p1/390/fr-motion-01.png" width="220"> | <img src="shots/statement/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/statement/p1/1440/en-motion-00.png" width="220"> | <img src="shots/statement/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/statement/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/statement/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/statement/p1/390/en-motion-00.png" width="220"> | <img src="shots/statement/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/statement/p1/390/fr-motion-01.png" width="220"> | <img src="shots/statement/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/statement/p1/1440/en-motion-00.png" width="220"> | <img src="shots/statement/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/statement/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/statement/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [375x667-en-reduced-pinned.png](shots/statement/p1-fix/375x667-en-reduced-pinned.png) · [740x360-fr-pinned.png](shots/statement/p1-fix/740x360-fr-pinned.png) · [844l-fr-pinned.png](shots/statement/p1-fix/844l-fr-pinned.png) · [844x390-fr-pinned.png](shots/statement/p1-fix/844x390-fr-pinned.png) · [932x430-fr-pinned.png](shots/statement/p1-fix/932x430-fr-pinned.png) · [1440-enter.png](shots/statement/p2-fix/1440-enter.png) · [1440-leave.png](shots/statement/p2-fix/1440-leave.png) · [1440-mid.png](shots/statement/p2-fix/1440-mid.png) · [390-enter.png](shots/statement/p2-fix/390-enter.png) · [390-leave.png](shots/statement/p2-fix/390-leave.png) · [390-mid.png](shots/statement/p2-fix/390-mid.png)
 
@@ -80,10 +80,10 @@ Targeted proof shots: [375x667-en-reduced-pinned.png](shots/statement/p1-fix/375
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/about/p1/390/en-motion-00.png" width="220"> | <img src="shots/about/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/about/p1/390/fr-motion-01.png" width="220"> | <img src="shots/about/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/about/p1/1440/en-motion-00.png" width="220"> | <img src="shots/about/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/about/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/about/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/about/p1/390/en-motion-00.png" width="220"> | <img src="shots/about/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/about/p1/390/fr-motion-01.png" width="220"> | <img src="shots/about/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/about/p1/1440/en-motion-00.png" width="220"> | <img src="shots/about/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/about/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/about/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-after-nav-about.png](shots/about/p2-fix/1440-after-nav-about.png) · [390-after-nav-about.png](shots/about/p2-fix/390-after-nav-about.png) · [768-after-nav-about.png](shots/about/p2-fix/768-after-nav-about.png)
 
@@ -91,10 +91,10 @@ Targeted proof shots: [1440-after-nav-about.png](shots/about/p2-fix/1440-after-n
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/focus/p1/390/en-motion-00.png" width="220"> | <img src="shots/focus/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/focus/p1/390/fr-motion-01.png" width="220"> | <img src="shots/focus/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/focus/p1/1440/en-motion-00.png" width="220"> | <img src="shots/focus/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/focus/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/focus/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/focus/p1/390/en-motion-00.png" width="220"> | <img src="shots/focus/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/focus/p1/390/fr-motion-01.png" width="220"> | <img src="shots/focus/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/focus/p1/1440/en-motion-00.png" width="220"> | <img src="shots/focus/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/focus/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/focus/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [320-code-window.png](shots/focus/p1-fix/320-code-window.png) · [390-code-window.png](shots/focus/p1-fix/390-code-window.png) · [1024x768.png](shots/focus/p2-fix/1024x768.png) · [1440x900.png](shots/focus/p2-fix/1440x900.png) · [768x1024.png](shots/focus/p2-fix/768x1024.png)
 
@@ -102,10 +102,10 @@ Targeted proof shots: [320-code-window.png](shots/focus/p1-fix/320-code-window.p
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/projects/p1/390/en-motion-00.png" width="220"> | <img src="shots/projects/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/projects/p1/390/fr-motion-01.png" width="220"> | <img src="shots/projects/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/projects/p1/1440/en-motion-00.png" width="220"> | <img src="shots/projects/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/projects/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/projects/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/projects/p1/390/en-motion-00.png" width="220"> | <img src="shots/projects/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/projects/p1/390/fr-motion-01.png" width="220"> | <img src="shots/projects/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/projects/p1/1440/en-motion-00.png" width="220"> | <img src="shots/projects/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/projects/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/projects/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-broken-image-fallback.png](shots/projects/p1-fix/1440-broken-image-fallback.png) · [fr-card2-titlebar.png](shots/projects/p1-fix/1440/fr-card2-titlebar.png) · [slides-held-on-hover.png](shots/projects/p1-fix/1440/slides-held-on-hover.png) · [fr-card2-titlebar.png](shots/projects/p1-fix/375/fr-card2-titlebar.png) · [1440-card1.png](shots/projects/p2-fix/1440-card1.png) · [1440-card2.png](shots/projects/p2-fix/1440-card2.png) · [1440-order.png](shots/projects/p2-fix/1440-order.png) · [1440r-card1.png](shots/projects/p2-fix/1440r-card1.png) · [1440r-card2.png](shots/projects/p2-fix/1440r-card2.png) · [390-card1.png](shots/projects/p2-fix/390-card1.png)
 
@@ -113,10 +113,10 @@ Targeted proof shots: [1440-broken-image-fallback.png](shots/projects/p1-fix/144
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/experience/p1/390/en-motion-00.png" width="220"> | <img src="shots/experience/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/experience/p1/390/fr-motion-01.png" width="220"> | <img src="shots/experience/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/experience/p1/1440/en-motion-00.png" width="220"> | <img src="shots/experience/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/experience/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/experience/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/experience/p1/390/en-motion-00.png" width="220"> | <img src="shots/experience/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/experience/p1/390/fr-motion-01.png" width="220"> | <img src="shots/experience/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/experience/p1/1440/en-motion-00.png" width="220"> | <img src="shots/experience/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/experience/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/experience/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [768-fr-rows.png](shots/experience/p1-fix/768-fr-rows.png) · [844l-experience.png](shots/experience/p1-fix/844l-experience.png)
 
@@ -124,9 +124,9 @@ Targeted proof shots: [768-fr-rows.png](shots/experience/p1-fix/768-fr-rows.png)
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/skills/p1/390/en-motion-00.png" width="220"> | <img src="shots/skills/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/skills/p1/390/fr-motion-01.png" width="220"> | <img src="shots/skills/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/skills/p1/1440/en-motion-00.png" width="220"> | <img src="shots/skills/p6/1440/en-motion-00.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/skills/p1/390/en-motion-00.png" width="220"> | <img src="shots/skills/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/skills/p1/390/fr-motion-01.png" width="220"> | <img src="shots/skills/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/skills/p1/1440/en-motion-00.png" width="220"> | <img src="shots/skills/p10/1440/en-motion-00.png" width="220"> |
 
 Targeted proof shots: [768-fr-chip-tapped.png](shots/skills/p1-fix/768-fr-chip-tapped.png) · [844l-skills.png](shots/skills/p1-fix/844l-skills.png)
 
@@ -134,10 +134,10 @@ Targeted proof shots: [768-fr-chip-tapped.png](shots/skills/p1-fix/768-fr-chip-t
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/contact/p1/390/en-motion-00.png" width="220"> | <img src="shots/contact/p6/390/en-motion-00.png" width="220"> |
-| 390 · fr-motion-01 | <img src="shots/contact/p1/390/fr-motion-01.png" width="220"> | <img src="shots/contact/p6/390/fr-motion-01.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/contact/p1/1440/en-motion-00.png" width="220"> | <img src="shots/contact/p6/1440/en-motion-00.png" width="220"> |
-| 1440 · fr-motion-01 | <img src="shots/contact/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/contact/p6/1440/fr-motion-01.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/contact/p1/390/en-motion-00.png" width="220"> | <img src="shots/contact/p10/390/en-motion-00.png" width="220"> |
+| 390 · fr-motion-01 | <img src="shots/contact/p1/390/fr-motion-01.png" width="220"> | <img src="shots/contact/p10/390/fr-motion-01.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/contact/p1/1440/en-motion-00.png" width="220"> | <img src="shots/contact/p10/1440/en-motion-00.png" width="220"> |
+| 1440 · fr-motion-01 | <img src="shots/contact/p1/1440/fr-motion-01.png" width="220"> | <img src="shots/contact/p10/1440/fr-motion-01.png" width="220"> |
 
 Targeted proof shots: [1440-copy-focus-copied.png](shots/contact/p1-fix/1440-copy-focus-copied.png) · [1440-tab-to-email-fresh-load.png](shots/contact/p1-fix/1440-tab-to-email-fresh-load.png) · [375-tab-to-email-fresh-load.png](shots/contact/p1-fix/375-tab-to-email-fresh-load.png) · [844l-contact.png](shots/contact/p1-fix/844l-contact.png) · [fr-320-email.png](shots/contact/p1-fix/fr-320-email.png) · [fr-320-heading.png](shots/contact/p1-fix/fr-320-heading.png)
 
@@ -145,8 +145,8 @@ Targeted proof shots: [1440-copy-focus-copied.png](shots/contact/p1-fix/1440-cop
 
 | viewport | before | after |
 |---|---|---|
-| 390 · en-motion-00 | <img src="shots/footer/p1/390/en-motion-00.png" width="220"> | <img src="shots/footer/p6/390/en-motion-00.png" width="220"> |
-| 1440 · en-motion-00 | <img src="shots/footer/p1/1440/en-motion-00.png" width="220"> | <img src="shots/footer/p6/1440/en-motion-00.png" width="220"> |
+| 390 · en-motion-00 | <img src="shots/footer/p1/390/en-motion-00.png" width="220"> | <img src="shots/footer/p10/390/en-motion-00.png" width="220"> |
+| 1440 · en-motion-00 | <img src="shots/footer/p1/1440/en-motion-00.png" width="220"> | <img src="shots/footer/p10/1440/en-motion-00.png" width="220"> |
 
 Targeted proof shots: [768-fr.png](shots/footer/p1-fix/768-fr.png)
 
@@ -193,6 +193,11 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-320 | P1 | nav | verified | The sticky header has no opaque background or backdrop blur, so page content scrolls straight underneath it and prints on top of the nav. At 1440 (projects specs-open) the word CONTACT sits directly on the sentence 'Ever… | dbg-scrim |
 | UI-321 | P1 | hero | verified | In landscape (844x390) the hero tagline is gone entirely. On every other viewport the hero reads eyebrow -> GREGORY SUTJIAN -> 'I like building things, from AI agents to full websites, and I'm always up for learning some… | shots/hero/p4-fix/844x390-fr-name.png (tagline as one clamped line) |
 | UI-322 | P1 | footer | wontfix | The giant outlined SUTJIAN wordmark at the very bottom of the page is sliced off mid-glyph by the end of the document on every single viewport. At 1440 the letters are cut roughly at their waist - you see the top ~60% of… | the cropped wordmark is a deliberate bleed (UI-119/120/312) |
+| UI-340 | P1 | nav | verified | The sticky header has no opaque or blurred backdrop, so body copy scrolls visibly through it and collides with the nav links. Worst case: projects specs-open at 1440, where the bullet "Every demo site gets its own design… | dbg-hdr2 in the exact specs-open state: is-scrolled true, backdrop opacity 1 at 1440 and 390; shots/nav/p6-fix/*-specs-open.png |
+| UI-341 | P1 | hero | verified | In landscape (844x390) the hero tagline — the one sentence that says who he is — is line-clamped to a single line and truncated with an ellipsis, in BOTH languages. EN reads "I like building things, from AI agents to ful… | vcold3 844x390: tagline two lines (EN complete, FR clamped at 2), name 72px, 13px clear of the bottom row; shots/hero/p6-fix/844x390-fr.png |
+| UI-342 | P1 | focus | wontfix | The Focus section lives in a container far narrower than every other section, leaving a giant dead column on the right. At 1920 the cards end at x≈1157, so 763px — 40% of the screen — is empty black beside all three card… | the sideways panels are a track that scrolls through that space; at the end of the track the last panel sits on the right gutter (measured 1866 of 1920) |
+| UI-343 | P1 | focus | verified | On the short laptop the Focus section becomes a horizontal carousel whose cards bleed past both viewport edges with no gutter and no fade, so body copy is sliced mid-word at the right edge: "J'utilise chaque jour des out… | vcold3 focusMask; shots/focus/p6-fix/1280s-edges.png |
+| UI-344 | P1 | global | verified | The first-visit boot intro shows a blank page. At 390 the 1700ms frame is a completely empty black screen — no logo, no progress line, no hero, just a faint horizontal band — so on a phone the visitor stares at nothing f… | vcold3 boot: mark visible at 900ms and 1500ms, gone only as the screen opens (1900ms) |
 | UI-002 | P2 | nav | verified | When the header slides back in mid-page (scroll up), its gradient backdrop is too transparent: body copy runs straight through the logo and EN/FR/Menu, looking cluttered. | shots/nav/p1-fix/390/header-over-content.png,shots/nav/p1-fix/1440/header-over-content.png |
 | UI-004 | P2 | projects | verified | Inactive slide tab labels (text-paper/45, 0.6rem ≈ 9.6px) fail contrast (axe color-contrast serious). | axe 375/1440 reduced: 0 violations |
 | UI-005 | P2 | projects | verified | Preview window title bar truncates the slug ('WHATSAPP-AI-AGE…') because the traffic-light dots + badge leave too little room on phones. | shots/projects/p1-fix/375/fr-card2-titlebar.png |
@@ -322,6 +327,14 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-332 | P2 | contact | wontfix | The email address is styled as two different components depending on viewport. At 375/390/768 'gregory.sutjian@mail.mcgill.ca' carries a link underline; at 1440/1920 the identical element in the identical settled state h… | on touch there is no hover to reveal the underline, so it shows at rest (UI-035) |
 | UI-333 | P2 | global | wontfix | The first-visit intro passes through a frame that looks like a rendering failure. At boot-900ms the word GREGORY is sliced by a hard horizontal edge at y~480 - only the top halves of the letters are drawn, with the botto… | a mid-flight frame of the intro: the letters rise behind their mask |
 | UI-334 | P2 | nav | verified | The keyboard focus ring on the language switcher is a hard-cornered rectangle drawn around BOTH 'EN' and 'FR' (tab07), so a keyboard user cannot tell which of the two is focused. Every other focus ring on the site is a r… | the switch is one link (both codes); its ring is now a pill like the others |
+| UI-345 | P2 | projects | wontfix | The four project cards are not the same component. Lead Finder and Clarté Math get a step/filmstrip bar ("01 · LEADS  02 · DESIGNS  03 · DEMO") plus a caption under the mock and a "VIEW WEBSITE" CTA; WhatsApp AI Agent an… | OWNER ACTION: two projects have no public link; a consistent footer row is a content decision (see the report) |
+| UI-346 | P2 | projects | wontfix | The WhatsApp AI Agent mock is mostly empty. The chat column is bottom-anchored inside a tall panel, so there is ~190px of blank black between the "Commerce démo · Assistant" title bar and the first message bubble, and th… | a chat thread sits at the bottom of its panel; the demo rests on the full conversation |
+| UI-347 | P2 | contact | wontfix | The contact card is centred in the viewport but all of its content is left-aligned inside it, so the right ~45% of the card is completely empty. The heading, the paragraph (max ~3 lines ending well short of the edge), th… | left-aligned content in a centred card is the section's editorial layout |
+| UI-348 | P2 | nav | wontfix | The full-screen mobile menu wastes its top half and its state indicators look random. The four items are bottom-anchored, leaving ~440px of the 844px overlay (over half the screen) completely empty. The small leading das… | the menu is anchored low on purpose (thumb reach); the uneven dashes are DPR-1 rendering |
+| UI-349 | P2 | hero | verified | On the short laptop the hero collapses. The name shrinks to ~500px wide inside a 1280px viewport, so 60% of the width beside "GREGORY / SUTJIAN" is empty, and there is a ~145px void between the header and the "GÉNIE INFO… | vcold3 1280x620: name 77.5 → 107.5px, 52px clear of the bottom row (EN) and 29px (FR); shots/hero/p6-fix/1280x620-en.png |
+| UI-350 | P2 | footer | verified | The giant outlined "SUTJIAN" wordmark that closes the page is cut off mid-letter at the very bottom of the document — not just the viewport. In the stitched full-page capture at 1440 the letters are sliced roughly 55% do… | vcold3 wordmark |
+| UI-351 | P2 | global | verified | The 404 page looks unfinished. It stacks both languages on top of each other — "Page not found." in white with "Page introuvable." in grey directly under it (order flipped at 390) — and offers two near-identical buttons,… | vcold3: /fr/nope shows French only, /de still shows both |
+| UI-352 | P2 | projects | wontfix | The Lead Finder app screenshot is cropped mid-component. At the bottom of the window frame (just above the "01 · LEADS" step bar) a white rounded card's top edge is sliced off by the frame — a thin light sliver of a UI e… | OWNER ACTION: recrop of the Lead Finder capture (see the report) |
 | UI-008 | P3 | hero | verified | Hero eyebrow wraps to a lone 'UNIVERSITY' on the second line at 375px (orphan). | shots/hero/p1-fix/375/fr-reduced-atf.png |
 | UI-022 | P3 | contact | verified | The Copy pill changes shape on keyboard focus. The global `:focus-visible { border-radius: 2px }` is unlayered CSS, so it beats Tailwind v4's `rounded-full`, which lives in @layer utilities. The measured computed radius … | verify-bottom copy radius stays pill on focus |
 | UI-023 | P3 | footer | verified | The '↑' in 'Back to top ↑' / 'Haut de page ↑' is part of the button's accessible name (ariaSnapshot: `button "Back to top ↑"`), so screen readers say 'Back to top, upwards arrow'. This is inconsistent with Contact and He… | `{t(footer.backToTop, locale)} <span aria-hidden="true">↑</span>` |
@@ -495,3 +508,9 @@ None were deleted. Duplicates were merged into their first report (`also_reporte
 | UI-337 | P3 | footer | wontfix | In the footer meta row the three static items (c 2026 GREGORY SUTJIAN / MADE IN MONTREAL / LOCAL TIME 19:37) sit on rows 681-688 while BACK TO TOP sits on 682-690 - about 2px lower and 1px larger, so the only interactive… | P3 baseline nit |
 | UI-338 | P3 | experience | verified | Each experience row uses a date column roughly 340px wide to hold ~120px of text ('JUL - SEP 2026' ends at x=175, the job title does not start until x=396), so every row carries a 220px empty gutter between the date and … | date column 2/12, text 6/12 at lg |
 | UI-339 | P3 | global | verified | The custom cursor is a ~64px orange ring with no pointer tip, and it is drawn over the element it is pointing at rather than around it. On the hero CTA the ring's stroke cuts straight through the button label ('VIEW PROJ… | hover ring 1.9 → 1.55 |
+| UI-353 | P3 | experience | wontfix | Date formats are inconsistent within one list. Work shows "JUL — SEP 2026", then "2025 — 2026", then "FEB — MAY 2024", then "JUL — AUG 2023"; Education shows "2026 — 2031" and then "CLASS OF 2025". Four different shapes … | OWNER ACTION: date formats are content |
+| UI-354 | P3 | skills | wontfix | Two things in the chip-hover state. (1) The custom cursor renders as a grey ring that sits on top of the hovered chip's label and blots out the middle of the word — "Python" reads as "Py○on". (2) Directly below, the cont… | cursor ring already reduced to 1.55; it is the site pointer treatment |
+| UI-355 | P3 | footer | wontfix | The "LOCAL TIME" readout renders in two different formats depending on the capture: "20:56" at 1440/1920/768/375 (reduce-motion) but "20:57:35" / "20:56:39" at 1280s and 844l (motion). The seconds version is visibly wide… | HH:MM without ticking seconds is the reduced-motion variant, on purpose |
+| UI-356 | P3 | global | wontfix | The "SKIP TO CONTENT" link is the only cream/white-filled control anywhere on the site — every other button is either solid orange or a dark outlined pill — and it renders on top of the "GREGORY SUTJIAN" wordmark rather … | a high-contrast skip link is the accepted pattern |
+| UI-357 | P3 | about | wontfix | EN/FR mismatch inside the datasheet card: the STATUS value "Always learning" fits on one line in EN, but FR "Toujours en apprentissage" wraps to two lines, making that one row visibly taller than MODÈLE / TYPE / ORIGINE … | P3: the French status value wraps; shortening it is copy |
+| UI-358 | P3 | focus | wontfix | Each Focus card carries a small grey filled square in its top-right corner, opposite the orange "01 / 02 / 03" index. It has no label, no hover affordance and no apparent meaning, and at this size it reads as a broken ic… | the small square is the panel's circuit node (lights on hover) |
