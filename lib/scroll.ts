@@ -34,7 +34,7 @@ export function isAutoScrolling() {
   return autoScrolling;
 }
 
-export function scrollToTarget(target: string | number | HTMLElement, push = false) {
+export function scrollToTarget(target: string | number | HTMLElement, push = false, duration = 1.6) {
   const el = typeof target === "number" ? null : typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
   // Section links keep the address shareable (#projects); from the nav they also add a history entry,
   // so Back walks back through the sections the visitor jumped to.
@@ -48,7 +48,7 @@ export function scrollToTarget(target: string | number | HTMLElement, push = fal
   if (lenis) {
     autoScrolling = true;
     lenis.scrollTo(target, {
-      duration: 1.6,
+      duration,
       easing: (x) => 1 - Math.pow(1 - x, 4),
       onComplete: () => (autoScrolling = false),
     });

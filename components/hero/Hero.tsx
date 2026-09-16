@@ -140,8 +140,10 @@ export default function Hero({ locale }: { locale: Locale }) {
       );
 
       /* ---------- a keyboard user tabbing back into the hero gets it back in full ---------- */
+      // Short on purpose: the visitor may keep tabbing, and a long scroll would still be running
+      // when the next control asks to be brought into view.
       const onFocus = () => {
-        if (window.scrollY > 0 && root.current!.querySelector(":focus-visible")) scrollToTarget(0);
+        if (window.scrollY > 0 && root.current!.querySelector(":focus-visible")) scrollToTarget(0, false, 0.5);
       };
       root.current!.addEventListener("focusin", onFocus);
 

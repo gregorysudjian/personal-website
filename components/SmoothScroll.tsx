@@ -9,7 +9,7 @@ declare global {
     __gsReady?: boolean;
   }
 }
-import { clearCarry, jumpTo, readAnchor, readSaved, saveAnchor, scrollToTarget, setLenis, type Anchor } from "@/lib/scroll";
+import { clearCarry, getLenis, jumpTo, readAnchor, readSaved, saveAnchor, scrollToTarget, setLenis, type Anchor } from "@/lib/scroll";
 
 /** Smooth, weighted scrolling on desktop, kept in sync with GSAP's clock.
  *  Touch devices keep native scrolling (it already feels right, and never lags). */
@@ -84,7 +84,11 @@ export default function SmoothScroll() {
       if (!el?.getBoundingClientRect || !el.matches(":focus-visible")) return;
       const r = el.getBoundingClientRect();
       if (r.bottom > 80 && r.top < window.innerHeight - 20) return;
-      el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+      // Through Lenis, so it replaces any smooth scroll still running (a plain scrollIntoView would be
+      // overridden a frame later); otherwise the browser's own.
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(el, { offset: -(window.innerHeight / 2 - r.height / 2), duration: 0.35, force: true });
+      else el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
     };
     document.addEventListener("focusin", onFocusIn);
 
