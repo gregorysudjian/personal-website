@@ -23,7 +23,7 @@ export const person = {
   timezone: "America/Toronto", // Montreal time
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/gregorysutjian" },
-    { label: "GitHub", href: "https://github.com/gregorysudjian-ui" },
+    { label: "GitHub", href: "https://github.com/gregorysudjian" },
   ],
   // Photo shown in the datasheet card (About section). Put the file in /public/images/.
   photo: {
@@ -226,9 +226,10 @@ export type Project = {
 };
 
 const soloBuild = { en: "Solo project, AI-assisted", fr: "Projet solo, assisté par IA" };
-// All project repos are private, so there are no "View code" links. To add one back:
-// { label: { en: "View code", fr: "Voir le code" }, href: "https://github.com/..." }
 const viewSite = { en: "View website", fr: "Voir le site" };
+// Every project repo is public, so each card links to its code on GitHub.
+const viewCode = { en: "View code", fr: "Voir le code" };
+const repo = (name: string) => `https://github.com/gregorysudjian/${name}`;
 
 export const projects = {
   label: { en: "Projects", fr: "Projets" },
@@ -355,7 +356,10 @@ export const projects = {
           },
         ],
       },
-      links: [{ label: viewSite, href: "https://ai-lead-agent-lac.vercel.app" }],
+      links: [
+        { label: viewSite, href: "https://ai-lead-agent-lac.vercel.app" },
+        { label: viewCode, href: repo("ai-lead-agent") },
+      ],
     },
     {
       slug: "whatsapp-ai-agent",
@@ -397,7 +401,7 @@ export const projects = {
       },
       preview: "chat",
       media: null,
-      links: [],
+      links: [{ label: viewCode, href: repo("whatsapp-ai-agent") }],
     },
     {
       slug: "clarte-math",
@@ -469,7 +473,10 @@ export const projects = {
           },
         ],
       },
-      links: [{ label: viewSite, href: "https://clarte-math.vercel.app" }],
+      links: [
+        { label: viewSite, href: "https://clarte-math.vercel.app" },
+        { label: viewCode, href: repo("clarte-math") },
+      ],
     },
     {
       slug: "personal-website",
@@ -515,7 +522,7 @@ export const projects = {
         mobile: { en: "/projects/site-en-m.webp", fr: "/projects/site-fr-m.webp" },
         alt: { en: "The opening screen of this website", fr: "L'écran d'ouverture de ce site" },
       },
-      links: [],
+      links: [{ label: viewCode, href: repo("personal-website") }],
     },
   ] satisfies Project[],
 };
